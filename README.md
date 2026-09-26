@@ -12,7 +12,7 @@ Built for IBM Bob 2.0. Bob's free lifecycle hooks record every write; Whyline tu
 ```sh
 npm install -g SAL-Sovereign-AI-Labs/whyline   # from GitHub (npm release coming: npm install -g whyline)
 cd your-repo
-whyline init                  # writes .bob/ (hooks, a mode, skills) and git hooks
+whyline init                  # writes .bob/ (hooks and skills) and git hooks
 git add .bob && git commit -m "add whyline"
 ```
 
@@ -36,14 +36,14 @@ active --(condition met: date passed, or no references left)--> due --(you decid
 ```
 `active` and `due` are recomputed from the repo on every `check`, so they never go stale. `kept` and `removed` are recorded decisions. Bob never changes a state on its own.
 
-In Bob: `/whyline-check` lists due items, and in the `whyline-remover` mode you say "remove the mock payment gateway"; Bob finds the item, shows evidence, and asks for your approval.
+In Bob, in normal Agent mode: ask "why does this line exist?", say "remove the mock payment gateway", or "keep the beta flag until Q1". The installed skills run the right whyline command; removals end in Bob's own approval prompt.
 
 ## How it works
 
 1. `UserPromptSubmit` and `PostToolUse` hooks record the prompt and the exact lines each write touched (`.git/whyline/session.jsonl`).
 2. On commit, a git hook compares what the agent wrote with what was committed: `ai`, `ai-edited`, or human. It attaches one JSON note to the commit on `refs/notes/whyline`. Nothing lands in your working tree.
 3. Writes that look temporary (mock, demo, flag, shim, fixture, "until ...") become items with a removal condition: a date, or "no references left".
-4. `whyline check` evaluates the conditions. Removal happens in Bob, through its normal approval prompt.
+4. `whyline check` evaluates the conditions. Removal happens in Bob through the whyline-remove skill and Bob's normal approval prompt.
 
 Costs 0 Bobcoins. Hooks are deterministic; Bob is only used for removals.
 

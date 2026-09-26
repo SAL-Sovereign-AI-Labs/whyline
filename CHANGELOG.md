@@ -5,7 +5,7 @@ All notable changes to this project are documented here. Format: Keep a Changelo
 ## [Unreleased]
 
 ### Added
-- `whyline init`: installs Bob lifecycle hooks, the `whyline-remover` mode, skills, and git hooks.
+- `whyline init`: installs Bob lifecycle hooks, six skills (why, check, decide, remove, setup, status), and git hooks. No custom mode: everything works in Agent mode.
 - `whyline capture`: records prompts and exact written line ranges from Bob hook payloads; the adapter registry is ready for other agents.
 - `whyline commit`: attaches a provenance note (`refs/notes/whyline`) to each commit, classifying ranges as `ai` or `ai-edited`.
 - `whyline why <file>:<line>`: origin, session, prompt, cost, siblings and temporary item for a line.

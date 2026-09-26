@@ -20,4 +20,4 @@ Trigger phrases: "what AI code is unreviewed", "what did the AI write in this re
 ## Output template
 For **unreviewed**: a table of file, AI lines, coverage (worst first), then the totals line.
 For **bom**: one table with rows: lines changed, AI lines (with % of lines changed), by agent, reviewed (with % of AI lines), tested, active items, due items, removed items, cost ("n of m sessions"); then list any missing data fields.
-End with one next command: `whyline why <file>:<line>` to trace a specific line, or tell the user to say "remove `<id>`" in whyline-remover mode when any items are due.
+End with one next command: `whyline why <file>:<line>` to trace a specific line, or tell the user to say "remove `<id>`" with the whyline-remove skill when any items are due.

@@ -114,7 +114,7 @@ input.search{border:1px solid var(--line);background:var(--card);color:var(--ink
     <div class="row2">
       <div class="card"><h3>By agent</h3><table id="agentTable"></table></div>
       <div class="card"><h3>Needs a human</h3><table id="needsHumanTable"></table>
-        <div class="howto">In Bob IDE say <code>remove &lt;id&gt;</code> (mode whyline-remover). In a terminal: <code>whyline check</code>, <code>whyline why &lt;file&gt;:&lt;line&gt;</code>.</div>
+        <div class="howto">In Bob IDE (Agent mode) say <code>remove &lt;file name&gt;</code>. In a terminal: <code>whyline check</code>, <code>whyline why &lt;file&gt;:&lt;line&gt;</code>.</div>
       </div>
     </div>
     <div class="row3">
@@ -376,7 +376,7 @@ document.getElementById('needsHumanTable').innerHTML = nhHtml;
   var removed = other.filter(function(it) { return it.state === 'removed'; });
   var el = document.getElementById('ovLastRemoval');
   if (!removed.length) {
-    el.innerHTML = '<p class="muted" style="margin:0">nothing removed yet (say <code>remove &lt;id&gt;</code> in the whyline-remover mode)</p>';
+    el.innerHTML = '<p class="muted" style="margin:0">nothing removed yet (say <code>remove &lt;file name&gt;</code> to Bob when an item is due)</p>';
     return;
   }
   // pick the one with the latest `at` timestamp

@@ -60,4 +60,4 @@ Run `whyline check --json` again and find the item. Show its new condition and s
 - Show null values as "no data", never as 0.
 - Trust the CLI output over any note in context.
 - These commands change recorded state in git notes. They are not reversible with a simple undo. Say so in the confirmation prompt.
-- Do not use this skill to remove items; that is handled by the whyline-remover mode.
+- Do not use this skill to remove items; that is handled by the whyline-remove skill.

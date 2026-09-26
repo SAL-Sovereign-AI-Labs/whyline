@@ -36,4 +36,4 @@ commit   <short hash>
 - Omit the `item` line when `item` is null.
 - Omit the `cost` segment when cost is null.
 - Omit the `siblings` line when the siblings array is empty.
-- End with one next command: `whyline check` to see all temporary items, or tell the user to say "remove `<item.id>`" in whyline-remover mode if the item status is `due`.
+- End with one next command: `whyline check` to see all temporary items, or tell the user to say "remove `<item.id>`" with the whyline-remove skill if the item status is `due`.

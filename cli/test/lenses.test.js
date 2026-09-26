@@ -90,12 +90,12 @@ test('coverage parsers: lcov and cobertura agree on a small sample', () => {
   assert.deepEqual(coverage.forLines({ files: lcov }, 'src/a.js', [1, 2, 3]), { covered: 1, measured: 2 });
 });
 
-test('session-start names the due item and the remover mode, and mentions unreviewed lines', () => {
+test('session-start names the due item and the remove skill, and mentions unreviewed lines', () => {
   const dir = repo();
   agentWrite(dir, 'demo_seed.py', 'def seed():\n    pass\n', 's3', 'Add a demo seed script.');
   git(dir, ['add', '.']); git(dir, ['commit', '-q', '-m', 'seed']); assert.ok(commit.run(dir).attached);
   const out = cli(dir, ['session-start']).stdout;
-  assert.match(out, /due for removal: demo_seed\.py \(L-[0-9a-f]{6}\)\. To act, switch to the whyline-remover mode and say "remove demo_seed\.py"/);
+  assert.match(out, /due for removal: demo_seed\.py \(L-[0-9a-f]{6}\)\. To act, say "remove demo_seed\.py" and the whyline-remove skill will guide the removal/);
   assert.match(out, /2 AI-written line\(s\) in 1 file\(s\)/);
 });
 

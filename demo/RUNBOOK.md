@@ -22,7 +22,7 @@ Say: "Weeks later, anyone can ask why. The prompt is the documentation. It also 
 
 ## Act 4: the lifecycle, and Bob removes with approval (1:10 to 2:10)
 Screen: `whyline check` (one item already due: the demo script nobody references). Then `git merge payments-v2`, the post-merge hook runs `whyline check`: the mock is now due.
-Then in Bob IDE: switch to the whyline-remover mode and type `remove the mock payment gateway`.
+Then in Bob IDE, Agent mode, a new task: type `remove the mock payment gateway`.
 What happens: Bob runs `whyline check --json`, greps for the symbol, removes the ranges, runs pytest, shows the evidence table, asks for approval. Approve. Bob commits.
 Say: "Whyline never guesses. The condition was recorded at birth: no references left. The merge made it true. Bob gathers the evidence, and a human approves. Nothing is deleted on its own."
 
@@ -32,7 +32,7 @@ Say: "For the lead: AI lines no human has edited since they were written, with t
 
 ## Act 6: the bill of materials and the report (2:35 to 3:00)
 Screen: `whyline bom` (the demo has no tags, so this covers the whole history) and the report page.
-Say: "For the release manager: how much of this release is AI, how much was reviewed, what temporary code shipped, what it cost. It ships as a Bob plugin: hooks, a custom mode, skills. With enforced hooks an organisation makes provenance mandatory. Speed with control."
+Say: "For the release manager: how much of this release is AI, how much was reviewed, what temporary code shipped, what it cost. It ships as Bob hooks and skills. With enforced hooks an organisation makes provenance mandatory. Speed with control."
 
 ## Reset
 `demo/reset.sh` rebuilds `~/projects/whyline-demo-shop` from scratch. Bob's own task history is not touched.

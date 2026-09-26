@@ -62,7 +62,7 @@ function sessionCost(session) {
   return null;
 }
 
-// Writes .bob/ (hooks merged into settings.json, mode, rules, skills) and the shared hook entry script.
+// Writes .bob/ (hooks merged into settings.json, skills) and the shared hook entry script.
 function installInto(root) {
   const dst = path.join(root, CONFIG_DIR);
   const written = install.copyTree(ASSETS, dst, ['settings.json']);

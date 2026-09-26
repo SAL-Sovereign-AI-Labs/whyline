@@ -79,7 +79,7 @@ function dispatch(argv) {
         const lenses = require('./lib/lenses');
         const r = lenses.check(cwd);
         const parts = [];
-        if (r.due.length) parts.push(`${r.due.length} temporary item(s) due for removal: ${r.due.map(i => `${i.file} (${i.id})`).join(', ')}. To act, switch to the whyline-remover mode and say "remove ${r.due[0].file.split('/').pop()}"`);
+        if (r.due.length) parts.push(`${r.due.length} temporary item(s) due for removal: ${r.due.map(i => `${i.file} (${i.id})`).join(', ')}. To act, say "remove ${r.due[0].file.split('/').pop()}" and the whyline-remove skill will guide the removal`);
         const u = lenses.unreviewed(cwd);
         if (u.totals.aiLines) parts.push(`${u.totals.aiLines} AI-written line(s) in ${u.totals.files} file(s) have had no human edit since (run: whyline unreviewed)`);
         if (parts.length) process.stdout.write(`whyline: ${parts.join('. ')}\n`);
@@ -215,7 +215,7 @@ function printCheck(r) {
   section('ACTIVE', r.active);
   section('DECIDED', r.other.map(it => ({ ...it, evidence: { summary: `${it.state}${it.reason ? ': ' + it.reason : ''}` } })));
   const c = r.counts;
-  const next = r.due.length ? `Next: in Bob's whyline-remover mode say "remove ${r.due[0].file.split('/').pop()}", or whyline keep <file> "<reason>", or whyline why <file>:<line>` : 'Nothing is due.';
+  const next = r.due.length ? `Next: tell Bob "remove ${r.due[0].file.split('/').pop()}", or whyline keep <file> "<reason>", or whyline why <file>:<line>` : 'Nothing is due.';
   console.log(`${c.active} active, ${c.due} due, ${c.kept} kept, ${c.removed} removed. ${next}`);
 }
 
