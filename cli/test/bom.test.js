@@ -65,7 +65,7 @@ test('bom over the whole fixture: lines, AI by agent, reviewed, tested, items, c
   assert.equal(r.range, `${fx.base}..${fx.c3}`);
   assert.equal(r.linesChanged, 12, 'added lines: 4 + 3 + 3 + 2');
   assert.deepEqual(r.ai, { total: 7, byAgent: { bob: 7 } });
-  assert.deepEqual(r.reviewed, { lines: 1, percent: 14 }, 'the ai-edited line counts as reviewed');
+  assert.deepEqual(r.reviewed, { lines: 1, percent: 14, unreviewedLines: 6 }, 'the ai-edited line counts as reviewed');
   assert.deepEqual(r.tested, { lines: null, percent: null }, 'no coverage file: null, never zero');
   assert.deepEqual(r.items, { active: 1, due: 0, removed: 0 });
   assert.deepEqual(r.cost, { sum: null, sessionsWithCost: 0, sessions: 2 });
@@ -92,7 +92,7 @@ test('a range with only human commits: zero AI lines is a real zero, the review 
   const r = bom.run(fx.dir, `${fx.c1}..${fx.c2}`);
   assert.equal(r.linesChanged, 3);
   assert.deepEqual(r.ai, { total: 0, byAgent: {} });
-  assert.deepEqual(r.reviewed, { lines: 0, percent: null });
+  assert.deepEqual(r.reviewed, { lines: 0, percent: null, unreviewedLines: 0 });
   assert.deepEqual(r.items, { active: 0, due: 0, removed: 0 });
   assert.deepEqual(r.cost, { sum: null, sessionsWithCost: 0, sessions: 0 });
 });
@@ -173,4 +173,26 @@ test('text output: one table under 80 columns, count and percent in the same cel
   assert.match(out, /1 \(14%\)/, 'reviewed with its share of AI lines');
   assert.match(out, /tested.*no data/);
   assert.match(out, /cost.*no data \(0 of 2 sessions\)/);
+});
+
+test('AI lines never exceed lines changed: a file Bob wrote and a human deleted counts in both, and counts as reviewed', () => {
+  const fs = require('node:fs'), os = require('node:os'), path = require('node:path');
+  const { execFileSync } = require('node:child_process');
+  const capture = require('../lib/capture'), commit = require('../lib/commit'), bom = require('../lib/bom');
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'whyline-bom-del-'));
+  const env = { ...process.env, GIT_AUTHOR_NAME: 't', GIT_COMMITTER_NAME: 't', GIT_AUTHOR_EMAIL: 't@example.invalid', GIT_COMMITTER_EMAIL: 't@example.invalid', WHYLINE_BOB_DB: '/nonexistent' };
+  const git = (...a) => execFileSync('git', a, { cwd: dir, encoding: 'utf8', env }).trim();
+  git('init', '-q', '-b', 'main'); fs.writeFileSync(path.join(dir, 'README.md'), 'x\n'); git('add', '.'); git('commit', '-q', '-m', 'base');
+  const base = git('rev-parse', 'HEAD');
+  const content = Array.from({ length: 10 }, (_, i) => `line ${i}`).join('\n') + '\n';
+  capture.handle({ hook_event_name: 'UserPromptSubmit', session_id: 'sdel', cwd: dir, prompt: 'Add ten lines.' }, { cwd: dir });
+  fs.writeFileSync(path.join(dir, 'ten.txt'), content);
+  capture.handle({ hook_event_name: 'PostToolUse', session_id: 'sdel', cwd: dir, tool_name: 'write_file', tool_input: { path: path.join(dir, 'ten.txt'), content, line_count: 10 }, tool_response: 'ok' }, { cwd: dir });
+  git('add', '.'); git('commit', '-q', '-m', 'ten'); commit.run(dir);
+  git('rm', '-q', 'ten.txt'); fs.writeFileSync(path.join(dir, 'two.txt'), 'a\nb\n'); git('add', '.'); git('commit', '-q', '-m', 'human replaces');
+  const r = bom.run(dir, `${base}..HEAD`);
+  assert.equal(r.ai.total, 10);
+  assert.equal(r.linesChanged, 12, 'additions summed per commit: 10 + 2');
+  assert.ok(r.ai.total <= r.linesChanged);
+  assert.deepEqual(r.reviewed, { lines: 10, percent: 100, unreviewedLines: 0 }, 'deleted by a human counts as reviewed');
 });

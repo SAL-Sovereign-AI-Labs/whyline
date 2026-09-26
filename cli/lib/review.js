@@ -47,4 +47,17 @@ function unreviewedByFile(cwd, index) {
   return out;
 }
 
-module.exports = { blameFile, unreviewedByFile };
+// Surviving, unchanged AI lines at HEAD grouped by the commit that wrote them. bom uses this so that
+// "reviewed" means the same thing everywhere: AI-written lines a human has edited or removed since.
+function unreviewedByCommit(cwd, index) {
+  const out = new Map();
+  for (const f of unreviewedByFile(cwd, index)) {
+    for (const row of blameFile(cwd, f.file)) {
+      if (!f.aiLines.includes(row.line)) continue;
+      out.set(row.commit, (out.get(row.commit) || 0) + 1);
+    }
+  }
+  return out;
+}
+
+module.exports = { blameFile, unreviewedByFile, unreviewedByCommit };

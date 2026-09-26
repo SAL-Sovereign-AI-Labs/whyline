@@ -24,6 +24,7 @@ function resolveRange(cwd, range) {
     rawB = range.slice(dotdot + 2);
   }
   for (const rev of [rawA, rawB]) {
+    if (!rev || rev.startsWith('.')) throw new Error(`range must look like A..B or A (meaning A..HEAD); got "${range}"`);
     const ok = git.tryGit(['rev-parse', '--verify', '--quiet', rev + '^{commit}'], { cwd });
     if (!ok) throw new Error(`unknown revision ${rev} (use a tag or commit from git log, e.g. v1.0..HEAD)`);
   }
@@ -32,8 +33,11 @@ function resolveRange(cwd, range) {
   return { displayRange: `${rawA}..${rawB}`, treeA, treeB, revListArgs: [treeA + '..' + treeB] };
 }
 
-function linesChanged(cwd, treeA, treeB) {
-  const out = git.tryGit(['diff', '--numstat', treeA, treeB, '--', '.', ...CONFIG_DIRS.map(d => `:!${d}`)], { cwd }) || '';
+// Added lines summed over every commit in the range (not the net diff), so it is on the same basis as AI lines,
+// which are counted when they were committed. A file written by Bob and deleted by a human later counts in both.
+// Pathspecs are root-anchored (":/") so the numbers do not depend on the directory the command runs from.
+function linesChanged(cwd, revListArgs) {
+  const out = git.tryGit(['log', '--numstat', '--format=', '--no-renames', ...revListArgs, '--', ':/', ...CONFIG_DIRS.map(d => `:(exclude,top)${d}`)], { cwd }) || '';
   let total = 0;
   for (const line of out.split('\n').filter(Boolean)) {
     const parts = line.split('\t');
@@ -53,8 +57,8 @@ function run(cwd, range) {
   const resolved = resolveRange(cwd, range);
   const { displayRange, treeA, treeB, revListArgs } = resolved;
 
-  const changed = linesChanged(cwd, treeA, treeB);
   const commits = revSet(cwd, revListArgs);
+  const changed = linesChanged(cwd, revListArgs);
 
   const idx = lenses.index(cwd);
 
@@ -74,9 +78,14 @@ function run(cwd, range) {
     const agent = (sess && sess.agent) || 'unknown';
     byAgent[agent] = (byAgent[agent] || 0) + lineCount;
     sessionIds.add(r.session);
-    if (r.origin === 'ai-edited') reviewedLines += lineCount;
   }
 
+  // reviewed = AI-written lines a human has edited or removed since (at commit time: ai-edited; later: no longer
+  // blamed unchanged to their AI commit). This is exactly the complement of `whyline unreviewed` for the range.
+  const unreviewedByCommit = require('./review').unreviewedByCommit(cwd, idx);
+  let unreviewedLines = 0;
+  for (const [commit, n] of unreviewedByCommit) if (commits.has(commit)) unreviewedLines += n;
+  reviewedLines = Math.max(0, aiTotal - unreviewedLines);
   const reviewedPercent = aiTotal > 0 ? Math.round(reviewedLines / aiTotal * 100) : null;
 
   // Items: from check(), only those whose commit is in range
@@ -119,7 +128,7 @@ function run(cwd, range) {
     range: displayRange,
     linesChanged: changed,
     ai: { total: aiTotal, byAgent },
-    reviewed: { lines: reviewedLines, percent: reviewedPercent },
+    reviewed: { lines: reviewedLines, percent: reviewedPercent, unreviewedLines },
     tested: { lines: null, percent: null },
     items: itemCounts,
     cost: { sum: costSum, sessionsWithCost, sessions: sessCount },

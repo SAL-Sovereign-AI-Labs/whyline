@@ -604,7 +604,7 @@ document.querySelectorAll('#expFilters button').forEach(function(b) {
 // UNREVIEWED kpis
 var utotals = unreviewed.totals || {};
 var uKpis = [
-  { v: nd(utotals.aiLines || null), l: 'AI-written lines' },
+  { v: nd(utotals.aiLines), l: 'AI-written lines' },
   { v: nd(utotals.files || null), l: 'files with unreviewed AI lines', c: 'color:var(--warn)' }
 ];
 var uKpiHtml = '';
