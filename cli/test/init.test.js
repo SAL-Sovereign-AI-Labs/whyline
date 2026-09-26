@@ -23,6 +23,9 @@ test('init installs .bob files and git hooks, merges without dropping user hooks
   assert.ok(fs.existsSync(path.join(dir, '.bob', 'custom_modes.yaml')));
   assert.ok(fs.existsSync(path.join(dir, '.bob', 'skills', 'whyline-remove', 'SKILL.md')));
   assert.ok(fs.existsSync(path.join(dir, '.bob', 'skills', 'whyline-check', 'SKILL.md')));
+  assert.ok(fs.existsSync(path.join(dir, '.bob', 'skills', 'whyline-why', 'SKILL.md')));
+  assert.ok(fs.existsSync(path.join(dir, '.bob', 'skills', 'whyline-decide', 'SKILL.md')));
+  assert.ok(fs.existsSync(path.join(dir, '.bob', 'skills', 'whyline-setup', 'SKILL.md')));
   assert.equal(execFileSync('git', ['config', 'notes.rewriteRef'], { cwd: dir, encoding: 'utf8' }).trim(), 'refs/notes/whyline');
   assert.equal(execFileSync('git', ['config', '--get-all', 'notes.displayRef'], { cwd: dir, encoding: 'utf8' }).trim().split('\n').length, 1, 'displayRef added once');
   const pc = fs.readFileSync(path.join(dir, '.git', 'hooks', 'post-commit'), 'utf8');
