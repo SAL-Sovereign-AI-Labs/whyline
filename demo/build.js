@@ -33,6 +33,9 @@ function main(argv) {
   git('config', 'user.name', 'demo'); git('config', 'user.email', 'demo@example.invalid');
   git('add', '.'); git('commit', '-q', '-m', 'init shop-backend');
   whyline(['init']);
+  // keep raw hook payloads from IDE sessions in .git/whyline/raw/ so they become fixtures
+  const settingsFile = path.join(target, '.bob', 'settings.json');
+  fs.writeFileSync(settingsFile, fs.readFileSync(settingsFile, 'utf8').replace(/whyline\.sh capture --agent bob/g, 'whyline.sh capture --dump --agent bob'));
   git('add', '.bob'); git('commit', '-q', '-m', 'add whyline');
 
   for (const s of SESSIONS) {
