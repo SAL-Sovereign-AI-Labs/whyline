@@ -33,31 +33,31 @@ git blame tells you who. Whyline tells you why. Provenance for AI-written code i
 
 **Bob inside the product.** `whyline init` installs a `.bob/` folder: lifecycle hooks (SessionStart, UserPromptSubmit, PostToolUse) and six skills (why, check, decide, remove, status, setup).
 
-- The SessionStart hook puts one line into Bob's context: which items are due and how many AI lines are unreviewed.
+- The SessionStart hook tells Bob which items are due and how many AI lines are unreviewed.
 - The whyline-remove skill works in Agent mode: it runs `whyline check --json`, searches for references, runs the tests, shows an evidence table and waits for Bob's approval prompt before deleting and committing.
 - The other skills answer plain questions through the CLI (why is this line here, keep this flag, what is unreviewed, what shipped) and never guess an id.
-- Each note records the session's Bobcoin cost from Bob's task database, so the bill of materials can say what a release cost.
+- Each note records the session's Bobcoin cost from Bob's task database, so a release can say what it cost.
 
-**Bob building the product.** Every task below has a summary screenshot in `bob_sessions/` and a row in `bob_sessions/costs.md`.
+**Bob building the product.** Every task has a summary screenshot and a cost row in `bob_sessions/`.
 
 | Task | What Bob did | Bobcoins |
 |---|---|---|
-| A task01 | cart module in the demo shop; hooks and cost verified from Bob IDE | 0.768 |
+| A task01 | cart module in the demo shop; hooks and cost verified | 0.768 |
 | A task02 | whyline-why skill | 1.18 |
 | A task03 | whyline-decide skill | 0.49 |
 | A task04 | whyline-setup skill | 0.68 |
-| A task05 | dogfood: Whyline installed on Whyline, used on Bob's own work | 3.44 |
-| A task06 | removal take in the demo shop: evidence, dry run, approval, commit | 0.687 |
-| A task07 | removal through the whyline-remove skill in Agent mode | 0.794 |
-| B task01 | bill of materials lens (`cli/lib/bom.js`), passing the tests written for it | 0.605 |
-| B task02 | report renderer and template from the design mockup | 1.755 |
+| A task05 | dogfood: Whyline on Whyline, five issues reported | 3.44 |
+| A task06 | removal take: evidence, dry run, approval, commit | 0.687 |
+| A task07 | removal through the skill in Agent mode | 0.794 |
+| B task01 | bill of materials lens, passing its tests | 0.605 |
+| B task02 | report renderer and template | 1.755 |
 | B task03 | whyline-status skill | 0.85 |
-| B task04 | report Why view: a code viewer backed by git blame | 4.24 |
-| B task05 | report overview: temporary code by kind, AI share, last removal | 1.74 |
+| B task04 | report Why view, blame-backed code viewer | 4.24 |
+| B task05 | report overview panels | 1.74 |
 | B task06 | report keyboard and screen reader support | 2.44 |
-| B task07 | GitHub Pages workflow for the demo report | 5.26 |
-| B task08 | code review of the report and bom, two fixes | 4.22 |
-| B task09 | Whyline used from Bob: status questions in the demo shop | 0.132 |
+| B task07 | GitHub Pages workflow | 5.26 |
+| B task08 | Bob code review of report and bom, two fixes | 4.22 |
+| B task09 | Whyline used from Bob, status questions | 0.132 |
 
 Bob also used Whyline: asked what AI code nobody reviewed, it loaded whyline-status itself and ran three commands. On this repository it found three bugs we fixed: skill files flagged as temporary, a git warning after init, a recursive pre-push hook.
 
