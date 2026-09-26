@@ -43,7 +43,7 @@ git blame tells you who. Whyline tells you why. Provenance for AI-written code i
 
 | Task | Member | What Bob did | Bobcoins |
 |---|---|---|---|
-| A task01 | Faisal | cart module in the demo shop, hooks and cost verified from Bob IDE | 0.77 |
+| A task01 | Faisal | cart module in the demo shop, hooks and cost verified from Bob IDE | 0.768 |
 | B task01 | Atiq | first implementation of the bill of materials lens (`cli/lib/bom.js`), passing the 8 tests written for it | 0.605 |
 | B task02 | Atiq | HTML report renderer and template from the design mockup, with escaping tests | 1.755 |
 | B task03 | Atiq | whyline-status skill | 0.85 |
