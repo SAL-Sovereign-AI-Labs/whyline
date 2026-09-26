@@ -47,7 +47,7 @@ In Bob, in normal Agent mode: ask "why does this line exist?", say "remove the m
 3. Writes that look temporary (mock, demo, flag, shim, fixture, "until ...") become items with a removal condition: a date, or "no references left".
 4. `whyline check` evaluates the conditions. Removal happens in Bob through the whyline-remove skill and Bob's normal approval prompt.
 
-Costs 0 Bobcoins. Hooks are deterministic; Bob is only used for removals.
+Costs 0 Bobcoins. Hooks are deterministic; Bob is only used for removals. When a Bob task spans several commits, every commit keeps the same prompt.
 
 ## Status
 
@@ -112,7 +112,7 @@ Node 20 or newer, git. Bob IDE 2.2 or Bob Shell 2.x for the hooks. macOS and Lin
 
 ## Private by design
 
-Whyline sends nothing over the network. Prompts are stored as git notes in your own repository.
+Whyline itself makes no network calls. Prompts are stored verbatim in git notes in your own repository, and the installed git hooks push and fetch that notes ref together with your code, so prompts travel to wherever your code travels and nowhere else. Do not paste secrets into prompts; the generated report (`.whyline-report.html`) also embeds prompts and is excluded from commits by `whyline init` through `.git/info/exclude`.
 
 ## Development
 

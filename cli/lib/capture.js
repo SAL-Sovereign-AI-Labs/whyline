@@ -18,6 +18,7 @@ function handle(payload, { cwd, agent, now = new Date() } = {}) {
   const workdir = ev.cwd && fs.existsSync(ev.cwd) ? ev.cwd : cwd;
 
   if (ev.type === 'prompt') {
+    // the first prompt of a session is the intent; later steering prompts do not replace it
     const has = session.readAll(workdir).some(l => l.t === 'prompt' && l.session === ev.session);
     if (!has) session.append(workdir, { t: 'prompt', session: ev.session, ts, agent: adapter.id, prompt: ev.prompt.slice(0, 4000) });
     return 'prompt';
@@ -29,16 +30,23 @@ function handle(payload, { cwd, agent, now = new Date() } = {}) {
   const abs = path.join(git.repoRoot(workdir), rel);
   if (!fs.existsSync(abs) || isBinary(abs)) return 'skipped';
   const total = countLines(abs);
-  let ranges, approx = false, hunks = [];
-  if (adapter.isWholeFileTool(ev.tool)) {
-    ranges = [[1, total]];
+  let ranges, approx = false, hunks = [], whole = false;
+  const headBlob = adapter.isWholeFileTool(ev.tool) ? git.blobAt(workdir, 'HEAD', rel) : null;
+  if (adapter.isWholeFileTool(ev.tool) && !headBlob) {
+    ranges = [[1, total]]; whole = true; // a new file: every line is the agent's
+  } else if (adapter.isWholeFileTool(ev.tool)) {
+    // the agent rewrote an existing file: only the lines that differ from HEAD are the agent's
+    const newBlob = git.hashObject(workdir, abs);
+    hunks = git.diffHunks(workdir, headBlob, newBlob);
+    ranges = patch.merge(hunks.filter(h => h.newLen > 0).map(h => [h.newStart, h.newStart + h.newLen - 1]));
+    if (!hunks.length && !ranges.length) return 'unchanged';
   } else {
     hunks = patch.parseHunks(ev.patch);
     ranges = patch.addedRanges(ev.patch);
     if (!ranges.length) { ranges = [[1, total]]; approx = true; hunks = []; }
   }
   const hash = git.hashObject(workdir, abs);
-  session.append(workdir, { t: 'write', session: ev.session, ts, agent: adapter.id, file: rel, tool: ev.tool, ranges, hunks, hash, total, approx });
+  session.append(workdir, { t: 'write', session: ev.session, ts, agent: adapter.id, file: rel, tool: ev.tool, ranges, hunks, hash, total, approx, whole });
   return 'write';
 }
 

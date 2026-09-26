@@ -33,9 +33,17 @@ function rewrite(cwd, lines) {
   fs.writeFileSync(f, lines.map(l => JSON.stringify(l)).join('\n') + (lines.length ? '\n' : ''));
 }
 
+// Remove the lines that `shouldDrop` selects, re-reading the file first so lines appended meanwhile survive.
+function consume(cwd, shouldDrop) {
+  const f = file(cwd);
+  if (!f || !fs.existsSync(f)) return;
+  const keep = readAll(cwd).filter(l => !shouldDrop(l));
+  rewrite(cwd, keep);
+}
+
 function logError(cwd, msg) {
   const d = dir(cwd);
   if (d) fs.appendFileSync(path.join(d, 'hook.err'), `${new Date().toISOString()} ${msg}\n`);
 }
 
-module.exports = { dir, file, append, readAll, rewrite, logError };
+module.exports = { dir, file, append, readAll, rewrite, consume, logError };

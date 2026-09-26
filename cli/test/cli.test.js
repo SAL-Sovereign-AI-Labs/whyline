@@ -96,3 +96,17 @@ test('capture --dump keeps the raw payload for fixtures', () => {
   assert.equal(raw.length, 1);
   assert.equal(JSON.parse(fs.readFileSync(path.join(dir, '.git', 'whyline', 'raw', raw[0]), 'utf8')).source, 'startup');
 });
+
+test('review S10: read commands outside a git repository exit 3 with the fix named', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'whyline-norepo-'));
+  for (const c of [['check'], ['unreviewed'], ['why', 'a.py:1'], ['bom']]) {
+    const r = run(dir, c);
+    assert.equal(r.status, 3, c.join(' ')); assert.match(r.stderr, /not a git repository/);
+  }
+});
+
+test('review L7: until rejects an impossible date', () => {
+  const dir = repoWithItem();
+  const r = run(dir, ['until', 'demo_seed.py', '2026-13-45']);
+  assert.equal(r.status, 1); assert.match(r.stderr, /real date/);
+});

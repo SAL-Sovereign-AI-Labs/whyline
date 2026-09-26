@@ -10,7 +10,9 @@ const lenses = require('./lenses');
 // tag, a "remove after/once/when ..." instruction, "until <thing> lands/ships", or "temporary" next to such a word.
 // The bare word "temporary" in code or strings is not a marker (this repository talks about temporary code everywhere).
 const COMMENT = /(^|\s)(#|\/\/|\/\*|\*|<!--|--)\s*(.*)$/;
-const MARKER = /\b(TODO|FIXME|HACK|XXX)\b|\bremove\s+(this|me|after|once|when|before)\b|\buntil\s+[A-Za-z0-9._-]+\s+(lands|ships|is merged|is done|is ready)\b|\btemporar(y|ily)\s+(workaround|hack|fix|shim|until)\b|\bworkaround\s+(until|for now)\b/i;
+const TAG = /\b(TODO|FIXME|HACK|XXX)\b/; // upper case only: "the todo items" is not a marker
+const PHRASE = /\bremove\s+(this|me|after|once|when|before)\b|\buntil\s+[A-Za-z0-9._-]+\s+(lands|ships|is merged|is done|is ready)\b|\btemporar(y|ily)\s+(workaround|hack|fix|shim|until)\b|\bworkaround\s+(until|for now)\b/i;
+const MARKER = { test: t => TAG.test(t) || PHRASE.test(t) };
 const CODE_EXCLUDES = ['.bob/**', '.claude/**', '*.md', '*.txt', 'docs/**', 'node_modules/**', '*.lock', '*.json', 'tests/**', 'test/**', '*.test.*', '*_test.*', 'test_*'];
 
 // byName: also take files whose name or folder looks temporary (mock_, compat_, examples/, fixtures/). Off by default:
@@ -47,7 +49,7 @@ function run(cwd, { dryRun = false, byName = false } = {}) {
     const kindByPath = classify.temporary('', file, { created: false });
     const kind = kindByPath ? kindByPath.kind : (/mock|stub|fake/i.test(hit.text) ? 'mock' : /flag/i.test(hit.text) ? 'flag' : 'shim');
     const text = git.tryGit(['show', `HEAD:${file}`], { cwd }) || '';
-    const lines = text.split('\n').length;
+    const lines = text.length ? text.split('\n').length : 0; // git() strips one trailing newline, so this is the line count
     const firstSeen = git.tryGit(['log', '--diff-filter=A', '--format=%ad', '--date=short', '--follow', '--', file], { cwd });
     const created = firstSeen ? firstSeen.split('\n').pop() : null;
     const author = git.tryGit(['log', '--diff-filter=A', '--format=%an', '--follow', '--', file], { cwd });

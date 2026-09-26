@@ -50,6 +50,9 @@ function dispatch(argv) {
   const [cmd, ...rest] = argv;
   const cwd = process.cwd();
   const json = rest.includes('--json');
+  if (['why', 'check', 'unreviewed', 'bom', 'report', 'keep', 'until', 'watch', 'removed', 'seed'].includes(cmd) && !require('./lib/git').repoRoot(cwd)) {
+    process.stderr.write('not a git repository (run whyline inside a repo, or whyline init to set one up)\n'); return 3;
+  }
   const agentIds = [];
   const args = [];
   for (let i = 0; i < rest.length; i++) {
@@ -116,8 +119,8 @@ function dispatch(argv) {
       const r = require('./lib/lenses').unreviewed(cwd);
       if (json) { console.log(JSON.stringify(r, null, 2)); return 0; }
       if (!r.files.length) { console.log('no AI-written lines recorded yet (commit something Bob wrote, then run again)'); return 0; }
-      console.log('file'.padEnd(44) + 'ai lines  edited  coverage');
-      for (const f of r.files) console.log(`${f.file.padEnd(44)}${String(f.aiLines).padStart(8)}  ${String(f.editedRanges).padStart(6)}  ${f.coverage == null ? 'no data' : f.coverage + '%'}`);
+      console.log('file'.padEnd(44) + 'ai lines  edited ranges  coverage');
+      for (const f of r.files) console.log(`${f.file.padEnd(44)}${String(f.aiLines).padStart(8)}  ${String(f.editedRanges).padStart(13)}  ${f.coverage == null ? 'no data' : f.coverage + '%'}`);
       console.log(`${r.totals.aiLines} unreviewed AI lines in ${r.totals.files} file(s)${r.totals.coverageSource ? `, coverage from ${r.totals.coverageSource}` : ', no coverage report found (coverage.xml or lcov.info)'}`);
       return 0;
     }
@@ -166,7 +169,7 @@ function dispatch(argv) {
       const id = args[0], value = cmd === 'removed' ? (args[1] || 'removed by hand') : (args[1] === '--symbol' ? args[2] : args[1]);
       const usage = { keep: '"<reason>"', until: '<YYYY-MM-DD>', watch: '--symbol <Name>', removed: '' }[cmd];
       if (!id || !value) { process.stderr.write(`usage: whyline ${cmd} <file|symbol|kind|id> ${usage}\n`); return 1; }
-      if (cmd === 'until' && !/^\d{4}-\d{2}-\d{2}$/.test(value)) { process.stderr.write('until: date must be YYYY-MM-DD\n'); return 1; }
+      if (cmd === 'until' && (!/^\d{4}-\d{2}-\d{2}$/.test(value) || isNaN(Date.parse(value + 'T00:00:00Z')) || new Date(value + 'T00:00:00Z').toISOString().slice(0, 10) !== value)) { process.stderr.write('until: date must be a real date in YYYY-MM-DD form\n'); return 1; }
       const lenses = require('./lib/lenses');
       const change = cmd === 'keep' ? { status: 'kept', reason: value }
         : cmd === 'until' ? { status: 'active', condition: { type: 'date', on: value } }

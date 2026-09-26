@@ -21,7 +21,7 @@ Run `whyline why <file>:<line> --json` with execute_command.
 ## Interpreting the result
 - `found: false` -- git blame could not locate the line (file not tracked or line out of range). Show the `reason` field.
 - `origin: "human"` -- a human wrote this line. Show the author and short commit hash.
-- `origin: "ai-written"` -- the agent wrote every part of this line. Show all fields below.
+- `origin: "ai"` -- the agent wrote every part of this line. Show all fields below.
 - `origin: "ai-edited"` -- a human and an agent both touched this line. Show all fields below.
 
 ## Output template (ai-written or ai-edited)

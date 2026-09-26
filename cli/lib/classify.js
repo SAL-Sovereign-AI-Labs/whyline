@@ -1,11 +1,11 @@
 'use strict';
 // Rules that mark an agent write as temporary code. Deterministic, no model call.
 const RULES = [
-  { kind: 'mock', words: ['mock', 'stub', 'fake'], paths: [/(^|\/)mock_/, /(^|\/)fake_/, /(^|\/)mocks\//, /stub/] },
-  { kind: 'demo', words: ['demo', 'example', 'sample', 'quick script'], paths: [/(^|\/)examples?\//, /(^|\/)demos?\//, /(^|\/)demo_/, /(^|\/)sample_/] },
+  { kind: 'mock', words: ['mock', 'stub', 'fake'], paths: [/(^|\/)mock_/, /(^|\/)fake_/, /(^|\/)mocks\//, /(^|\/|_)stubs?(\.|_|\/)/] },
+  { kind: 'demo', words: ['demo', 'demo script', 'quick script'], paths: [/(^|\/)examples?\//, /(^|\/)demos?\//, /(^|\/)demo_/, /(^|\/)sample_/] },
   { kind: 'flag', words: [], paths: [/flags?\.(ya?ml|json)$/, /feature_flags/] }, // flags live in config files; the reader code is permanent
-  { kind: 'shim', words: ['workaround', 'temporary', 'temporarily', 'until', 'shim', 'compat', 'hack', 'todo remove'], paths: [/(^|\/)compat_/, /_shim/, /(^|\/)legacy_/] },
-  { kind: 'fixture', words: ['fixture', 'seed data', 'test data'], paths: [/(^|\/)fixtures\//, /(^|\/)seed/] },
+  { kind: 'shim', words: ['workaround', 'temporary', 'temporarily', 'shim', 'compat', 'hack', 'todo remove', 'until the real', 'until it lands', 'until it ships'], paths: [/(^|\/)compat_/, /_shim/, /(^|\/)legacy_/] },
+  { kind: 'fixture', words: ['fixture', 'seed data', 'test data'], paths: [/(^|\/)fixtures\//, /(^|\/)seed(s|_|\.|\/)/] },
 ];
 
 function hasWord(text, w) {
@@ -25,6 +25,7 @@ function temporary(prompt, file, { created = true } = {}) {
   for (const r of RULES) if (r.paths.some(re => re.test(file))) return { kind: r.kind, reason: reasonFrom(p) };
   if (!created || inTests || DOC_ASSET.test(file)) return null;
   for (const r of RULES) if (r.words.some(w => hasWord(p, w))) return { kind: r.kind, reason: reasonFrom(p) };
+  if (/\buntil\s+[A-Za-z0-9._-]+\s+(lands|ships|is merged|is done|is ready|arrives)\b/i.test(p)) return { kind: 'shim', reason: reasonFrom(p) };
   return null;
 }
 

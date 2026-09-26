@@ -5,8 +5,9 @@ const path = require('node:path');
 
 const NOTES_REF = 'whyline';
 
+// core.quotePath=false: non-ASCII file names come back verbatim instead of octal-escaped, so they match session lines
 function git(args, { cwd, input } = {}) {
-  return execFileSync('git', args, { cwd, input, encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] }).replace(/\n$/, '');
+  return execFileSync('git', ['-c', 'core.quotePath=false', ...args], { cwd, input, encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] }).replace(/\n$/, '');
 }
 
 function tryGit(args, opts) {

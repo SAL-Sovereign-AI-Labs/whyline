@@ -39,3 +39,14 @@ test('init installs .bob files and git hooks, merges without dropping user hooks
   assert.match(pc, /whyline commit; \(whyline report/);
   assert.equal((pc.match(/whyline commit/g) || []).length, 1);
 });
+
+test('review S3 and S5: init excludes the report locally and honours core.hooksPath', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'whyline-init2-'));
+  execFileSync('git', ['init', '-q', dir]);
+  execFileSync('git', ['config', 'core.hooksPath', '.husky'], { cwd: dir });
+  const silent = console.log; console.log = () => {};
+  try { assert.equal(init.run(dir), 0); } finally { console.log = silent; }
+  assert.ok(fs.existsSync(path.join(dir, '.husky', 'post-commit')), 'hook written where git looks');
+  assert.match(fs.readFileSync(path.join(dir, '.git', 'info', 'exclude'), 'utf8'), /\.whyline-report\.html/);
+  assert.match(fs.readFileSync(path.join(dir, '.husky', 'pre-push'), 'utf8'), /GIT_TERMINAL_PROMPT=0/);
+});

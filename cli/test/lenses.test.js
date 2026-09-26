@@ -181,3 +181,21 @@ test('seed records temporary-looking code that predates whyline, once, with age 
   assert.equal(c.due.length + c.active.length, 2);
   assert.match(cli(dir, ['seed']).stdout, /nothing new to seed from comment markers \(2 file\(s\) already tracked\)/);
 });
+
+test('review S8 and S9: ordinary prompts and lowercase todo are not temporary', () => {
+  const classify = require('../lib/classify');
+  assert.equal(classify.temporary('Add a retry helper, for example with exponential backoff.', 'src/retry.py'), null);
+  assert.equal(classify.temporary('Loop until the queue is empty.', 'src/queue.py'), null);
+  assert.equal(classify.temporary('Add x', 'src/stubborn.py'), null);
+  assert.equal(classify.temporary('Add x', 'src/seeder.py'), null);
+  assert.equal(classify.temporary('Add a mock gateway until payments-v2 lands.', 'src/gw.py').kind, 'mock');
+  assert.equal(classify.temporary('Keep this until the real service lands.', 'src/bridge.py').kind, 'shim');
+  const seed = require('../lib/seed');
+  const dir = repo();
+  fs.writeFileSync(path.join(dir, 'app.py'), '# the todo items live here\ntodos = []\n');
+  fs.writeFileSync(path.join(dir, 'old.py'), '# TODO remove after the migration\nx = 1\n');
+  git(dir, ['add', '.']); git(dir, ['commit', '-q', '-m', 'x']);
+  const r = seed.run(dir, { dryRun: true });
+  assert.deepEqual(r.items.map(i => i.file), ['old.py']);
+  assert.deepEqual(r.items[0].lines, [[1, 2]]);
+});

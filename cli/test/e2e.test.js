@@ -102,7 +102,8 @@ test('an edited call site of a mock is not itself flagged as temporary', () => {
   assert.ok(r.attached, r.reason);
   assert.deepEqual(r.note.items.map(i => i.file), ['mock_gateway.py']);
   assert.ok(r.note.ranges.some(x => x.file === 'checkout.py' && x.lines[0] === 1 && x.lines[1] === 1));
-  assert.equal(session.readAll(dir).length, 0, 'prompt pruned once its writes are consumed');
+  assert.equal(session.readAll(dir).filter(l => l.t === 'write').length, 0, 'writes consumed');
+  assert.equal(session.readAll(dir).filter(l => l.t === 'prompt').length, 1, 'the prompt stays: a session can span several commits');
 });
 
 test('a payload whose path differs only in letter case still lands inside the repo (macOS, Windows)', (t) => {
@@ -135,4 +136,87 @@ test('real Bob payload fixture records the apply_diff ranges', () => {
   assert.equal(line.tool, 'apply_diff');
   assert.equal(line.approx, false);
   assert.ok(line.ranges.length >= 1);
+});
+
+test('review finding 1: human imports added above AI code before the commit stay human', () => {
+  const dir = tempRepo();
+  agentWrite(dir, 'lib.py', 'def a():\n    return 1\n\ndef b():\n    return 2\n', 's10', 'Add helpers.');
+  fs.writeFileSync(path.join(dir, 'lib.py'), 'import os\nimport sys\ndef a():\n    return 1\n\ndef b():\n    return 2\n');
+  sh(dir, 'git', ['add', '.']); sh(dir, 'git', ['commit', '-q', '-m', 'helpers with imports']);
+  const r = commit.run(dir);
+  assert.ok(r.attached, r.reason);
+  assert.deepEqual(r.note.ranges.map(x => [x.origin, x.lines]), [['ai', [3, 7]]]);
+  assert.equal(lenses.why(dir, 'lib.py', 1).origin, 'human');
+  assert.equal(lenses.why(dir, 'lib.py', 3).origin, 'ai');
+});
+
+test('review finding 2: a file with a non-ASCII name gets a note and its session lines drain', () => {
+  const dir = tempRepo();
+  agentWrite(dir, 'src/café.py', 'x = 1\n', 's11', 'Add café.');
+  sh(dir, 'git', ['add', '.']); sh(dir, 'git', ['commit', '-q', '-m', 'café']);
+  const r = commit.run(dir);
+  assert.ok(r.attached, r.reason);
+  assert.equal(r.note.ranges[0].file, 'src/café.py');
+  assert.equal(session.readAll(dir).filter(l => l.t === 'write').length, 0);
+});
+
+test('review finding 3: the prompt survives into the second commit of the same session', () => {
+  const dir = tempRepo();
+  agentWrite(dir, 'a.py', 'a = 1\n', 's12', 'Add a and a mock b, temporary until the real b lands.');
+  sh(dir, 'git', ['add', '.']); sh(dir, 'git', ['commit', '-q', '-m', 'a']); assert.ok(commit.run(dir).attached);
+  agentWrite(dir, 'mock_b.py', 'class MockB:\n    pass\n', 's12');
+  sh(dir, 'git', ['add', '.']); sh(dir, 'git', ['commit', '-q', '-m', 'b']);
+  const r = commit.run(dir);
+  assert.ok(r.attached, r.reason);
+  assert.match(r.note.sessions.s12.prompt, /temporary until the real b lands/);
+  assert.match(r.note.items[0].reason, /until the real b lands/);
+});
+
+test('review finding 4: a whole-file rewrite of an existing file records only the changed lines', () => {
+  const dir = tempRepo();
+  const big = Array.from({ length: 50 }, (_, i) => `line ${i + 1}`).join('\n') + '\n';
+  fs.writeFileSync(path.join(dir, 'big.py'), big); sh(dir, 'git', ['add', '.']); sh(dir, 'git', ['commit', '-q', '-m', 'big']);
+  const changed = big.replace('line 25', 'line 25 changed by bob');
+  agentWrite(dir, 'big.py', changed, 's13', 'Fix line 25.');
+  sh(dir, 'git', ['add', '.']); sh(dir, 'git', ['commit', '-q', '-m', 'fix']);
+  const r = commit.run(dir);
+  assert.ok(r.attached, r.reason);
+  assert.deepEqual(r.note.ranges.map(x => x.lines), [[25, 25]]);
+  assert.equal(lenses.why(dir, 'big.py', 1).origin, 'human');
+  assert.equal(lenses.why(dir, 'big.py', 25).origin, 'ai');
+});
+
+test('review S1: git commit --amend keeps the earlier file ranges in the note', () => {
+  const dir = tempRepo();
+  sh(dir, 'git', ['config', 'notes.rewriteRef', 'refs/notes/whyline']);
+  agentWrite(dir, 'a.py', 'a = 1\n', 's14', 'Add a.');
+  sh(dir, 'git', ['add', '.']); sh(dir, 'git', ['commit', '-q', '-m', 'a']); assert.ok(commit.run(dir).attached);
+  agentWrite(dir, 'b.py', 'b = 2\n', 's14');
+  sh(dir, 'git', ['add', '.']); sh(dir, 'git', ['commit', '-q', '--amend', '--no-edit']);
+  const r = commit.run(dir);
+  assert.ok(r.attached, r.reason);
+  assert.deepEqual(r.note.ranges.map(x => x.file).sort(), ['a.py', 'b.py']);
+  assert.equal(lenses.why(dir, 'a.py', 1).origin, 'ai');
+});
+
+test('review S2: a deleted item file is recorded removed whatever the message; an edit-only commit naming the file is not', () => {
+  const dir = tempRepo();
+  agentWrite(dir, 'mocks/fake_pay.py', 'class FakePay:\n    pass\n', 's15', 'Add a fake payment stub until the gateway is ready.');
+  sh(dir, 'git', ['add', '.']); sh(dir, 'git', ['commit', '-q', '-m', 'stub']); assert.ok(commit.run(dir).attached);
+  fs.appendFileSync(path.join(dir, 'mocks/fake_pay.py'), '# note\n');
+  sh(dir, 'git', ['commit', '-q', '-am', 'remove stale print from fake_pay.py']);
+  assert.deepEqual(commit.run(dir).removed, [], 'edit only: not removed');
+  sh(dir, 'git', ['rm', '-q', 'mocks/fake_pay.py']); sh(dir, 'git', ['commit', '-q', '-m', 'chore: drop the fake payment stub']);
+  assert.equal(commit.run(dir).removed.length, 1, 'file deleted: removed even without the word remove');
+  assert.equal(lenses.check(dir).counts.removed, 1);
+});
+
+test('review S13: a second session rewriting a tracked file does not create a second item', () => {
+  const dir = tempRepo();
+  agentWrite(dir, 'mock_gw.py', 'class M:\n    pass\n', 's16', 'Add a mock gateway.');
+  sh(dir, 'git', ['add', '.']); sh(dir, 'git', ['commit', '-q', '-m', 'm1']); assert.ok(commit.run(dir).attached);
+  agentWrite(dir, 'mock_gw.py', 'class M:\n    def charge(self):\n        return True\n', 's17', 'Extend the mock gateway.');
+  sh(dir, 'git', ['add', '.']); sh(dir, 'git', ['commit', '-q', '-m', 'm2']); assert.ok(commit.run(dir).attached);
+  assert.equal(lenses.index(dir).items.size, 1);
+  assert.equal(lenses.resolveItem(dir, 'mock_gw.py').file, 'mock_gw.py');
 });

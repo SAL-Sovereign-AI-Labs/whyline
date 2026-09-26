@@ -66,7 +66,9 @@ function mapRanges(ranges, hunks) {
 function offsetAt(line, hunks) {
   let off = 0;
   for (const h of hunks) {
-    if (h.oldLen === 0) { if (h.oldStart < line) off += h.newLen; }
+    // parseHunks stores a pure insertion's oldStart as the first old line AFTER the anchor, so an insertion
+    // at oldStart <= line sits before that line and shifts it
+    if (h.oldLen === 0) { if (h.oldStart <= line) off += h.newLen; }
     else if (h.oldStart + h.oldLen - 1 < line) off += h.newLen - h.oldLen;
   }
   return off;
