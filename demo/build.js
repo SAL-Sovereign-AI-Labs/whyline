@@ -24,9 +24,14 @@ function main(argv) {
 
   if (fs.existsSync(target)) {
     if (!fs.existsSync(path.join(target, MARKER))) throw new Error(`${target} exists and is not a whyline demo folder; refusing to delete it`);
-    // a background `whyline report` from the previous build's post-commit hook may still be writing: retry briefly
+    // Empty the folder but keep the folder itself and .bob/ in place: an open Bob IDE window keeps its index of
+    // .bob (skills, hooks) and loses it when the directory is deleted and recreated. Files inside .bob are refreshed by init.
+    // A background `whyline report` from the previous build's post-commit hook may still be writing: retry briefly.
     for (let attempt = 0; ; attempt++) {
-      try { fs.rmSync(target, { recursive: true, force: true }); break; } catch (e) {
+      try {
+        for (const entry of fs.readdirSync(target)) if (entry !== '.bob') fs.rmSync(path.join(target, entry), { recursive: true, force: true });
+        break;
+      } catch (e) {
         if (attempt >= 10) throw e;
         Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 300);
       }
