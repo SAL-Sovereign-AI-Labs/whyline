@@ -104,6 +104,13 @@ function run(cwd, range) {
   const missing = ['coverage'];
   if (sessionsWithCost < sessCount) missing.push('cost');
 
+  // No notes at all: AI lines, review and items are unknown, not zero (the hooks never recorded anything here).
+  if (!idx.notes.length) {
+    return { range: displayRange, linesChanged: changed, ai: { total: null, byAgent: {} }, reviewed: { lines: null, percent: null },
+      tested: { lines: null, percent: null }, items: { active: null, due: null, removed: null },
+      cost: { sum: null, sessionsWithCost: 0, sessions: 0 }, missing: ['notes', 'coverage', 'cost'] };
+  }
+
   return {
     range: displayRange,
     linesChanged: changed,
@@ -118,9 +125,10 @@ function run(cwd, range) {
 
 function format(r) {
   const title = r.range ? `BOM: ${r.range}` : 'BOM: all history';
-  const aiPct = r.linesChanged > 0 ? Math.round(r.ai.total / r.linesChanged * 100) : null;
-  const aiCell = r.ai.total + (aiPct !== null ? ` (${aiPct}%)` : '');
-  const revCell = r.reviewed.percent !== null ? `${r.reviewed.lines} (${r.reviewed.percent}%)` : `${r.reviewed.lines} (no data)`;
+  const nd = v => (v == null ? 'no data' : String(v));
+  const aiPct = r.ai.total != null && r.linesChanged > 0 ? Math.round(r.ai.total / r.linesChanged * 100) : null;
+  const aiCell = nd(r.ai.total) + (aiPct !== null ? ` (${aiPct}%)` : '');
+  const revCell = r.reviewed.lines == null ? 'no data' : r.reviewed.percent !== null ? `${r.reviewed.lines} (${r.reviewed.percent}%)` : `${r.reviewed.lines} (no data)`;
   const testedCell = 'no data';
   let costCell;
   if (r.cost.sum !== null) {
@@ -133,9 +141,9 @@ function format(r) {
     ['AI lines', aiCell],
     ['reviewed', revCell],
     ['tested', testedCell],
-    ['active items', String(r.items.active)],
-    ['due items', String(r.items.due)],
-    ['removed items', String(r.items.removed)],
+    ['active items', nd(r.items.active)],
+    ['due items', nd(r.items.due)],
+    ['removed items', nd(r.items.removed)],
     ['cost', costCell],
   ];
   const colW = Math.max(...rows.map(([k]) => k.length));
@@ -143,6 +151,7 @@ function format(r) {
   for (const [k, v] of rows) {
     lines.push(`${k.padEnd(colW)}  ${v}`);
   }
+  if ((r.missing || []).includes('notes')) lines.push('', 'no notes yet (commit something Bob wrote, then run whyline bom again)');
   return lines.join('\n');
 }
 

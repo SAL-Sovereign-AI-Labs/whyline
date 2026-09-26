@@ -57,8 +57,30 @@ th{color:var(--muted);font-weight:600;font-size:12px}
 .howto{border-left:3px solid var(--accent);background:var(--ai);border-radius:0 8px 8px 0;padding:8px 12px;font-size:12.5px;margin-top:10px}
 .howto code{background:rgba(0,0,0,.08);padding:1px 5px;border-radius:4px}
 .muted{color:var(--muted)}
+input.search{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;padding:7px 10px;font-size:13px;width:240px;max-width:100%}
+.code{background:var(--term);color:var(--termink);border-radius:10px;font:12.5px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;overflow:auto;max-height:420px}
+.code div{padding:0 12px;white-space:pre;position:relative;cursor:default}
+.code .n{display:inline-block;width:34px;color:#8d96a5;user-select:none}
+.code .ai{background:rgba(69,137,255,.30);border-left:3px solid var(--accent)}
+.code .mx{background:rgba(241,194,27,.26);border-left:3px solid var(--warn)}
+.code .hu{border-left:3px solid transparent}
+.code .tmp{background:rgba(138,63,252,.32);border-left:3px solid var(--accent2)}
+.code div.sel{outline:1px solid var(--accent)}
+.detail{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;font-size:13px}
+.detail h4{margin:0 0 6px;font-size:13px}
+.detail dl{display:grid;grid-template-columns:100px 1fr;gap:4px 8px;margin:0}
+.detail dt{color:var(--muted)}.detail dd{margin:0;word-break:break-word}
+.term{background:var(--term);color:var(--termink);border-radius:10px;padding:12px 14px;font:12.5px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap;margin-top:10px}
+.term .d{color:#8d96a5}.term .p{color:#82cfff}
+.why-file-row{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;cursor:pointer;font-size:12.5px}
+.why-file-row:hover{background:var(--line)}
+.why-file-row.on{background:var(--ai);font-weight:600}
+.why-file-row .fname{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.why-file-row .fbar{width:60px;flex-shrink:0}
+.why-file-row .fcnt{flex-shrink:0;font-size:11px;color:var(--muted);white-space:nowrap}
 .burger{display:none;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;padding:5px 10px;font-size:12px;cursor:pointer;margin-bottom:6px}
 @media (max-width:820px){.app{grid-template-columns:1fr}aside{position:fixed;left:-240px;width:232px;transition:.2s;z-index:15}aside.open{left:0}.burger{display:inline-block}main{padding:16px}.top{align-items:flex-start}}
+@media (max-width:680px){#v-why .row2c{grid-template-columns:1fr !important}.card{overflow-x:auto}table.stack thead{display:none}table.stack tr{display:block;padding:8px 0;border-bottom:1px solid var(--line)}table.stack td{display:block;border:0;padding:2px 0;max-width:none !important;min-width:0 !important}table.stack td[data-label]::before{content:attr(data-label) ": ";color:var(--muted);font-size:12px}}
 </style>
 </head>
 <body>
@@ -96,8 +118,37 @@ th{color:var(--muted);font-weight:600;font-size:12px}
 
   <!-- WHY -->
   <section class="view" id="v-why">
-    <div class="card"><h3>AI-written ranges by file <small>prompt on record</small></h3>
-      <table id="whyTable"><thead><tr><th>File</th><th>Lines</th><th>Agent</th><th>Prompt</th><th>Session</th><th>Origin</th></tr></thead><tbody></tbody></table>
+    <div id="whyEmpty" style="display:none;padding:20px" class="card muted">
+      no AI-written lines at HEAD yet (commit something Bob wrote, then run whyline report)
+    </div>
+    <div id="whyMain" style="display:none">
+      <div class="filters" style="margin-bottom:10px">
+        <input class="search" id="whySearch" placeholder="filter files..." type="text">
+      </div>
+      <div class="row2c" style="display:grid;grid-template-columns:260px 1fr;gap:12px;align-items:start;overflow-x:auto">
+        <div class="card" style="padding:10px;min-width:0">
+          <h3 style="margin-bottom:8px">Files <small id="whyFileCount"></small></h3>
+          <div id="whyFileList" style="max-height:500px;overflow-y:auto"></div>
+        </div>
+        <div style="min-width:0">
+          <div class="card" style="padding:12px;min-width:0">
+            <h3 id="whyCodeTitle" style="margin-bottom:6px">select a file</h3>
+            <div class="code" id="whyCode" style="overflow-x:auto"></div>
+            <div class="legend" style="margin-top:8px">
+              <span><i style="background:rgba(69,137,255,.6)"></i>AI</span>
+              <span><i style="background:rgba(241,194,27,.6)"></i>AI, edited by a human</span>
+              <span><i style="background:rgba(138,63,252,.6)"></i>AI, temporary item</span>
+              <span><i style="background:var(--line)"></i>human</span>
+            </div>
+          </div>
+          <div class="detail" id="whyDetail" style="margin-top:12px;display:none"></div>
+        </div>
+      </div>
+      <div id="whyFallback" style="display:none;margin-top:12px">
+        <div class="card"><h3>AI ranges (fallback)</h3>
+          <table id="whyTable"><thead><tr><th>File</th><th>Lines</th><th>Agent</th><th>Prompt</th><th>Session</th><th>Origin</th></tr></thead><tbody></tbody></table>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -107,6 +158,7 @@ th{color:var(--muted);font-weight:600;font-size:12px}
       <button class="on" data-f="all">All</button>
       <button data-f="due">Due</button>
       <button data-f="active">Active</button>
+      <button data-f="kept">Kept</button>
       <button data-f="removed">Removed</button>
     </div>
     <div class="card">
@@ -236,27 +288,146 @@ var nhHtml = '';
 if (!nhHtml) nhHtml = '<tr><td colspan="2" class="muted">nothing needs attention right now</td></tr>';
 document.getElementById('needsHumanTable').innerHTML = nhHtml;
 
-// WHY: ranges grouped by file
-var byFile = {};
-ranges.forEach(function(r) {
-  if (!byFile[r.file]) byFile[r.file] = [];
-  byFile[r.file].push(r);
-});
-var whyTbody = document.querySelector('#whyTable tbody');
-Object.keys(byFile).sort().forEach(function(file) {
-  byFile[file].forEach(function(r) {
-    var sess = sessions.find(function(s) { return s.id === r.session; }) || {};
-    var tr = document.createElement('tr');
-    tr.innerHTML =
-      '<td>' + esc(file) + '</td>' +
-      '<td>' + r.lines[0] + '-' + r.lines[1] + '</td>' +
-      '<td>' + esc(sess.agent || '') + '</td>' +
-      '<td class="prompt" style="margin:0;border-radius:0;background:none;font-style:normal;max-width:280px;word-break:break-word">' + esc(sess.prompt || '') + '</td>' +
-      '<td>' + esc((r.session || '').slice(0, 8)) + '</td>' +
-      '<td>' + esc(r.origin) + '</td>';
-    whyTbody.appendChild(tr);
-  });
-});
+// WHY view
+(function() {
+  var why = DATA.why;
+  var allItems = (check.due || []).concat(check.active || []).concat(check.other || []);
+
+  // undefined = old data without why; null or empty files = nothing at HEAD
+  if (why === undefined) {
+    // fallback: show the old ranges table
+    document.getElementById('whyMain').style.display = 'block';
+    document.getElementById('whyFallback').style.display = 'block';
+    var byFile = {};
+    ranges.forEach(function(r) {
+      if (!byFile[r.file]) byFile[r.file] = [];
+      byFile[r.file].push(r);
+    });
+    var whyTbody = document.querySelector('#whyTable tbody');
+    Object.keys(byFile).sort().forEach(function(file) {
+      byFile[file].forEach(function(r) {
+        var sess = sessions.find(function(s) { return s.id === r.session; }) || {};
+        var tr = document.createElement('tr');
+        tr.innerHTML =
+          '<td>' + esc(file) + '</td>' +
+          '<td>' + r.lines[0] + '-' + r.lines[1] + '</td>' +
+          '<td>' + esc(sess.agent || '') + '</td>' +
+          '<td style="max-width:280px;word-break:break-word">' + esc(sess.prompt || '') + '</td>' +
+          '<td>' + esc((r.session || '').slice(0, 8)) + '</td>' +
+          '<td>' + esc(r.origin) + '</td>';
+        whyTbody.appendChild(tr);
+      });
+    });
+    return;
+  }
+
+  var files = ((why && why.files) || []).slice().sort(function(a, b) { return b.aiLines - a.aiLines || (a.file < b.file ? -1 : 1); });
+  if (!files.length) {
+    document.getElementById('whyEmpty').style.display = 'block';
+    return;
+  }
+
+  document.getElementById('whyMain').style.display = 'block';
+  document.getElementById('whyFileCount').textContent = files.length + ' file(s)';
+
+  var sessMap = {};
+  sessions.forEach(function(s) { sessMap[s.id] = s; });
+  var itemMap = {};
+  allItems.forEach(function(it) { itemMap[it.id] = it; });
+
+  var currentFile = null;
+
+  function lineClass(line) {
+    if (!line.origin) return 'hu';
+    if (line.item) return 'tmp';
+    if (line.origin === 'ai-edited') return 'mx';
+    return 'ai';
+  }
+
+  function renderCode(f) {
+    currentFile = f;
+    document.getElementById('whyCodeTitle').textContent = f.file + (f.truncated ? ' (showing first 400 lines)' : '');
+    var cv = document.getElementById('whyCode');
+    cv.innerHTML = '';
+    var detail = document.getElementById('whyDetail');
+    detail.style.display = 'none';
+    detail.innerHTML = '';
+    f.code.forEach(function(line) {
+      var d = document.createElement('div');
+      d.className = lineClass(line);
+      d.innerHTML = '<span class="n">' + line.n + '</span>' + esc(line.text);
+      d.onclick = function() {
+        cv.querySelectorAll('div').forEach(function(x) { x.classList.remove('sel'); });
+        d.classList.add('sel');
+        showLineDetail(f.file, line);
+      };
+      cv.appendChild(d);
+    });
+    // select first AI line by default
+    var first = f.code.find(function(l) { return l.origin; });
+    if (first) {
+      var el = cv.children[first.n - 1] || cv.children[0];
+      if (el) { el.classList.add('sel'); showLineDetail(f.file, first); }
+    }
+    // update file list selection
+    document.querySelectorAll('.why-file-row').forEach(function(r) {
+      r.classList.toggle('on', r.getAttribute('data-file') === f.file);
+    });
+  }
+
+  function showLineDetail(file, line) {
+    var detail = document.getElementById('whyDetail');
+    detail.style.display = 'block';
+    var sess = line.session ? (sessMap[line.session] || {}) : {};
+    var item = line.item ? (itemMap[line.item] || null) : null;
+    if (!line.origin) {
+      detail.innerHTML = '<h4>Line ' + line.n + ' &middot; human</h4>' +
+        '<p class="muted" style="margin:4px 0 0">Human-written: no prompt on record.</p>' +
+        '<div class="term"><span class="p">$</span> whyline why ' + esc(file) + ':' + line.n + '</div>';
+      return;
+    }
+    var who = line.origin === 'ai-edited' ? 'AI (edited by a human)' : 'AI (' + esc(sess.agent || 'unknown') + ')';
+    var h = '<h4>Line ' + line.n + ' &middot; ' + who + '</h4><dl>';
+    if (sess.id) h += '<dt>Session</dt><dd>' + esc(sess.id.slice(0, 8)) + (sess.cost != null ? ' &middot; ' + esc(String(sess.cost)) + ' Bobcoin' : ' &middot; cost: no data') + '</dd>';
+    if (sess.author) h += '<dt>Author</dt><dd>' + esc(sess.author) + '</dd>';
+    if (sess.ts) h += '<dt>When</dt><dd>' + esc(sess.ts.slice(0, 10)) + '</dd>';
+    h += '<dt>Origin</dt><dd>' + esc(line.origin) + '</dd>';
+    if (item) {
+      var cond = item.condition ? (item.condition.type + (item.condition.on ? ' ' + item.condition.on : '')) : '';
+      h += '<dt>Item</dt><dd>' + esc(item.id) + ' ' + esc(item.kind || '') + ' &middot; ' + esc(item.state || '') + (cond ? ' &middot; ' + esc(cond) : '') + '</dd>';
+    }
+    h += '</dl>';
+    if (sess.prompt) h += '<div class="prompt">&ldquo;' + esc(sess.prompt) + '&rdquo;</div>';
+    h += '<div class="term"><span class="p">$</span> whyline why ' + esc(file) + ':' + line.n + '</div>';
+    detail.innerHTML = h;
+  }
+
+  function buildFileList(filter) {
+    var list = document.getElementById('whyFileList');
+    list.innerHTML = '';
+    var visible = files.filter(function(f) { return !filter || f.file.toLowerCase().indexOf(filter.toLowerCase()) !== -1; });
+    document.getElementById('whyFileCount').textContent = visible.length + ' / ' + files.length + ' file(s)';
+    visible.forEach(function(f) {
+      var pct = f.lines ? Math.round(f.aiLines / f.lines * 100) : 0;
+      var row = document.createElement('div');
+      row.className = 'why-file-row';
+      row.setAttribute('data-file', f.file);
+      row.innerHTML =
+        '<span class="fname" title="' + esc(f.file) + '">' + esc(f.file) + '</span>' +
+        '<span class="fbar"><div class="bar" style="height:6px"><i style="width:' + pct + '%"></i></div></span>' +
+        '<span class="fcnt">' + f.aiLines + ' / ' + f.lines + '</span>';
+      row.onclick = function() { renderCode(f); };
+      list.appendChild(row);
+    });
+  }
+
+  buildFileList('');
+  renderCode(files[0]);
+
+  document.getElementById('whySearch').oninput = function() {
+    buildFileList(this.value);
+  };
+})();
 
 // EXPIRY
 var allItems = (check.due || []).concat(check.active || []).concat(check.other || []);
@@ -271,11 +442,12 @@ function renderExpiry(f) {
       '<td>' + esc(x.id) + '</td>' +
       '<td><span class="tag ' + esc(kindTag(x.kind)) + '">' + esc(x.kind || '') + '</span></td>' +
       '<td>' + esc(x.file || '') + '</td>' +
-      '<td>' + esc(x.reason || '') + '</td>' +
+      '<td class="wrap" style="min-width:180px">' + esc(x.reason || '') + '</td>' +
       '<td>' + esc(cond) + '</td>' +
       '<td><span class="tag ' + esc(stTag[x.state] || 'dim') + '">' + esc(x.state) + '</span></td>';
     tb.appendChild(tr);
   });
+  if (!tb.children.length) tb.innerHTML = '<tr><td colspan="6" class="muted">' + (allItems.length ? 'no ' + esc(f) + ' items' : 'no temporary items yet (Whyline records one when Bob writes a mock, demo, flag, shim or fixture)') + '</td></tr>';
   document.querySelectorAll('#expFilters button').forEach(function(b) {
     b.classList.toggle('on', b.getAttribute('data-f') === f);
   });
@@ -309,15 +481,16 @@ var unrevTbody = document.querySelector('#unrevTable tbody');
   tr.innerHTML = '<td>' + esc(f.file) + '</td><td>' + f.aiLines + '</td><td>' + (f.coverage != null ? f.coverage + '%' : 'no data') + '</td>';
   unrevTbody.appendChild(tr);
 });
+if (!unrevTbody.children.length) unrevTbody.innerHTML = '<tr><td colspan="3" class="muted">' + (ranges.length ? 'every AI line has had a human edit since' : 'no AI-written lines recorded yet (commit something Bob wrote, then run whyline report)') + '</td></tr>';
 
 // BOM
 if (bom) {
   document.getElementById('bomTitle').textContent = 'AI Bill of Materials: ' + (bom.range || 'all history');
   var bomRows = [
     ['Lines changed', nd(bom.linesChanged)],
-    ['AI-written', bom.ai.total + (aiPct != null ? ' (' + aiPct + '%)' : '')],
+    ['AI-written', nd(bom.ai.total) + (aiPct != null ? ' (' + aiPct + '%)' : '')],
     ['By agent', Object.keys(bom.ai.byAgent).map(function(a) { return esc(a) + ' ' + bom.ai.byAgent[a]; }).join(' &middot; ') || 'no data'],
-    ['AI lines reviewed', bom.reviewed.lines + (bom.reviewed.percent != null ? ' (' + bom.reviewed.percent + '%)' : ' (no data)')],
+    ['AI lines reviewed', bom.reviewed.lines == null ? 'no data' : bom.reviewed.lines + (bom.reviewed.percent != null ? ' (' + bom.reviewed.percent + '%)' : ' (no data)')],
     ['AI lines covered by tests', bom.tested.lines != null ? String(bom.tested.lines) : 'no data'],
     ['Temporary items (active)', nd(bom.items.active)],
     ['Temporary items (due)', nd(bom.items.due)],
@@ -339,7 +512,7 @@ var statRows = [
   ['Notes recorded', nd(DATA.notes)],
   ['Ranges recorded', nd(ranges.length)],
   ['Sessions recorded', nd(sessions.length)],
-  ['HEAD', esc(DATA.head || 'no data')],
+  ['HEAD', DATA.head ? '<span title="' + esc(DATA.head) + '">' + esc(DATA.head.slice(0, 7)) + '</span>' : 'no data'],
   ['Generated at', esc(DATA.generatedAt || 'no data')]
 ];
 var statHtml = '';
@@ -355,9 +528,24 @@ sessions.slice(0, 50).forEach(function(s) {
     '<td>' + esc(s.author || '') + '</td>' +
     '<td>' + esc((s.ts || '').slice(0, 10)) + '</td>' +
     '<td>' + (s.cost != null ? nd(s.cost) : 'no data') + '</td>' +
-    '<td style="max-width:300px;word-break:break-word">' + esc(s.prompt || '') + '</td>';
+    '<td class="wrap" style="min-width:220px;max-width:300px;word-break:break-word">' + esc(s.prompt || '') + '</td>';
   sessTbody.appendChild(tr);
 });
+if (!sessions.length) sessTbody.innerHTML = '<tr><td colspan="6" class="muted">no sessions yet (work in Bob, commit, then run whyline report)</td></tr>';
+
+// phones: tables with a header stack into one block per row, each cell labelled by its column
+function labelCells() {
+  document.querySelectorAll('table').forEach(function(t) {
+    var heads = [].map.call(t.querySelectorAll('thead th'), function(th) { return th.textContent; });
+    if (!heads.length) return;
+    t.classList.add('stack');
+    t.querySelectorAll('tbody tr').forEach(function(tr) {
+      [].forEach.call(tr.children, function(td, i) { if (heads[i] && !td.hasAttribute('colspan')) td.setAttribute('data-label', heads[i]); });
+    });
+  });
+}
+labelCells();
+document.querySelectorAll('#expFilters button').forEach(function(b) { b.addEventListener('click', labelCells); });
 
 // initial view
 var v = 'overview';
