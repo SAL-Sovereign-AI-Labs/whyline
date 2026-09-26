@@ -14,6 +14,7 @@ Cost is the task's own figure from its task summary (click New task before each 
 | A task05 | dogfood: whyline installed on whyline itself, used on Bob's own work, 5 issues reported (see docs/04 section 11); badge 5.79 minus 2.35 | 3.44 | whyline_a_task05_dogfood.png |
 | A task06 | removal take in the whyline-remover mode on the demo shop: evidence, dry run, approval, commit bdf52fd, item recorded removed; new task, cost from Bob's database | 0.687 | whyline_a_task06_removal.png |
 | A task07 | removal in plain Agent mode via the whyline-remove skill (no custom mode): "remove the mock payment gateway", evidence, approval, commit 75b84b6, item recorded removed; new task | 0.794 | whyline_a_task07_removal_skill.png |
+| A tasks02-05 | the task session summary panel (Task, Context Length, Task Id, Workspace, Bobcoins) of the shared thread behind tasks 02 to 05: 67.7k of 270k context tokens; per-task costs above come from the badge deltas and Bob's task database (5.786 total) | (sum of rows above) | whyline_a_tasks02-05_thread_summary.png |
 
 ## Atiq
 
