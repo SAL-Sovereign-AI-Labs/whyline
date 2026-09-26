@@ -114,6 +114,11 @@ input.search{border:1px solid var(--line);background:var(--card);color:var(--ink
         <div class="howto">In Bob IDE say <code>remove &lt;id&gt;</code> (mode whyline-remover). In a terminal: <code>whyline check</code>, <code>whyline why &lt;file&gt;:&lt;line&gt;</code>.</div>
       </div>
     </div>
+    <div class="row3">
+      <div class="card"><h3>Temporary code by kind</h3><table id="ovKindTable"></table></div>
+      <div class="card" id="ovFolderCard"><h3>AI share by folder <small>lines in files Bob touched</small></h3><table id="ovFolderTable"></table></div>
+      <div class="card"><h3>Last removal</h3><div id="ovLastRemoval"></div></div>
+    </div>
   </section>
 
   <!-- WHY -->
@@ -287,6 +292,107 @@ var nhHtml = '';
 });
 if (!nhHtml) nhHtml = '<tr><td colspan="2" class="muted">nothing needs attention right now</td></tr>';
 document.getElementById('needsHumanTable').innerHTML = nhHtml;
+
+// OVERVIEW panel 1: Temporary code by kind
+(function() {
+  var allItems = (check.due || []).concat(check.active || []).concat(check.other || []);
+  var KINDS = ['mock', 'demo', 'flag', 'shim', 'fixture', 'todo'];
+  var STATES = ['active', 'due', 'kept', 'removed'];
+  var stCls = { active: 'ok', due: 'bad', kept: 'dim', removed: 'dim' };
+  // group items by kind then state
+  var byKind = {};
+  allItems.forEach(function(it) {
+    var k = it.kind || 'other';
+    if (!byKind[k]) byKind[k] = { active: 0, due: 0, kept: 0, removed: 0 };
+    var s = it.state || 'active';
+    byKind[k][s] = (byKind[k][s] || 0) + 1;
+  });
+  // sort: known kinds first (in KINDS order), then any extras alphabetically
+  var knownKinds = KINDS.filter(function(k) { return byKind[k]; });
+  var extraKinds = Object.keys(byKind).filter(function(k) { return KINDS.indexOf(k) === -1; }).sort();
+  var kinds = knownKinds.concat(extraKinds);
+  var html = '';
+  if (!kinds.length) {
+    html = '<tr><td class="muted" colspan="2">no temporary items recorded yet</td></tr>';
+  } else {
+    html += '<tr><th>Kind</th><th>Counts</th></tr>';
+    kinds.forEach(function(k) {
+      var counts = byKind[k];
+      var tags = STATES.filter(function(s) { return counts[s]; }).map(function(s) {
+        return '<span class="tag ' + stCls[s] + '" style="margin-right:3px">' + counts[s] + ' ' + esc(s) + '</span>';
+      }).join('');
+      html += '<tr><td>' + esc(k) + '</td><td>' + tags + '</td></tr>';
+    });
+  }
+  document.getElementById('ovKindTable').innerHTML = html;
+})();
+
+// OVERVIEW panel 2: AI share by folder
+(function() {
+  var why = DATA.why;
+  var files = (why && why.files) || [];
+  if (!files.length) {
+    document.getElementById('ovFolderCard').style.display = 'none';
+    return;
+  }
+  // group by folder: use first two segments when first is "src", else first segment
+  var byFolder = {};
+  files.forEach(function(f) {
+    var parts = f.file.split('/');
+    var folder = (parts.length > 1 && parts[0] === 'src') ? parts[0] + '/' + (parts[1] || '') : parts[0];
+    if (!byFolder[folder]) byFolder[folder] = { aiLines: 0, lines: 0 };
+    byFolder[folder].aiLines += f.aiLines;
+    byFolder[folder].lines += f.lines;
+  });
+  // sort by AI lines descending
+  var sorted = Object.keys(byFolder).sort(function(a, b) { return byFolder[b].aiLines - byFolder[a].aiLines; });
+  var html = '';
+  sorted.forEach(function(folder) {
+    var d = byFolder[folder];
+    var p = d.lines ? Math.round(d.aiLines / d.lines * 100) : 0;
+    html += '<tr>' +
+      '<td style="width:100px;white-space:nowrap">' + esc(folder) + '</td>' +
+      '<td style="width:50%"><div class="bar"><i style="width:' + p + '%"></i></div></td>' +
+      '<td style="white-space:nowrap;font-size:12px">' + d.aiLines + ' of ' + d.lines + ' (' + p + '%)</td>' +
+      '</tr>';
+  });
+  document.getElementById('ovFolderTable').innerHTML = html;
+})();
+
+// OVERVIEW panel 3: Last removal
+(function() {
+  var other = check.other || [];
+  var removed = other.filter(function(it) { return it.state === 'removed'; });
+  var el = document.getElementById('ovLastRemoval');
+  if (!removed.length) {
+    el.innerHTML = '<p class="muted" style="margin:0">nothing removed yet (say <code>remove &lt;id&gt;</code> in the whyline-remover mode)</p>';
+    return;
+  }
+  // pick the one with the latest `at` timestamp
+  removed.sort(function(a, b) { return (b.at || '') > (a.at || '') ? 1 : -1; });
+  var it = removed[0];
+  var cond = it.condition ? (it.condition.type + (it.condition.on ? ' ' + it.condition.on : '')) : null;
+  var short = it.removedIn ? it.removedIn.slice(0, 7) : null;
+  var html = '<dl style="display:grid;grid-template-columns:90px 1fr;gap:3px 8px;font-size:13px;margin:0">' +
+    '<dt class="muted">Item</dt><dd>' + esc(it.id) + '</dd>' +
+    '<dt class="muted">Kind</dt><dd><span class="tag ' + esc(kindTagOf(it.kind)) + '">' + esc(it.kind || 'unknown') + '</span></dd>' +
+    '<dt class="muted">File</dt><dd>' + esc(it.file || '') + '</dd>' +
+    '<dt class="muted">Reason</dt><dd>' + nd(it.reason) + '</dd>' +
+    (cond ? '<dt class="muted">Condition</dt><dd>' + esc(cond) + '</dd>' : '') +
+    '<dt class="muted">Removed by</dt><dd>' + nd(it.by) + '</dd>' +
+    '<dt class="muted">Date</dt><dd>' + nd(it.at ? it.at.slice(0, 10) : null) + '</dd>' +
+    (short ? '<dt class="muted">Commit</dt><dd>' + esc(short) + '</dd>' : '') +
+    '</dl>';
+  if (short) {
+    html += '<div class="howto" style="margin-top:8px">evidence: the Bob task that removed it and commit <code>' + esc(short) + '</code></div>';
+  }
+  el.innerHTML = html;
+})();
+
+function kindTagOf(k) {
+  var m = { flag: 'info', mock: 'pur', shim: 'warn', demo: 'dim', todo: 'dim', fixture: 'dim' };
+  return m[k] || 'dim';
+}
 
 // WHY view
 (function() {
