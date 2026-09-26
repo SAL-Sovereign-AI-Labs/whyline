@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Whyline Report</title>
+<style>
+:root{--bg:#f4f6f9;--card:#fff;--ink:#14171c;--muted:#5d6675;--line:#e1e5ea;--accent:#0f62fe;--accent2:#8a3ffc;--ok:#198038;--warn:#b28600;--bad:#da1e28;--term:#111418;--termink:#d6dde6;--ai:#e8f0ff;--human:#e6f4ea;--side:#161616;--sideink:#c6c6c6}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#0f1216;--card:#181d24;--ink:#e6e9ee;--muted:#98a2b3;--line:#2a313b;--accent:#4589ff;--accent2:#be95ff;--ok:#42be65;--warn:#f1c21b;--bad:#fa4d56;--term:#0a0c0f;--ai:#1d2a45;--human:#16301f;--side:#0a0c0f}}
+:root[data-theme="dark"]{--bg:#0f1216;--card:#181d24;--ink:#e6e9ee;--muted:#98a2b3;--line:#2a313b;--accent:#4589ff;--accent2:#be95ff;--ok:#42be65;--warn:#f1c21b;--bad:#fa4d56;--term:#0a0c0f;--ai:#1d2a45;--human:#16301f;--side:#0a0c0f}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+.app{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
+aside{background:var(--side);color:var(--sideink);padding:18px 14px;position:sticky;top:0;height:100vh}
+.brand{color:#fff;font-weight:700;font-size:15px;margin:0 6px 4px}
+.brand small{display:block;color:#8d8d8d;font-weight:400;font-size:11px}
+.repo{margin:14px 6px;padding:8px 10px;border:1px solid #393939;border-radius:8px;font-size:12px;color:#fff}
+.repo small{display:block;color:#8d8d8d}
+nav button{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:none;border:0;color:var(--sideink);padding:10px 10px;border-radius:8px;font-size:14px;cursor:pointer}
+nav button:hover{background:#262626;color:#fff}
+nav button.on{background:var(--accent);color:#fff}
+nav button .cnt{margin-left:auto;font-size:11px;background:#393939;padding:1px 7px;border-radius:10px;color:#fff}
+nav button.on .cnt{background:rgba(255,255,255,.25)}
+.side-foot{position:absolute;bottom:16px;left:14px;right:14px;font-size:11px;color:#8d8d8d;line-height:1.5}
+.side-foot b{color:#fff;display:block}
+main{padding:22px 26px 60px;min-width:0}
+.top{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+h1{font-size:22px;margin:0}
+.top p{margin:2px 0 0;color:var(--muted)}
+.ro{font-size:12px;color:var(--muted);border:1px solid var(--line);border-radius:8px;padding:6px 10px;background:var(--card)}
+.ro b{color:var(--ink)}
+.view{display:none}.view.on{display:block}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.kpi .v{font-size:30px;font-weight:700;line-height:1.1}
+.kpi .l{color:var(--muted);font-size:12px;margin-top:4px}
+.kpi .d{font-size:12px;margin-top:6px}
+.row2{display:grid;grid-template-columns:1.4fr 1fr;gap:12px;margin-top:12px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:12px}
+@media (max-width:980px){.row2,.row3{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}
+.card h3{margin:0 0 10px;font-size:14px}
+.card h3 small{color:var(--muted);font-weight:400;margin-left:6px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{text-align:left;padding:8px 8px;border-bottom:1px solid var(--line);vertical-align:middle}
+th{color:var(--muted);font-weight:600;font-size:12px}
+.tag{display:inline-block;font-size:11px;padding:2px 7px;border-radius:5px;font-weight:600;white-space:nowrap}
+.tag.ok{background:rgba(25,128,56,.15);color:var(--ok)}.tag.warn{background:rgba(178,134,0,.15);color:var(--warn)}.tag.bad{background:rgba(218,30,40,.15);color:var(--bad)}.tag.info{background:var(--ai);color:var(--accent)}.tag.pur{background:rgba(138,63,252,.15);color:var(--accent2)}.tag.dim{background:var(--line);color:var(--muted)}
+.bar{height:8px;background:var(--line);border-radius:4px;overflow:hidden;display:flex}
+.bar i{display:block;height:100%;background:var(--accent);width:0}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:8px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;vertical-align:-1px;margin-right:4px}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;align-items:center}
+.filters button{border:1px solid var(--line);background:var(--card);color:var(--muted);border-radius:16px;padding:4px 11px;font-size:12px;cursor:pointer}
+.filters button.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.prompt{background:var(--ai);border-radius:8px;padding:8px 10px;margin-top:8px;font-style:italic;font-size:12.5px;word-break:break-word}
+.howto{border-left:3px solid var(--accent);background:var(--ai);border-radius:0 8px 8px 0;padding:8px 12px;font-size:12.5px;margin-top:10px}
+.howto code{background:rgba(0,0,0,.08);padding:1px 5px;border-radius:4px}
+.muted{color:var(--muted)}
+.burger{display:none;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;padding:5px 10px;font-size:12px;cursor:pointer;margin-bottom:6px}
+@media (max-width:820px){.app{grid-template-columns:1fr}aside{position:fixed;left:-240px;width:232px;transition:.2s;z-index:15}aside.open{left:0}.burger{display:inline-block}main{padding:16px}.top{align-items:flex-start}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside id="side">
+  <div class="brand">Whyline <small>report &middot; read-only &middot; generated by whyline report</small></div>
+  <div class="repo" id="repoBox"></div>
+  <nav id="nav">
+    <button class="on" data-view="overview">Overview</button>
+    <button data-view="why">Why (blame)</button>
+    <button data-view="expiry">Expiry <span class="cnt" id="expCnt"></span></button>
+    <button data-view="unreviewed">Unreviewed <span class="cnt" id="unrevCnt"></span></button>
+    <button data-view="bom">AI Bill of Materials</button>
+    <button data-view="status">Status</button>
+  </nav>
+  <div class="side-foot" id="sidefoot"></div>
+</aside>
+<main>
+  <div class="top">
+    <div><button class="burger" onclick="document.getElementById('side').classList.toggle('open')">Menu</button>
+      <h1 id="title">Overview</h1><p id="subtitle"></p></div>
+    <div class="ro"><b>Read-only.</b> Actions run in Bob or the CLI. This page has no buttons that change anything.</div>
+  </div>
+
+  <!-- OVERVIEW -->
+  <section class="view on" id="v-overview">
+    <div class="kpis" id="ovKpis"></div>
+    <div class="row2">
+      <div class="card"><h3>By agent</h3><table id="agentTable"></table></div>
+      <div class="card"><h3>Needs a human</h3><table id="needsHumanTable"></table>
+        <div class="howto">In Bob IDE say <code>remove &lt;id&gt;</code> (mode whyline-remover). In a terminal: <code>whyline check</code>, <code>whyline why &lt;file&gt;:&lt;line&gt;</code>.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHY -->
+  <section class="view" id="v-why">
+    <div class="card"><h3>AI-written ranges by file <small>prompt on record</small></h3>
+      <table id="whyTable"><thead><tr><th>File</th><th>Lines</th><th>Agent</th><th>Prompt</th><th>Session</th><th>Origin</th></tr></thead><tbody></tbody></table>
+    </div>
+  </section>
+
+  <!-- EXPIRY -->
+  <section class="view" id="v-expiry">
+    <div class="filters" id="expFilters">
+      <button class="on" data-f="all">All</button>
+      <button data-f="due">Due</button>
+      <button data-f="active">Active</button>
+      <button data-f="removed">Removed</button>
+    </div>
+    <div class="card">
+      <table id="expTable"><thead><tr><th>Item</th><th>Kind</th><th>Where</th><th>Reason</th><th>Condition</th><th>Status</th></tr></thead><tbody></tbody></table>
+      <div class="howto">To act: in Bob IDE say <code>remove &lt;id&gt;</code>. To override: <code>whyline keep &lt;id&gt; "reason"</code> or <code>whyline until &lt;id&gt; 2027-01-01</code>.</div>
+    </div>
+  </section>
+
+  <!-- UNREVIEWED -->
+  <section class="view" id="v-unreviewed">
+    <div class="kpis" id="unrevKpis"></div>
+    <div class="card" style="margin-top:12px">
+      <h3>Worst first</h3>
+      <table id="unrevTable"><thead><tr><th>File</th><th>AI lines</th><th>Coverage</th></tr></thead><tbody></tbody></table>
+      <div class="howto" id="unrevHowto"></div>
+    </div>
+  </section>
+
+  <!-- BOM -->
+  <section class="view" id="v-bom">
+    <div class="card" id="bomCard"><h3 id="bomTitle">AI Bill of Materials</h3><table id="bomTable"></table></div>
+  </section>
+
+  <!-- STATUS -->
+  <section class="view" id="v-status">
+    <div class="card"><h3>Notes and sessions</h3>
+      <table id="statusTable"></table>
+    </div>
+    <div class="card" style="margin-top:12px"><h3>Recent sessions <small>prompt on record</small></h3>
+      <table id="sessionTable"><thead><tr><th>Session</th><th>Agent</th><th>Author</th><th>When</th><th>Cost</th><th>Prompt</th></tr></thead><tbody></tbody></table>
+    </div>
+  </section>
+</main>
+</div>
+
+<script>
+var DATA = window.WHYLINE_DATA;
+
+function esc(s) {
+  if (s == null) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function nd(v) { return (v == null) ? 'no data' : esc(String(v)); }
+function pct(n, d) { return (d && d > 0 && n != null) ? Math.round(n / d * 100) + '%' : 'no data'; }
+
+var titles = {
+  overview: ['Overview', 'captured by Bob hooks'],
+  why: ['Why does this line exist?', 'the prompt, the session, the agent behind every AI range'],
+  expiry: ['Expiry', 'temporary code with a reason and a removal condition'],
+  unreviewed: ['Unreviewed AI code', 'AI-written lines with no review signal'],
+  bom: ['AI Bill of Materials', 'lines changed, AI share, reviewed, cost for the range'],
+  status: ['Status', 'notes, sessions and ranges recorded by the hooks']
+};
+
+function showView(v) {
+  document.querySelectorAll('.view').forEach(function(s) { s.classList.toggle('on', s.id === 'v-' + v); });
+  document.querySelectorAll('nav button').forEach(function(b) { b.classList.toggle('on', b.getAttribute('data-view') === v); });
+  var t = titles[v] || titles['overview'];
+  document.getElementById('title').textContent = t[0];
+  document.getElementById('subtitle').textContent = t[1];
+  document.getElementById('side').classList.remove('open');
+  try { localStorage.setItem('whyline-report-view', v); } catch(e) {}
+}
+document.querySelectorAll('nav button').forEach(function(b) {
+  b.onclick = function() { showView(b.getAttribute('data-view')); };
+});
+
+// ---- populate ----
+var check = DATA.check || {};
+var bom = DATA.bom || null;
+var unreviewed = DATA.unreviewed || {};
+var sessions = DATA.sessions || [];
+var ranges = DATA.ranges || [];
+
+// repo box
+document.getElementById('repoBox').innerHTML =
+  '<b>' + esc(DATA.repo) + '</b>' +
+  '<small>' + esc((DATA.head || '').slice(0,7)) + ' &middot; ' + (DATA.notes || 0) + ' note(s) &middot; ' + ranges.length + ' range(s)</small>';
+
+// side foot
+document.getElementById('sidefoot').innerHTML =
+  '<b>Whyline 0.1</b>generated ' + esc(DATA.generatedAt ? DATA.generatedAt.replace('T', ' ').slice(0, 16) : '');
+
+// expiry counts
+var due = (check.due || []).length;
+var counts = check.counts || {};
+document.getElementById('expCnt').textContent = due > 0 ? due + ' due' : '';
+var unrevFiles = (unreviewed.totals && unreviewed.totals.files) || 0;
+document.getElementById('unrevCnt').textContent = unrevFiles > 0 ? unrevFiles : '';
+
+// OVERVIEW kpis
+var aiTotal = bom ? bom.ai.total : null;
+var linesChanged = bom ? bom.linesChanged : null;
+var aiPct = (aiTotal != null && linesChanged) ? Math.round(aiTotal / linesChanged * 100) : null;
+var revPct = bom ? bom.reviewed.percent : null;
+var kpis = [
+  { v: aiPct != null ? aiPct + '%' : 'no data', l: 'AI-written (% of lines changed)', c: '' },
+  { v: revPct != null ? revPct + '%' : 'no data', l: 'AI lines reviewed', c: 'color:var(--warn)' },
+  { v: nd(counts.active + counts.due || null), l: 'temporary items tracked', c: 'color:var(--accent2)' },
+  { v: nd(sessions.length || null), l: 'sessions on record', c: '' }
+];
+var kpiHtml = '';
+kpis.forEach(function(k) {
+  kpiHtml += '<div class="kpi"><div class="v" style="' + k.c + '">' + k.v + '</div><div class="l">' + k.l + '</div></div>';
+});
+document.getElementById('ovKpis').innerHTML = kpiHtml;
+
+// by agent table
+var byAgent = (bom && bom.ai && bom.ai.byAgent) ? bom.ai.byAgent : {};
+var agHtml = '';
+Object.keys(byAgent).forEach(function(agent) {
+  var n = byAgent[agent];
+  var w = aiTotal ? Math.round(n / aiTotal * 100) : 0;
+  agHtml += '<tr><td>' + esc(agent) + '</td><td style="width:55%"><div class="bar"><i style="width:' + w + '%"></i></div></td><td>' + nd(n) + '</td></tr>';
+});
+if (!agHtml) agHtml = '<tr><td colspan="3" class="muted">no AI ranges in this range</td></tr>';
+document.getElementById('agentTable').innerHTML = agHtml;
+
+// needs a human
+var nhHtml = '';
+(check.due || []).slice(0, 5).forEach(function(it) {
+  nhHtml += '<tr><td><span class="tag bad">due</span></td><td>' + esc(it.id) + ' ' + esc(it.kind || '') + ' &middot; ' + esc(it.file || '') + '</td></tr>';
+});
+(unreviewed.files || []).filter(function(f) { return f.aiLines > 0; }).slice(0, 3).forEach(function(f) {
+  nhHtml += '<tr><td><span class="tag warn">unreviewed</span></td><td>' + esc(f.file) + ': ' + f.aiLines + ' AI lines</td></tr>';
+});
+if (!nhHtml) nhHtml = '<tr><td colspan="2" class="muted">nothing needs attention right now</td></tr>';
+document.getElementById('needsHumanTable').innerHTML = nhHtml;
+
+// WHY: ranges grouped by file
+var byFile = {};
+ranges.forEach(function(r) {
+  if (!byFile[r.file]) byFile[r.file] = [];
+  byFile[r.file].push(r);
+});
+var whyTbody = document.querySelector('#whyTable tbody');
+Object.keys(byFile).sort().forEach(function(file) {
+  byFile[file].forEach(function(r) {
+    var sess = sessions.find(function(s) { return s.id === r.session; }) || {};
+    var tr = document.createElement('tr');
+    tr.innerHTML =
+      '<td>' + esc(file) + '</td>' +
+      '<td>' + r.lines[0] + '-' + r.lines[1] + '</td>' +
+      '<td>' + esc(sess.agent || '') + '</td>' +
+      '<td class="prompt" style="margin:0;border-radius:0;background:none;font-style:normal;max-width:280px;word-break:break-word">' + esc(sess.prompt || '') + '</td>' +
+      '<td>' + esc((r.session || '').slice(0, 8)) + '</td>' +
+      '<td>' + esc(r.origin) + '</td>';
+    whyTbody.appendChild(tr);
+  });
+});
+
+// EXPIRY
+var allItems = (check.due || []).concat(check.active || []).concat(check.other || []);
+var stTag = { due: 'bad', active: 'ok', kept: 'dim', removed: 'dim' };
+function renderExpiry(f) {
+  var tb = document.querySelector('#expTable tbody');
+  tb.innerHTML = '';
+  allItems.filter(function(x) { return f === 'all' || x.state === f; }).forEach(function(x) {
+    var cond = x.condition ? (x.condition.type + (x.condition.on ? ' ' + x.condition.on : '') + (x.condition.symbol ? ' ' + x.condition.symbol : '')) : '';
+    var tr = document.createElement('tr');
+    tr.innerHTML =
+      '<td>' + esc(x.id) + '</td>' +
+      '<td><span class="tag ' + esc(kindTag(x.kind)) + '">' + esc(x.kind || '') + '</span></td>' +
+      '<td>' + esc(x.file || '') + '</td>' +
+      '<td>' + esc(x.reason || '') + '</td>' +
+      '<td>' + esc(cond) + '</td>' +
+      '<td><span class="tag ' + esc(stTag[x.state] || 'dim') + '">' + esc(x.state) + '</span></td>';
+    tb.appendChild(tr);
+  });
+  document.querySelectorAll('#expFilters button').forEach(function(b) {
+    b.classList.toggle('on', b.getAttribute('data-f') === f);
+  });
+}
+function kindTag(k) {
+  var m = { flag: 'info', mock: 'pur', shim: 'warn', demo: 'dim', todo: 'dim', fixture: 'dim' };
+  return m[k] || 'dim';
+}
+renderExpiry('all');
+document.querySelectorAll('#expFilters button').forEach(function(b) {
+  b.onclick = function() { renderExpiry(b.getAttribute('data-f')); };
+});
+
+// UNREVIEWED kpis
+var utotals = unreviewed.totals || {};
+var uKpis = [
+  { v: nd(utotals.aiLines || null), l: 'AI-written lines' },
+  { v: nd(utotals.files || null), l: 'files with unreviewed AI lines', c: 'color:var(--warn)' }
+];
+var uKpiHtml = '';
+uKpis.forEach(function(k) {
+  uKpiHtml += '<div class="kpi"><div class="v" style="' + (k.c || '') + '">' + k.v + '</div><div class="l">' + k.l + '</div></div>';
+});
+document.getElementById('unrevKpis').innerHTML = uKpiHtml;
+if ((unreviewed.missing || []).includes('coverage')) {
+  document.getElementById('unrevHowto').textContent = 'No coverage report found. Add coverage.xml or lcov.info to the repo root to see test coverage per line.';
+}
+var unrevTbody = document.querySelector('#unrevTable tbody');
+(unreviewed.files || []).filter(function(f) { return f.aiLines > 0; }).forEach(function(f) {
+  var tr = document.createElement('tr');
+  tr.innerHTML = '<td>' + esc(f.file) + '</td><td>' + f.aiLines + '</td><td>' + (f.coverage != null ? f.coverage + '%' : 'no data') + '</td>';
+  unrevTbody.appendChild(tr);
+});
+
+// BOM
+if (bom) {
+  document.getElementById('bomTitle').textContent = 'AI Bill of Materials: ' + (bom.range || 'all history');
+  var bomRows = [
+    ['Lines changed', nd(bom.linesChanged)],
+    ['AI-written', bom.ai.total + (aiPct != null ? ' (' + aiPct + '%)' : '')],
+    ['By agent', Object.keys(bom.ai.byAgent).map(function(a) { return esc(a) + ' ' + bom.ai.byAgent[a]; }).join(' &middot; ') || 'no data'],
+    ['AI lines reviewed', bom.reviewed.lines + (bom.reviewed.percent != null ? ' (' + bom.reviewed.percent + '%)' : ' (no data)')],
+    ['AI lines covered by tests', bom.tested.lines != null ? String(bom.tested.lines) : 'no data'],
+    ['Temporary items (active)', nd(bom.items.active)],
+    ['Temporary items (due)', nd(bom.items.due)],
+    ['Temporary items (removed)', nd(bom.items.removed)],
+    ['Cost', bom.cost.sum != null ? bom.cost.sum + ' Bobcoin (' + bom.cost.sessionsWithCost + ' of ' + bom.cost.sessions + ' sessions)' : 'no data (' + bom.cost.sessionsWithCost + ' of ' + bom.cost.sessions + ' sessions)']
+  ];
+  var bomHtml = '';
+  bomRows.forEach(function(r) { bomHtml += '<tr><td>' + esc(r[0]) + '</td><td>' + r[1] + '</td></tr>'; });
+  document.getElementById('bomTable').innerHTML = bomHtml;
+  if (bom.missing && bom.missing.length) {
+    document.getElementById('bomCard').innerHTML += '<div class="howto">Missing data: ' + bom.missing.map(esc).join(', ') + '</div>';
+  }
+} else {
+  document.getElementById('bomCard').innerHTML = '<p class="muted">BOM data not available (run: whyline bom).</p>';
+}
+
+// STATUS
+var statRows = [
+  ['Notes recorded', nd(DATA.notes)],
+  ['Ranges recorded', nd(ranges.length)],
+  ['Sessions recorded', nd(sessions.length)],
+  ['HEAD', esc(DATA.head || 'no data')],
+  ['Generated at', esc(DATA.generatedAt || 'no data')]
+];
+var statHtml = '';
+statRows.forEach(function(r) { statHtml += '<tr><td>' + r[0] + '</td><td>' + r[1] + '</td></tr>'; });
+document.getElementById('statusTable').innerHTML = statHtml;
+
+var sessTbody = document.querySelector('#sessionTable tbody');
+sessions.slice(0, 50).forEach(function(s) {
+  var tr = document.createElement('tr');
+  tr.innerHTML =
+    '<td>' + esc((s.id || '').slice(0, 8)) + '</td>' +
+    '<td>' + esc(s.agent || '') + '</td>' +
+    '<td>' + esc(s.author || '') + '</td>' +
+    '<td>' + esc((s.ts || '').slice(0, 10)) + '</td>' +
+    '<td>' + (s.cost != null ? nd(s.cost) : 'no data') + '</td>' +
+    '<td style="max-width:300px;word-break:break-word">' + esc(s.prompt || '') + '</td>';
+  sessTbody.appendChild(tr);
+});
+
+// initial view
+var v = 'overview';
+try { v = localStorage.getItem('whyline-report-view') || 'overview'; } catch(e) {}
+if (!titles[v]) v = 'overview';
+showView(v);
+</script>
+</body>
+</html>
