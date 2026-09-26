@@ -149,3 +149,20 @@ test('keyboard and screen reader hooks are in place', () => {
   assert.match(html, /:focus-visible\{[^}]*outline:2px/, 'visible focus outline');
   assert.match(html, /\.why-file-row:focus\{[^}]*outline:2px/, 'file rows replace the default outline with their own');
 });
+
+test('overview KPI: zero items shows "0" not "no data" when notes exist (counts.active=0, counts.due=0)', () => {
+  // Before the fix, `counts.active + counts.due || null` evaluated to `0 || null = null`,
+  // causing nd(null) = 'no data' for repos with notes but no temporary items.
+  const html = report.render({
+    ...BASE_DATA,
+    check: { due: [], active: [], other: [], counts: { active: 0, due: 0, kept: 0, removed: 0 } },
+    sessions: [],
+  });
+  // The template JS must not have the old broken expression
+  assert.doesNotMatch(html, /counts\.active \+ counts\.due \|\| null/, 'old broken expression must not be present');
+  // The template JS must have the fixed null-guard
+  assert.match(html, /counts\.active != null/, 'fixed null-guard must be present');
+  // nd(sessions.length) must not silently turn 0 into "no data"
+  assert.doesNotMatch(html, /sessions\.length \|\| null/, 'sessions length must not use || null');
+});
+
