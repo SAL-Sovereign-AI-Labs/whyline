@@ -1,0 +1,99 @@
+[
+ {
+  "id": "a1c3e5f7091b2d4f6a8c0e2b4d6f8a0c",
+  "commit": "add mock payment gateway (Bob)",
+  "prompt": "Add a mock payment gateway in src/payments/mock_gateway.py with a class MockGateway whose charge(total) returns True, so the checkout demo works until payments-v2 lands. Make checkout() call MockGateway().charge(...) before returning the total.",
+  "writes": [
+   {
+    "file": "src/payments/mock_gateway.py",
+    "content": "# TODO(payments-v2): replace with the real gateway once payments-v2 lands\nclass MockGateway:\n    def charge(self, total):\n        return True\n"
+   },
+   {
+    "file": "src/payments/checkout.py",
+    "content": "from ..shop.pricing import with_tax\nfrom .mock_gateway import MockGateway\n\n\ndef checkout(order, region=\"pk\"):\n    total = with_tax(order.total(), region)\n    MockGateway().charge(total)\n    return total\n"
+   }
+  ]
+ },
+ {
+  "id": "b2d4f6a8102c3e5f7b9d1f3a5c7e9b1d",
+  "commit": "feature flag for checkout v2 (Bob)",
+  "prompt": "Add a feature flag file config/flags.yaml with checkout_v2 behind a flag, default false, and read it in src/shop/flags.py.",
+  "writes": [
+   {
+    "file": "config/flags.yaml",
+    "content": "features:\n  checkout_v2: false   # rollout flag, remove once 100%\n"
+   },
+   {
+    "file": "src/shop/flags.py",
+    "content": "import pathlib\n\n\ndef enabled(name):\n    text = pathlib.Path(__file__).parents[2].joinpath(\"config\", \"flags.yaml\").read_text()\n    return f\"{name}: true\" in text\n"
+   }
+  ]
+ },
+ {
+  "id": "c3e5f7b9213d4f6a8c0e2b4d6f8a0c2e",
+  "commit": "quick demo script for the sales demo (Bob)",
+  "prompt": "Add a quick demo script examples/demo_orders.py for the sales demo that builds two orders and prints their totals.",
+  "writes": [
+   {
+    "file": "examples/demo_orders.py",
+    "content": "from src.shop.orders import Order\n\nfor items in ([(10, 2)], [(5, 4), (20, 1)]):\n    print(Order(items).total())\n"
+   }
+  ]
+ },
+ {
+  "id": "d4f6a8c0324e5f7b9d1f3a5c7e9b1d3f",
+  "commit": "compat shim for the old sqlite schema (Bob)",
+  "prompt": "Add a compat shim src/db/compat_sqlite.py that maps the old sqlite column names to the new ones until migration 12 lands, and use it from src/db/__init__.py.",
+  "writes": [
+   {
+    "file": "src/db/compat_sqlite.py",
+    "content": "OLD_TO_NEW = {\"cust_id\": \"customer_id\", \"amt\": \"amount\"}\n\n\ndef rename_columns(row):\n    return {OLD_TO_NEW.get(k, k): v for k, v in row.items()}\n"
+   },
+   {
+    "file": "src/db/__init__.py",
+    "content": "from .compat_sqlite import rename_columns  # noqa: F401\n"
+   }
+  ]
+ },
+ {
+  "id": "e5f7b9d1435f6a8c0e2b4d6f8a0c2e4a",
+  "commit": "fixture data for the perf test (Bob)",
+  "prompt": "Add fixture test data tests/fixtures/big_orders.json with 3 orders for the perf test until the generator exists, and a tests/test_perf.py that loads it.",
+  "writes": [
+   {
+    "file": "tests/fixtures/big_orders.json",
+    "content": "[[[10, 2]], [[5, 4], [20, 1]], [[1, 100]]]\n"
+   },
+   {
+    "file": "tests/test_perf.py",
+    "content": "import json\nimport pathlib\n\nfrom src.shop.orders import Order\n\n\ndef test_big_orders_total():\n    data = json.loads(pathlib.Path(__file__).with_name(\"fixtures\").joinpath(\"big_orders.json\").read_text())\n    assert sum(Order(items).total() for items in data) == 160\n"
+   }
+  ]
+ },
+ {
+  "id": "f6a8c0e2546a7b9d1f3a5c7e9b1d3f5b",
+  "commit": "temporary CSV export until the reporting service ships (Bob)",
+  "prompt": "Add a temporary workaround src/reports/legacy_export.py that writes orders to CSV until the new reporting service ships before 2026-12-01, and expose it from src/reports/__init__.py.",
+  "writes": [
+   {
+    "file": "src/reports/legacy_export.py",
+    "content": "import csv\n\n\ndef export_orders(orders, path):\n    with open(path, \"w\", newline=\"\") as f:\n        w = csv.writer(f)\n        for o in orders:\n            w.writerow([o.total()])\n"
+   },
+   {
+    "file": "src/reports/__init__.py",
+    "content": "from .legacy_export import export_orders  # noqa: F401\n"
+   }
+  ]
+ },
+ {
+  "id": "0718293a4b5c6d7e8f90a1b2c3d4e5f6",
+  "commit": "rates helper for regions (Bob)",
+  "prompt": "Add region_names() to src/shop/rates.py returning the sorted region codes.",
+  "writes": [
+   {
+    "file": "src/shop/rates.py",
+    "content": "# Tax rates by region. This is a sample of the real table and is permanent.\nRATES = {\"pk\": 0.17, \"uk\": 0.20, \"us\": 0.0}\n\n\ndef rate_for(region):\n    return RATES.get(region, 0.0)\n\n\ndef region_names():\n    return sorted(RATES)\n"
+   }
+  ]
+ }
+]

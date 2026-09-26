@@ -105,6 +105,17 @@ test('an edited call site of a mock is not itself flagged as temporary', () => {
   assert.equal(session.readAll(dir).length, 0, 'prompt pruned once its writes are consumed');
 });
 
+test('a payload whose path differs only in letter case still lands inside the repo (macOS, Windows)', (t) => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'WhylineCase-'));
+  sh(dir, 'git', ['init', '-q', '-b', 'main']);
+  const lower = dir.toLowerCase();
+  if (!fs.existsSync(lower) || lower === dir) { t.skip('case-sensitive file system'); return; }
+  fs.writeFileSync(path.join(dir, 'a.py'), 'x = 1\n');
+  const git = require('../lib/git');
+  assert.equal(git.relPath(lower, path.join(lower, 'a.py')), 'a.py');
+  assert.equal(capture.handle({ hook_event_name: 'PostToolUse', session_id: 's9', cwd: lower, tool_name: 'write_file', tool_input: { path: path.join(lower, 'a.py'), content: '', line_count: 1 }, tool_response: 'ok' }, { cwd: lower }), 'write');
+});
+
 test('payloads outside the repo, malformed, or non-write tools are ignored', () => {
   const dir = tempRepo();
   assert.equal(capture.handle({ hook_event_name: 'PostToolUse', session_id: 'x', tool_name: 'read_file', tool_input: { path: '/etc/hosts' } }, { cwd: dir }), 'ignored');

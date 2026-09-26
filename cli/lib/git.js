@@ -24,7 +24,14 @@ function relPath(cwd, file) {
   const abs = path.isAbsolute(file) ? file : path.join(cwd, file);
   const real = p => { try { return require('node:fs').realpathSync(p); } catch { return p; } };
   // realpath the parent so a not-yet-existing file still resolves through symlinked temp dirs
-  const rel = path.relative(real(root), path.join(real(path.dirname(abs)), path.basename(abs))).split(path.sep).join('/');
+  const rootR = real(root), absR = path.join(real(path.dirname(abs)), path.basename(abs));
+  // macOS and Windows file systems are case-insensitive and realpath does not always fix the case,
+  // so compare case-insensitively and keep the caller's spelling for the remainder
+  const ci = process.platform === 'darwin' || process.platform === 'win32';
+  let rel;
+  if (ci && absR.toLowerCase().startsWith(rootR.toLowerCase() + path.sep)) rel = absR.slice(rootR.length + 1);
+  else rel = path.relative(rootR, absR);
+  rel = rel.split(path.sep).join('/');
   if (rel.startsWith('..') || rel === '' || rel.split('/')[0] === '.git') return null;
   return rel;
 }

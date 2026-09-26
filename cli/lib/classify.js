@@ -3,7 +3,7 @@
 const RULES = [
   { kind: 'mock', words: ['mock', 'stub', 'fake'], paths: [/(^|\/)mock_/, /(^|\/)fake_/, /\/mocks\//, /stub/] },
   { kind: 'demo', words: ['demo', 'example', 'sample', 'quick script'], paths: [/\/examples?\//, /\/demo\//, /(^|\/)demo_/, /(^|\/)sample_/] },
-  { kind: 'flag', words: ['feature flag', 'behind a flag', 'toggle'], paths: [/flags?\.(ya?ml|json)$/, /feature_flags/] },
+  { kind: 'flag', words: [], paths: [/flags?\.(ya?ml|json)$/, /feature_flags/] }, // flags live in config files; the reader code is permanent
   { kind: 'shim', words: ['workaround', 'temporary', 'temporarily', 'until', 'shim', 'compat', 'hack', 'todo remove'], paths: [/(^|\/)compat_/, /_shim/, /(^|\/)legacy_/] },
   { kind: 'fixture', words: ['fixture', 'seed data', 'test data'], paths: [/\/fixtures\//, /(^|\/)seed/] },
 ];
@@ -12,24 +12,22 @@ function hasWord(text, w) {
   return new RegExp(`(^|[^a-z])${w.replace(/ /g, '\\s+')}([^a-z]|$)`, 'i').test(text);
 }
 
-// Returns {kind, reason} or null. Prompt words only count for files the agent created (created=true);
-// an edit to an existing file that merely calls a mock is not itself temporary. Path rules always count.
+// Returns {kind, reason} or null.
+// Pass 1: path rules, any file (a fixtures folder or a flags file is temporary whatever the prompt said).
+// Pass 2: prompt words, only for files the agent created and only outside tests/ (an edit to an existing file that
+// merely calls a mock is not itself temporary, and a test that mentions "until" is not the temporary thing).
 function temporary(prompt, file, { created = true } = {}) {
   const p = String(prompt || '');
   const inTests = /(^|\/)tests?\//.test(file);
-  for (const r of RULES) {
-    const byWord = created && r.words.some(w => hasWord(p, w));
-    const byPath = r.paths.some(re => re.test(file));
-    if (!byWord && !byPath) continue;
-    if (inTests && (r.kind === 'mock' || r.kind === 'fixture') && !hasWord(p, 'until')) continue;
-    return { kind: r.kind, reason: reasonFrom(p) };
-  }
+  for (const r of RULES) if (r.paths.some(re => re.test(file))) return { kind: r.kind, reason: reasonFrom(p) };
+  if (!created || inTests) return null;
+  for (const r of RULES) if (r.words.some(w => hasWord(p, w))) return { kind: r.kind, reason: reasonFrom(p) };
   return null;
 }
 
 // "... until payments-v2 lands ..." -> "until payments-v2 lands"; else the first sentence.
 function reasonFrom(prompt) {
-  const m = prompt.match(/\b(until|before|for now|temporar\w+)\b[^.]*/i);
+  const m = prompt.match(/\b(until|before|for now|temporar\w+)\b[^.,;\n]*/i);
   if (m) return m[0].trim().slice(0, 140);
   return prompt.split(/[.\n]/)[0].trim().slice(0, 140);
 }

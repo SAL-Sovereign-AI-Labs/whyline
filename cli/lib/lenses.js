@@ -88,7 +88,8 @@ function evaluate(cwd, it, today) {
     return { due: today >= on, evidence: `date ${c.on}` };
   }
   if (c.type === 'no_references') {
-    const excludes = [it.file, 'tests/**', 'test/**', '**/*_test.*', '**/test_*'];
+    // a fixture exists for tests, so references from tests count for it; for everything else tests are excluded
+    const excludes = it.kind === 'fixture' ? [it.file] : [it.file, 'tests/**', 'test/**', '**/*_test.*', '**/test_*'];
     const stem = it.file.split('/').pop().replace(/\.[^.]+$/, '');
     const hits = [...new Set([...(c.symbol ? git.grep(cwd, c.symbol, excludes) : []), ...git.grep(cwd, stem, excludes)])];
     return { due: hits.length === 0, evidence: hits.length ? `${hits.length} reference(s): ${hits.slice(0, 3).join(' | ')}` : 'no references outside the file and its tests' };
