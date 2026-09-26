@@ -70,3 +70,58 @@ test('generatedAt and repo appear in the output', () => {
   assert.ok(html.includes('shop-backend'), 'repo name present');
   assert.ok(html.includes('2026-10-21'), 'generatedAt date present');
 });
+
+// collect(): the Why view's data at HEAD, on a real capture and commit fixture.
+const fs = require('node:fs');
+const os = require('node:os');
+const path = require('node:path');
+const { execFileSync } = require('node:child_process');
+const capture = require('../lib/capture');
+const commit = require('../lib/commit');
+const lenses = require('../lib/lenses');
+
+function sh(cwd, args) {
+  return execFileSync('git', args, { cwd, encoding: 'utf8', env: { ...process.env, GIT_AUTHOR_NAME: 'tester', GIT_COMMITTER_NAME: 'tester', GIT_AUTHOR_EMAIL: 't@example.invalid', GIT_COMMITTER_EMAIL: 't@example.invalid' } }).trim();
+}
+function agentWrite(dir, file, content, sessionId, prompt) {
+  const abs = path.join(dir, file);
+  fs.mkdirSync(path.dirname(abs), { recursive: true });
+  capture.handle({ hook_event_name: 'UserPromptSubmit', session_id: sessionId, cwd: dir, prompt }, { cwd: dir });
+  fs.writeFileSync(abs, content);
+  capture.handle({ hook_event_name: 'PostToolUse', session_id: sessionId, cwd: dir, tool_name: 'write_file', tool_input: { path: abs, content, line_count: content.split('\n').length - 1 }, tool_response: 'Created file' }, { cwd: dir });
+}
+function commitAll(dir, msg) { sh(dir, ['add', '-A', '.']); sh(dir, ['commit', '-q', '-m', msg]); commit.run(dir); }
+
+test('collect: every AI line at HEAD with its session, moved lines follow blame, deleted files are gone', () => {
+  process.env.WHYLINE_BOB_DB = '/nonexistent';
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'whyline-report-'));
+  sh(dir, ['init', '-q', '-b', 'main']);
+  agentWrite(dir, 'cart.py', 'def count(o):\n    return len(o.items)\n\ndef empty(o):\n    return not o.items\n', 's1', 'Add cart helpers.');
+  agentWrite(dir, 'mock_api.py', 'class MockApi:\n    pass\n', 's1', 'Add cart helpers.');
+  commitAll(dir, 'helpers');
+  // a human adds a header above the AI code, rewrites one AI line, and deletes the mock
+  fs.writeFileSync(path.join(dir, 'cart.py'), '# cart\nimport sys\ndef count(o):\n    return len(o.items)\n\ndef empty(o):\n    return len(o.items) == 0\n');
+  fs.rmSync(path.join(dir, 'mock_api.py'));
+  commitAll(dir, 'human edits');
+
+  const w = report.collect(dir, lenses.index(dir));
+  assert.deepEqual(w.files.map(f => f.file), ['cart.py'], 'the deleted mock is not listed');
+  const cart = w.files[0];
+  assert.equal(cart.lines, 7);
+  const origin = n => cart.code.find(l => l.n === n).origin;
+  assert.equal(origin(1), null, 'human header');
+  assert.equal(origin(2), null);
+  assert.equal(origin(3), 'ai', 'AI line moved from 1 to 3 keeps its origin');
+  assert.equal(cart.code.find(l => l.n === 3).session, 's1');
+  assert.equal(origin(7), null, 'the line a human rewrote is human now');
+  assert.equal(cart.aiLines, 4);
+  // same answer as `whyline why` on every line
+  for (const l of cart.code) assert.equal(l.origin, lenses.why(dir, 'cart.py', l.n).origin === 'human' ? null : lenses.why(dir, 'cart.py', l.n).origin, `line ${l.n}`);
+});
+
+test('collect: a repo with no notes gives an empty list, not an error', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'whyline-report-empty-'));
+  sh(dir, ['init', '-q', '-b', 'main']);
+  sh(dir, ['commit', '-q', '--allow-empty', '-m', 'init']);
+  assert.deepEqual(report.collect(dir), { files: [], skipped: 0 });
+});
