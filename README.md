@@ -27,6 +27,7 @@ whyline unreviewed                        # AI lines no human has edited since, 
 whyline keep flags.yaml "beta flag stays until Q1 review"     # name the file, a symbol, a kind, or the id
 whyline until legacy_export.py 2027-01-01
 whyline watch mock_gateway.py --symbol MockGateway            # fix the symbol the reference check looks for
+whyline seed --dry-run                    # existing repo: find temporary-looking code that predates whyline
 ```
 
 Lifecycle of a temporary item:
@@ -61,6 +62,7 @@ Hackathon build (IBM Bob 2.0 Hackathon, 25 to 27 Sep 2026). See docs/ for the re
 | `whyline unreviewed [--json]` | AI lines with no human edit since, per file, coverage from coverage.xml or lcov.info | 0 |
 | `whyline watch <item> --symbol Name` | change the symbol the reference check searches for | 0 |
 | `whyline removed <item>` | record a removal done by hand (a commit message naming the file or id records it automatically) | 0 |
+| `whyline seed [--dry-run]` | on an existing repo, record temporary-looking code that predates whyline (comment markers, mock and compat names, examples and fixtures folders) with its age from git | 0 |
 | `whyline keep <item> "<reason>"` | mark an item permanent; `<item>` is a file, symbol, kind or id | 0 |
 | `whyline until <item> <YYYY-MM-DD>` | set a date condition | 0 |
 | `whyline capture`, `whyline session-start`, `whyline commit` | hook entry points, always exit 0 | 0 |
@@ -72,7 +74,7 @@ Hackathon build (IBM Bob 2.0 Hackathon, 25 to 27 Sep 2026). See docs/ for the re
 - Squash merges drop the notes of the squashed commits. Amend and rebase keep them (init sets `notes.rewriteRef`).
 - The reference check is text search (git grep for the symbol and the module name). Code reached only through strings or reflection can look unreferenced, which is why removal always goes through Bob's evidence step and your approval.
 - "Unreviewed" means no human edit since the agent wrote the line. Review comments and PR approvals are not read yet.
-- Recording starts at `whyline init`. Code written before that has no note and shows as human. A `seed` command for existing repos is planned.
+- Recording starts at `whyline init`. Code written before that has no note and shows as human. `whyline seed` recovers temporary-looking code from before that point, but not who wrote it or why beyond the comment.
 - Hook commands print their one status line to stderr so that stdout stays empty for the agent. `git commit` shows it; tooling that hides stderr will not.
 
 ## Speed

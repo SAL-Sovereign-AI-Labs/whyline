@@ -157,3 +157,26 @@ test('mentions in docs, .bob config and skills are not references', () => {
   git(dir, ['add', '.']); git(dir, ['commit', '-q', '-m', 'stub']); assert.ok(commit.run(dir).attached);
   assert.equal(lenses.check(dir).due.length, 1, 'only docs mention it, so it is due');
 });
+
+test('seed records temporary-looking code that predates whyline, once, with age and reason', () => {
+  const dir = repo();
+  const seed = require('../lib/seed');
+  fs.mkdirSync(path.join(dir, 'src'), { recursive: true }); fs.mkdirSync(path.join(dir, 'examples'), { recursive: true });
+  fs.writeFileSync(path.join(dir, 'src/compat_pg12.py'), '# TODO remove after pg14 migration\ndef rename(row):\n    return row\n');
+  fs.writeFileSync(path.join(dir, 'src/orders.py'), 'def total(items):\n    return sum(items)\n');
+  fs.writeFileSync(path.join(dir, 'examples/old_demo.py'), 'print("demo")\n');
+  fs.writeFileSync(path.join(dir, 'README.md'), '# temporary notes, TODO remove nothing here\n');
+  git(dir, ['add', '.']); git(dir, ['commit', '-q', '-m', 'legacy code', '--date=2025-01-15T10:00:00']);
+  const dry = seed.run(dir, { dryRun: true });
+  assert.deepEqual(dry.items.map(i => [i.file, i.kind]).sort(), [['examples/old_demo.py', 'demo'], ['src/compat_pg12.py', 'shim']]);
+  assert.equal(lenses.index(dir).items.size, 0, 'dry run records nothing');
+  const r = seed.run(dir);
+  assert.equal(r.items.length, 2);
+  const shim = r.items.find(i => i.kind === 'shim');
+  assert.equal(shim.reason, 'TODO remove after pg14 migration'); assert.equal(shim.created, '2025-01-15');
+  assert.deepEqual(shim.condition, { type: 'no_references', symbol: 'rename' });
+  assert.equal(seed.run(dir).items.length, 0, 'second run adds nothing');
+  const c = lenses.check(dir);
+  assert.equal(c.due.length + c.active.length, 2);
+  assert.equal(cli(dir, ['seed']).stdout.trim(), 'nothing new to seed (2 file(s) already tracked)');
+});

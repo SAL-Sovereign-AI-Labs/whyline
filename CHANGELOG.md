@@ -14,7 +14,8 @@ All notable changes to this project are documented here. Format: Keep a Changelo
 - `session-start` hook summary injected into Bob's context, naming the due item and the remover mode.
 - Lifecycle state (`active`, `due`, `kept`, `removed`) on every item in `check` and `--json`, with counts.
 - `whyline unreviewed`: AI lines with no human edit since, per file, with coverage from coverage.xml or lcov.info.
-- `whyline watch <id> --symbol Name` to correct the reference check.
+- `whyline watch <item> --symbol Name` to correct the reference check.
+- `whyline seed`: first run on an existing repo records temporary-looking code with its age and a recovered reason.
 - Removals recorded from commit messages naming the item (id or file) and with `whyline removed <item>`.
 - Items can be named by file, symbol or kind in keep, until, watch, removed; ids are for notes and scripts.
 - `check` exits 0 on a normal answer; `check --gate` exits 2 when items are due (hooks, CI). Grouped table output; structured evidence in JSON.

@@ -18,6 +18,7 @@ const USAGE = `whyline <command> [--json]
   until <item> <YYYY-MM-DD> change the condition to a date       (stays active)
   watch <item> --symbol X   fix the symbol the reference check searches for
   removed <item>            record a removal done by hand (a commit message naming the item does this automatically)
+  seed [--dry-run] [--json] first run on an existing repo: record temporary-looking code that predates whyline
 
   <item> is a file path (or its last part), a watched symbol, a kind (mock, demo, flag, shim, fixture) when unique,
   or the id shown by check. People name files; ids are for notes and scripts.
@@ -175,6 +176,15 @@ function dispatch(argv) {
       const head = lenses.recordItemChange(cwd, item.id, change);
       const said = { keep: 'kept permanently', until: `due on ${value}`, watch: `now watching symbol ${value}`, removed: 'recorded as removed' }[cmd];
       console.log(`${item.file} (${item.id}): ${said} (recorded on ${head.slice(0, 7)})`);
+      return 0;
+    }
+    case 'seed': {
+      const r = require('./lib/seed').run(cwd, { dryRun: args.includes('--dry-run') });
+      if (r.error) { process.stderr.write(`seed: ${r.error}\n`); return 3; }
+      if (json) { console.log(JSON.stringify(r, null, 2)); return 0; }
+      if (!r.items.length) { console.log(`nothing new to seed (${r.skipped} file(s) already tracked)`); return 0; }
+      for (const it of r.items) console.log(`  ${it.id}  ${it.kind.padEnd(8)} ${it.file.padEnd(40)} since ${it.created}  "${it.reason}"`);
+      console.log(`${r.items.length} item(s) ${args.includes('--dry-run') ? 'found (dry run, nothing recorded)' : 'recorded on ' + r.head.slice(0, 7)}. Next: whyline check`);
       return 0;
     }
     case 'init':

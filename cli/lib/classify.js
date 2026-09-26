@@ -1,11 +1,11 @@
 'use strict';
 // Rules that mark an agent write as temporary code. Deterministic, no model call.
 const RULES = [
-  { kind: 'mock', words: ['mock', 'stub', 'fake'], paths: [/(^|\/)mock_/, /(^|\/)fake_/, /\/mocks\//, /stub/] },
-  { kind: 'demo', words: ['demo', 'example', 'sample', 'quick script'], paths: [/\/examples?\//, /\/demo\//, /(^|\/)demo_/, /(^|\/)sample_/] },
+  { kind: 'mock', words: ['mock', 'stub', 'fake'], paths: [/(^|\/)mock_/, /(^|\/)fake_/, /(^|\/)mocks\//, /stub/] },
+  { kind: 'demo', words: ['demo', 'example', 'sample', 'quick script'], paths: [/(^|\/)examples?\//, /(^|\/)demos?\//, /(^|\/)demo_/, /(^|\/)sample_/] },
   { kind: 'flag', words: [], paths: [/flags?\.(ya?ml|json)$/, /feature_flags/] }, // flags live in config files; the reader code is permanent
   { kind: 'shim', words: ['workaround', 'temporary', 'temporarily', 'until', 'shim', 'compat', 'hack', 'todo remove'], paths: [/(^|\/)compat_/, /_shim/, /(^|\/)legacy_/] },
-  { kind: 'fixture', words: ['fixture', 'seed data', 'test data'], paths: [/\/fixtures\//, /(^|\/)seed/] },
+  { kind: 'fixture', words: ['fixture', 'seed data', 'test data'], paths: [/(^|\/)fixtures\//, /(^|\/)seed/] },
 ];
 
 function hasWord(text, w) {
