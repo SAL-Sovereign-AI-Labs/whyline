@@ -28,6 +28,8 @@ test('init installs .bob files and git hooks, merges without dropping user hooks
   assert.ok(fs.existsSync(path.join(dir, '.bob', 'skills', 'whyline-setup', 'SKILL.md')));
   assert.equal(execFileSync('git', ['config', 'notes.rewriteRef'], { cwd: dir, encoding: 'utf8' }).trim(), 'refs/notes/whyline');
   assert.equal(require('node:child_process').spawnSync('git', ['config', '--get-all', 'notes.displayRef'], { cwd: dir, encoding: 'utf8' }).stdout.trim(), '', 'displayRef waits for the first note');
+  const pp = fs.readFileSync(path.join(dir, '.git', 'hooks', 'pre-push'), 'utf8');
+  assert.match(pp, /WHYLINE_PUSHING/, 'pre-push guards against re-entering itself when it pushes the notes ref');
   const pc = fs.readFileSync(path.join(dir, '.git', 'hooks', 'post-commit'), 'utf8');
   assert.match(pc, /whyline commit; \(whyline report/);
   assert.equal((pc.match(/whyline commit/g) || []).length, 1);

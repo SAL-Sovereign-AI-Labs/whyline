@@ -8,7 +8,8 @@ const agents = require('./agents');
 const GIT_HOOKS = {
   'post-commit': 'whyline commit; (whyline report >/dev/null 2>&1 &)',
   'post-merge': 'git fetch origin refs/notes/whyline:refs/notes/whyline >/dev/null 2>&1; whyline check || true',
-  'pre-push': 'git push origin refs/notes/whyline >/dev/null 2>&1 || true',
+  // the notes push is itself a push, so guard against re-entering this hook
+  'pre-push': '[ -n "$WHYLINE_PUSHING" ] && exit 0; WHYLINE_PUSHING=1 git push origin refs/notes/whyline >/dev/null 2>&1 || true',
 };
 const GUARD = '#!/bin/sh\n# installed by whyline init. Never blocks: missing tool means no-op.\ncommand -v whyline >/dev/null 2>&1 || exit 0\n';
 
