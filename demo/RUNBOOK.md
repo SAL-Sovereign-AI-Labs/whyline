@@ -7,7 +7,7 @@ Before every take: `cd ~/projects/whyline && npm test` green, `whyline --version
 
 ## Act 1: the pain (0:00 to 0:20)
 Screen: `git log --oneline` of the demo repo and `git blame src/payments/mock_gateway.py`.
-Say: "Git tells you who wrote this mock and when. Nobody can tell you why it exists, or whether it was meant to stay. Now 40 percent of new code comes from an agent that forgets the reason the moment the task ends."
+Say: "Git tells you who wrote this mock and when. Nobody can tell you why it exists, or whether it was meant to stay. Faros measured 22,000 developers this year: pull requests merged with no review are up 31 percent. The agent that wrote the code forgets the reason the moment the task ends."
 
 ## Act 2: Bob writes, Whyline records (0:20 to 0:50)
 Screen: Bob IDE, Agent mode, in the demo repo. Terminal 2 with `tail -f .git/whyline/session.jsonl`.
@@ -31,7 +31,7 @@ Screen: `whyline unreviewed`, then `whyline session-start` to show what Bob is t
 Say: "For the lead: AI lines no human has edited since they were written, with test coverage where a report exists. Bob is told about it at the start of every session."
 
 ## Act 6: the bill of materials and the report (2:35 to 3:00)
-Screen: `whyline bom v0.1.0..HEAD` and the report page.
+Screen: `whyline bom` (the demo has no tags, so this covers the whole history) and the report page.
 Say: "For the release manager: how much of this release is AI, how much was reviewed, what temporary code shipped, what it cost. It ships as a Bob plugin: hooks, a custom mode, skills. With enforced hooks an organisation makes provenance mandatory. Speed with control."
 
 ## Reset
