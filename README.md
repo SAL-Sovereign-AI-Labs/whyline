@@ -72,6 +72,8 @@ Hackathon build (IBM Bob 2.0 Hackathon, 25 to 27 Sep 2026). See docs/ for the re
 - Squash merges drop the notes of the squashed commits. Amend and rebase keep them (init sets `notes.rewriteRef`).
 - The reference check is text search (git grep for the symbol and the module name). Code reached only through strings or reflection can look unreferenced, which is why removal always goes through Bob's evidence step and your approval.
 - "Unreviewed" means no human edit since the agent wrote the line. Review comments and PR approvals are not read yet.
+- Recording starts at `whyline init`. Code written before that has no note and shows as human. A `seed` command for existing repos is planned.
+- Hook commands print their one status line to stderr so that stdout stays empty for the agent. `git commit` shows it; tooling that hides stderr will not.
 
 ## Speed
 

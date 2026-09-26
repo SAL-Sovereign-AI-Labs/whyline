@@ -132,3 +132,14 @@ Install for a user: `npx whyline init` inside a repo. It copies `bob/` into `.bo
 - The IDE and the Shell share `~/.bob/db/bob.db` (IDE log: "Task store opened /Users/.../.bob/db/bob.db"). The IDE keeps rows in the write-ahead log while it runs, so the cost lookup opens with `mode=ro` first (WAL-aware) and falls back to `immutable=1`. The cart task cost 0.768 Bobcoins for 21,254 context tokens.
 - `attribution_logs` stays empty from the IDE as well ("Attribution store opened" is logged, no rows written). Hooks remain the only source.
 - Note attached by the post-commit hook, and `git log` shows it under the commit thanks to `notes.displayRef`.
+
+
+## 11. Dogfood run (Bob IDE, 26 Sep 2026, 3:06 pm PKT, task05, 3.44 Bobcoins)
+
+Bob installed Whyline on the Whyline repository and used it on its own work. `whyline why` on the skill files it wrote returns the prompt. Bob reported five issues, triaged:
+
+1. Code written before `whyline init` has no note and shows as human. Expected; now stated in README Known limitations. A `seed` command is the planned answer.
+2. Hook status lines go to stderr. By design (stdout stays empty for the agent); now documented in README.
+3. Multi-edit attribution for a file edited by several apply_diff calls depends on the session lines being recorded in order, which the hook guarantees. Bob's concern was about reconstructed session data, which is not a real path. No change. `why` still falls through to "human" silently when a line is outside every range; a diagnostic is a possible improvement.
+4. The classifier flagged a skill file as temporary because the prompt contained "temporary". Fixed: markdown, .bob/, docs/ and skills/ paths never become items by prompt words. Test added. The existing item on this repo was marked kept.
+5. `refs/notes/whyline is invalid` warning after init until the first note. Fixed: `notes.displayRef` is now set by the first note write, not by init. Test added.

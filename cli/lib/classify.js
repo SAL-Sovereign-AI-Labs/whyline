@@ -16,11 +16,14 @@ function hasWord(text, w) {
 // Pass 1: path rules, any file (a fixtures folder or a flags file is temporary whatever the prompt said).
 // Pass 2: prompt words, only for files the agent created and only outside tests/ (an edit to an existing file that
 // merely calls a mock is not itself temporary, and a test that mentions "until" is not the temporary thing).
+// Documentation and agent assets (markdown, .bob/, skills, docs) are never temporary code, whatever the prompt said.
+const DOC_ASSET = /\.(md|mdx|txt|rst)$|(^|\/)\.bob\/|(^|\/)docs?\/|(^|\/)skills\//;
+
 function temporary(prompt, file, { created = true } = {}) {
   const p = String(prompt || '');
   const inTests = /(^|\/)tests?\//.test(file);
   for (const r of RULES) if (r.paths.some(re => re.test(file))) return { kind: r.kind, reason: reasonFrom(p) };
-  if (!created || inTests) return null;
+  if (!created || inTests || DOC_ASSET.test(file)) return null;
   for (const r of RULES) if (r.words.some(w => hasWord(p, w))) return { kind: r.kind, reason: reasonFrom(p) };
   return null;
 }

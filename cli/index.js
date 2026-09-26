@@ -146,6 +146,7 @@ function dispatch(argv) {
         check: lenses.check(cwd),
         unreviewed: lenses.unreviewed(cwd),
         bom: bomMod ? (bomMod.bom || bomMod.run)(cwd, range) : null,
+        why: mod.collect ? mod.collect(cwd, idx) : null,
         sessions: [...idx.sessions.values()],
         ranges: idx.ranges,
         notes: idx.notes.length,

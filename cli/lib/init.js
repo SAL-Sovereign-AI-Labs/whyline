@@ -30,12 +30,11 @@ function run(cwd, { agentIds = ['bob'] } = {}) {
   return 0;
 }
 
-// Carry notes across amend and rebase (git drops them otherwise), and show them in `git log`.
+// Carry notes across amend and rebase (git drops them otherwise). notes.displayRef is set by the first
+// `whyline commit` that writes a note, because git warns "refs/notes/whyline is invalid" while the ref does not exist.
 function configureNotes(root) {
   git.git(['config', 'notes.rewriteRef', `refs/notes/${git.NOTES_REF}`], { cwd: root });
-  const shown = git.tryGit(['config', '--get-all', 'notes.displayRef'], { cwd: root }) || '';
-  if (!shown.split('\n').includes(`refs/notes/${git.NOTES_REF}`)) git.git(['config', '--add', 'notes.displayRef', `refs/notes/${git.NOTES_REF}`], { cwd: root });
-  return ['git config notes.rewriteRef, notes.displayRef'];
+  return ['git config notes.rewriteRef (notes.displayRef is added with the first note)'];
 }
 
 function installGitHooks(root) {

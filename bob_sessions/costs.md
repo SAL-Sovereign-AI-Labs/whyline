@@ -8,6 +8,10 @@ Cost is the task's own figure from its task summary (click New task before each 
 | task | what | Bobcoins | screenshot |
 |---|---|---|---|
 | A task01 | cart module in the demo shop; proved hooks, note and cost from Bob IDE 2.2 (21.3k context tokens) | 0.768 | whyline_a_task01_cart.png |
+| A task02 | whyline-why skill (cli/lib/agents/bob/assets/skills/whyline-why/SKILL.md) plus init test; one thread with tasks 03 to 05, badge 1.18 | 1.18 | whyline_a_task02_why_skill.png |
+| A task03 | whyline-decide skill (keep, until, watch in plain words, never guesses an id); badge 1.67 minus 1.18 | 0.49 | whyline_a_task03_manage_skill.png |
+| A task04 | whyline-setup skill (user-invocable, checks the binary, runs init, tells what to commit); badge 2.35 minus 1.67 | 0.68 | whyline_a_task04_setup_skill.png |
+| A task05 | dogfood: whyline installed on whyline itself, used on Bob's own work, 5 issues reported (see docs/04 section 11); badge 5.79 minus 2.35 | 3.44 | whyline_a_task05_dogfood.png |
 
 ## Atiq
 
@@ -19,4 +23,4 @@ Cost is the task's own figure from its task summary (click New task before each 
 
 ## Totals
 
-Faisal: 0.768 · Atiq: 3.21 · team: 3.98 of 80.
+Faisal: 6.56 · Atiq: 3.21 · team: 9.77 of 80.

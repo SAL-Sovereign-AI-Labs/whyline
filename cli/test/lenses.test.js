@@ -117,3 +117,27 @@ test('a commit whose message says "remove L-xxxxxx" records the removed state; a
   assert.equal(cli(dir, ['removed', id2, 'deleted by hand']).status, 0);
   assert.equal(lenses.check(dir).counts.removed, 2);
 });
+
+test('documentation and agent assets are never temporary, even when the prompt says "temporary"', () => {
+  const classify = require('../lib/classify');
+  const prompt = 'Add a skill so a developer can keep a temporary item or fix the symbol whyline watches.';
+  assert.equal(classify.temporary(prompt, 'cli/lib/agents/bob/assets/skills/whyline-decide/SKILL.md'), null);
+  assert.equal(classify.temporary(prompt, '.bob/skills/x/SKILL.md'), null);
+  assert.equal(classify.temporary(prompt, 'docs/plan.md'), null);
+  assert.equal(classify.temporary(prompt, 'src/temp_thing.py').kind, 'shim', 'code files still follow the prompt words');
+});
+
+test('notes.displayRef is added with the first note, not at init, so git never warns about a missing ref', () => {
+  const dir = repo();
+  const { spawnSync } = require('node:child_process');
+  const get = () => spawnSync('git', ['config', '--get-all', 'notes.displayRef'], { cwd: dir, encoding: 'utf8' }).stdout.trim();
+  spawnSync(process.execPath, [path.join(__dirname, '..', 'index.js'), 'init'], { cwd: dir, encoding: 'utf8' });
+  assert.equal(get(), '');
+  const warn = spawnSync('git', ['log', '-1'], { cwd: dir, encoding: 'utf8' }).stderr;
+  assert.equal(warn.includes('invalid'), false, warn);
+  agentWrite(dir, 'a.py', 'x = 1\n', 's7', 'Add a.');
+  git(dir, ['add', '.']); git(dir, ['commit', '-q', '-m', 'a']);
+  commit.run(dir); // the installed post-commit hook may already have attached the note when whyline is on the PATH
+  assert.ok(require('../lib/git').notesShow(dir, 'HEAD'), 'note on HEAD');
+  assert.equal(get(), 'refs/notes/whyline');
+});

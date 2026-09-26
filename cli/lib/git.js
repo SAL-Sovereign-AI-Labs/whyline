@@ -56,6 +56,9 @@ function diffHunks(cwd, a, b) {
 
 function notesAdd(cwd, commit, obj) {
   git(['notes', `--ref=${NOTES_REF}`, 'add', '-f', '-F', '-', commit], { cwd, input: JSON.stringify(obj) });
+  // show notes in `git log` from the first note on (set earlier, git warns about the missing ref on every command)
+  const shown = tryGit(['config', '--get-all', 'notes.displayRef'], { cwd }) || '';
+  if (!shown.split('\n').includes(`refs/notes/${NOTES_REF}`)) tryGit(['config', '--add', 'notes.displayRef', `refs/notes/${NOTES_REF}`], { cwd });
 }
 
 function notesShow(cwd, commit) {
