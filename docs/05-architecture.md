@@ -66,7 +66,7 @@ Rules: paths are repo-relative with forward slashes. `hash` is `git hash-object`
     "status":"active","created":"2026-09-26"}]}
 ```
 - `origin` values: `ai` (content identical to what the agent wrote), `ai-edited` (range still overlaps an agent write but content changed before commit), never `human` (human lines are simply absent from notes).
-- `cost` is filled when readable from `~/.bob/db/bob.db` tasks.costs for that session id, else null.
+- `cost` comes from the adapter's `sessionCost(session)` (Bob: `~/.bob/db/bob.db` tasks.costs), else null.
 - Item ids: `L-` plus a 4-digit counter stored in `refs/notes/whyline` on an empty "meta" note attached to the root commit. Simpler alternative used if time is short: id = first 7 chars of sha1(file + lines + session).
 - Item state changes (`kept`, `until`, `removed`) are recorded as a new note on the commit that made the change, with `"items":[{"id":"L-0193","status":"removed","by":"faisal-fida","reason":"…"}]`. Readers fold all notes newest-last, so the latest status wins.
 
@@ -121,15 +121,15 @@ All commands run from anywhere inside the repo. Output is human text by default,
 ```json
 {
   "hooks": {
-    "SessionStart": [{ "hooks": [{ "type": "command", "command": "sh .bob/hooks/whyline.sh session-start", "timeout": 5 }] }],
-    "UserPromptSubmit": [{ "hooks": [{ "type": "command", "command": "sh .bob/hooks/whyline.sh capture", "timeout": 5 }] }],
+    "SessionStart": [{ "hooks": [{ "type": "command", "command": "sh .bob/hooks/whyline.sh session-start --agent bob", "timeout": 5 }] }],
+    "UserPromptSubmit": [{ "hooks": [{ "type": "command", "command": "sh .bob/hooks/whyline.sh capture --agent bob", "timeout": 5 }] }],
     "PostToolUse": [{ "matcher": "^(write_file|apply_diff|insert_content|search_and_replace)$",
-                      "hooks": [{ "type": "command", "command": "sh .bob/hooks/whyline.sh capture", "timeout": 5 }] }]
+                      "hooks": [{ "type": "command", "command": "sh .bob/hooks/whyline.sh capture --agent bob", "timeout": 5 }] }]
   }
 }
 ```
 
-### 4.2 .bob/hooks/whyline.sh (the only shell file)
+### 4.2 .bob/hooks/whyline.sh (the only shell file, shipped as cli/lib/agents/shared/hook-entry.sh and copied by every adapter)
 
 ```sh
 #!/bin/sh
@@ -178,7 +178,7 @@ PreToolUse on `execute_command`, matcher `^execute_command$`; the CLI inspects `
    - Must-list simplification: without the blob store, use `git diff` between the hash object and the committed blob (`git diff <hash> HEAD:<file>`); since `git hash-object -w` stores the object, this works with one extra flag in capture. So the blob store is free: capture uses `git hash-object -w`.
 4. Build sessions from prompt lines (only sessions that have at least one range in this commit).
 5. Temporary classification on each `ai` range whose session prompt or file matches a rule → item with condition.
-6. Cost: open `~/.bob/db/bob.db` read-only with `sqlite3` CLI if present (`sqlite3 -readonly … "select costs from tasks where id=?"`), else null. No sqlite dependency in Node.
+6. Cost: the session's adapter answers `sessionCost(session)`; the Bob adapter reads `~/.bob/db/bob.db` read-only with the `sqlite3` CLI, else null. No sqlite dependency in Node.
 7. `git notes --ref whyline add -f -F - HEAD`.
 8. Remove consumed lines from session.jsonl.
 
@@ -212,7 +212,7 @@ Walk the note index for ranges with `origin: ai` (ai-edited counts as reviewed).
 
 One HTML file. Template is a JS template string in report.js with `<script>const DATA = …</script>`. Views: Overview, Why (file picker limited to files with AI ranges, line table), Expiry, Unreviewed, BOM, Status. Design and copy follow whyline-dashboard.html on the Desktop, with the mock data replaced by DATA.
 
-## 6. Bob integration files (shipped in bob/, installed to .bob/)
+## 6. Bob integration files (shipped in cli/lib/agents/bob/assets/, installed to .bob/ by the Bob adapter)
 
 ### 6.1 custom_modes.yaml
 
@@ -263,7 +263,7 @@ Steps:
 Never delete anything before step 5 is approved.
 ```
 
-### 6.4 commands/whyline-check.md
+### 6.4 skills/whyline-check/SKILL.md (Bob Shell converts .bob/commands/*.md into this skill form itself, so we ship the skill directly)
 
 ```
 ---
