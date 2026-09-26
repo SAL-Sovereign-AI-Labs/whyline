@@ -23,10 +23,19 @@ function run(cwd, { agentIds = ['bob'] } = {}) {
     written.push(...adapter.install(root).map(w => `${w} (${adapter.name})`));
   }
   written.push(...installGitHooks(root));
+  written.push(...configureNotes(root));
 
   console.log('whyline installed:\n  ' + written.join('\n  '));
   console.log(`\nNext: commit the ${agentIds.map(id => agents.byId(id).configDir).join(' and ')} folder so your team gets the hooks, then start a task in ${agentIds.map(id => agents.byId(id).name).join(' or ')}.`);
   return 0;
+}
+
+// Carry notes across amend and rebase (git drops them otherwise), and show them in `git log`.
+function configureNotes(root) {
+  git.git(['config', 'notes.rewriteRef', `refs/notes/${git.NOTES_REF}`], { cwd: root });
+  const shown = git.tryGit(['config', '--get-all', 'notes.displayRef'], { cwd: root }) || '';
+  if (!shown.split('\n').includes(`refs/notes/${git.NOTES_REF}`)) git.git(['config', '--add', 'notes.displayRef', `refs/notes/${git.NOTES_REF}`], { cwd: root });
+  return ['git config notes.rewriteRef, notes.displayRef'];
 }
 
 function installGitHooks(root) {
@@ -47,4 +56,4 @@ function installGitHooks(root) {
   return written;
 }
 
-module.exports = { run, installGitHooks };
+module.exports = { run, installGitHooks, configureNotes };
