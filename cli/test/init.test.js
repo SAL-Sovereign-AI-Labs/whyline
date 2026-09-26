@@ -30,6 +30,12 @@ test('init installs .bob files and git hooks, merges without dropping user hooks
   assert.equal(require('node:child_process').spawnSync('git', ['config', '--get-all', 'notes.displayRef'], { cwd: dir, encoding: 'utf8' }).stdout.trim(), '', 'displayRef waits for the first note');
   const pp = fs.readFileSync(path.join(dir, '.git', 'hooks', 'pre-push'), 'utf8');
   assert.match(pp, /WHYLINE_PUSHING/, 'pre-push guards against re-entering itself when it pushes the notes ref');
+  // an older unguarded whyline line in an existing hook must be replaced, and a user's own line kept
+  fs.writeFileSync(path.join(dir, '.git', 'hooks', 'pre-push'), '#!/bin/sh\necho user-line\ngit push origin refs/notes/whyline >/dev/null 2>&1 || true\n');
+  console.log = () => {}; try { init.run(dir); } finally { console.log = silent.log; }
+  const pp2 = fs.readFileSync(path.join(dir, '.git', 'hooks', 'pre-push'), 'utf8');
+  assert.equal((pp2.match(/refs\/notes\/whyline/g) || []).length, 1, 'exactly one notes push line');
+  assert.match(pp2, /WHYLINE_PUSHING/); assert.match(pp2, /echo user-line/);
   const pc = fs.readFileSync(path.join(dir, '.git', 'hooks', 'post-commit'), 'utf8');
   assert.match(pc, /whyline commit; \(whyline report/);
   assert.equal((pc.match(/whyline commit/g) || []).length, 1);

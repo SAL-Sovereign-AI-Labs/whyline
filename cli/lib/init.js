@@ -45,8 +45,13 @@ function installGitHooks(root) {
   for (const [name, cmd] of Object.entries(GIT_HOOKS)) {
     const f = path.join(hooksDir, name);
     if (fs.existsSync(f)) {
+      // replace our own earlier lines (any older whyline command) and keep everything else the user had
       const cur = fs.readFileSync(f, 'utf8');
-      if (!cur.includes(cmd)) { fs.appendFileSync(f, `\n# whyline\ncommand -v whyline >/dev/null 2>&1 || exit 0\n${cmd}\n`); written.push(`.git/hooks/${name} (appended)`); }
+      const ours = l => /whyline/.test(l);
+      const kept = cur.split('\n').filter(l => !ours(l));
+      const body = kept.join('\n').replace(/\n+$/, '');
+      const next = (body.startsWith('#!') ? body : `#!/bin/sh\n${body}`) + `\n# whyline\ncommand -v whyline >/dev/null 2>&1 || exit 0\n${cmd}\n`;
+      if (next !== cur) { fs.writeFileSync(f, next); written.push(`.git/hooks/${name} (updated)`); }
     } else {
       fs.writeFileSync(f, `${GUARD}${cmd}\n`, { mode: 0o755 });
       written.push(`.git/hooks/${name}`);
