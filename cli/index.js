@@ -120,7 +120,7 @@ function dispatch(argv) {
       const mod = optional('./lib/bom');
       if (!mod) { process.stderr.write('bom is not built yet (cli/lib/bom.js missing)\n'); return 1; }
       const range = args[0] || defaultRange(cwd);
-      const r = mod.bom(cwd, range);
+      const r = (mod.bom || mod.run)(cwd, range);
       console.log(json ? JSON.stringify(r, null, 2) : mod.format(r));
       return 0;
     }
@@ -141,7 +141,7 @@ function dispatch(argv) {
         head: git.head(cwd),
         check: lenses.check(cwd),
         unreviewed: lenses.unreviewed(cwd),
-        bom: bomMod ? bomMod.bom(cwd, range) : null,
+        bom: bomMod ? (bomMod.bom || bomMod.run)(cwd, range) : null,
         sessions: [...idx.sessions.values()],
         ranges: idx.ranges,
         notes: idx.notes.length,
@@ -180,11 +180,11 @@ function dispatch(argv) {
 // Modules owned by the other developer may not exist yet on this branch.
 function optional(mod) { try { return require(mod); } catch (e) { if (e.code === 'MODULE_NOT_FOUND' && String(e.message).includes(mod.replace('./', ''))) return null; throw e; } }
 
-// Last tag to HEAD when a tag exists, else the whole history.
+// Last tag to HEAD when a tag exists, else undefined, which bom.js treats as the whole history.
 function defaultRange(cwd) {
   const git = require('./lib/git');
   const tag = git.tryGit(['describe', '--tags', '--abbrev=0'], { cwd });
-  return tag ? `${tag}..HEAD` : 'HEAD';
+  return tag ? `${tag}..HEAD` : undefined;
 }
 
 function printWhy(file, line, r) {
