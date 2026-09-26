@@ -35,7 +35,7 @@ git blame tells you who. Whyline tells you why. Provenance for AI-written code i
 
 - The SessionStart hook tells Bob which items are due and how many AI lines are unreviewed.
 - The whyline-remove skill works in Agent mode: it runs `whyline check --json`, searches for references, runs the tests, shows an evidence table and waits for Bob's approval prompt before deleting and committing.
-- The other skills answer plain questions through the CLI (why is this line here, keep this flag, what is unreviewed, what shipped) and never guess an id.
+- The other skills answer plain questions through the CLI (why is this line here, keep this flag, what is unreviewed, what shipped) and never guess an item.
 - Each note records the session's Bobcoin cost from Bob's task database, so a release can say what it cost.
 
 **Bob building the product.** Every task has a summary screenshot and a cost row in `bob_sessions/`.
