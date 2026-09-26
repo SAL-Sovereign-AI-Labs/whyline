@@ -17,8 +17,8 @@
     "node": ">=20"
   },
   "scripts": {
-    "test": "node --test cli/test/",
-    "coverage": "node --test --experimental-test-coverage cli/test/"
+    "test": "node --test cli/test/*.test.js",
+    "coverage": "node --test --experimental-test-coverage cli/test/*.test.js"
   },
   "keywords": [
     "ibm-bob",
