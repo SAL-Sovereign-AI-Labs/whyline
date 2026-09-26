@@ -141,3 +141,11 @@ test('overview panels: kinds, folders and last removal come from real data, and 
   for (const id of ['ovKindTable', 'ovFolderTable', 'ovLastRemoval']) assert.ok(html.includes(`id="${id}"`), id);
   assert.ok(html.includes('nothing removed yet'), 'empty last-removal message');
 });
+
+test('keyboard and screen reader hooks are in place', () => {
+  const html = report.render(BASE_DATA);
+  assert.match(html, /aria-live="polite"/, 'line detail is announced');
+  assert.match(html, /aria-controls="side"/, 'menu button names what it opens');
+  assert.match(html, /:focus-visible\{[^}]*outline:2px/, 'visible focus outline');
+  assert.match(html, /\.why-file-row:focus\{[^}]*outline:2px/, 'file rows replace the default outline with their own');
+});
