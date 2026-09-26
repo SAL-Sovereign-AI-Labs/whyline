@@ -6,6 +6,8 @@ All notable changes to this project are documented here. Format: Keep a Changelo
 
 ## [0.1.0] - 2026-09-26
 
+Published on npm as `@sal-sovereign-ai-labs/whyline` (the bare name is blocked by the registry as too similar to `byline`). The command is still `whyline`.
+
 ### Added
 - `whyline init`: installs Bob lifecycle hooks, six skills (why, check, decide, remove, setup, status), and git hooks. No custom mode: everything works in Agent mode.
 - `whyline capture`: records prompts and exact written line ranges from Bob hook payloads; the adapter registry is ready for other agents.

@@ -12,7 +12,7 @@ Run `command -v whyline` with execute_command.
 
 - **If it exits non-zero** (command not found): tell the user whyline is not installed and show the install command:
   ```
-  npm install -g whyline
+  npm install -g @sal-sovereign-ai-labs/whyline
   ```
   Then stop. Do not run any further steps until the user confirms the binary is available.
 
