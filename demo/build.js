@@ -42,12 +42,13 @@ function main(argv) {
   fs.writeFileSync(path.join(target, MARKER), 'built by whyline demo/build.js\n');
   git('init', '-q', '-b', 'main');
   git('config', 'user.name', 'demo'); git('config', 'user.email', 'demo@example.invalid');
-  git('add', '.'); git('commit', '-q', '-m', 'init shop-backend');
+  git('add', '.', ':!.bob'); git('commit', '-q', '-m', 'init shop-backend'); // .bob may survive from an earlier build
   whyline(['init']);
   // keep raw hook payloads from IDE sessions in .git/whyline/raw/ so they become fixtures
   const settingsFile = path.join(target, '.bob', 'settings.json');
   fs.writeFileSync(settingsFile, fs.readFileSync(settingsFile, 'utf8').replace(/whyline\.sh capture --agent bob/g, 'whyline.sh capture --dump --agent bob'));
   git('add', '.bob'); git('commit', '-q', '-m', 'add whyline');
+  fs.rmSync(path.join(target, '.git', 'whyline', 'session.jsonl'), { force: true }); // nothing from before this build
 
   for (const s of SESSIONS) {
     captureOrFail({ hook_event_name: 'UserPromptSubmit', session_id: s.id, cwd: target, prompt: s.prompt }, `prompt of ${s.id.slice(0, 8)}`);
