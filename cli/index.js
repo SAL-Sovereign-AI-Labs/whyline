@@ -12,6 +12,8 @@ const USAGE = `whyline <command> [--json]
   why <file>:<line>         who wrote this line, and why
   check [--json]            temporary items and their lifecycle state (exit 2 when any is due)
   unreviewed [--json]       AI lines no human has edited since, per file, with coverage if a report exists
+  bom [A..B] [--json]       AI bill of materials for a commit range (default: last tag..HEAD, else all)
+  report [--out file]       write the read-only HTML report (.whyline-report.html)
   keep <id> "<reason>"      decision: keep permanently          (due -> kept)
   until <id> <YYYY-MM-DD>   change the condition to a date       (stays active)
   watch <id> --symbol Name  fix the symbol the reference check searches for
@@ -113,6 +115,43 @@ function dispatch(argv) {
       console.log(`${r.totals.aiLines} unreviewed AI lines in ${r.totals.files} file(s)${r.totals.coverageSource ? `, coverage from ${r.totals.coverageSource}` : ', no coverage report found (coverage.xml or lcov.info)'}`);
       return 0;
     }
+    case 'bom': {
+      // optional module: cli/lib/bom.js exporting bom(cwd, range) -> JSON and format(result) -> text
+      const mod = optional('./lib/bom');
+      if (!mod) { process.stderr.write('bom is not built yet (cli/lib/bom.js missing)\n'); return 1; }
+      const range = args[0] || defaultRange(cwd);
+      const r = mod.bom(cwd, range);
+      console.log(json ? JSON.stringify(r, null, 2) : mod.format(r));
+      return 0;
+    }
+    case 'report': {
+      // optional module: cli/lib/report.js exporting render(data) -> HTML string. The router gathers the data.
+      const mod = optional('./lib/report');
+      if (!mod) { process.stderr.write('report is not built yet (cli/lib/report.js missing)\n'); return 1; }
+      const lenses = require('./lib/lenses');
+      const git = require('./lib/git');
+      const root = git.repoRoot(cwd);
+      if (!root) { process.stderr.write('not a git repository\n'); return 3; }
+      const bomMod = optional('./lib/bom');
+      const range = defaultRange(cwd);
+      const idx = lenses.index(cwd);
+      const data = {
+        generatedAt: new Date().toISOString(),
+        repo: require('node:path').basename(root),
+        head: git.head(cwd),
+        check: lenses.check(cwd),
+        unreviewed: lenses.unreviewed(cwd),
+        bom: bomMod ? bomMod.bom(cwd, range) : null,
+        sessions: [...idx.sessions.values()],
+        ranges: idx.ranges,
+        notes: idx.notes.length,
+      };
+      const outIdx = args.indexOf('--out');
+      const out = outIdx >= 0 && args[outIdx + 1] ? args[outIdx + 1] : require('node:path').join(root, '.whyline-report.html');
+      fs.writeFileSync(out, mod.render(data));
+      console.log(`report written: ${out} (${data.notes} note(s), ${data.ranges.length} range(s))`);
+      return 0;
+    }
     case 'keep':
     case 'until':
     case 'watch': {
@@ -136,6 +175,16 @@ function dispatch(argv) {
       process.stderr.write(`Unknown command: ${cmd}\nRun whyline --help for usage.\n`);
       return 1;
   }
+}
+
+// Modules owned by the other developer may not exist yet on this branch.
+function optional(mod) { try { return require(mod); } catch (e) { if (e.code === 'MODULE_NOT_FOUND' && String(e.message).includes(mod.replace('./', ''))) return null; throw e; } }
+
+// Last tag to HEAD when a tag exists, else the whole history.
+function defaultRange(cwd) {
+  const git = require('./lib/git');
+  const tag = git.tryGit(['describe', '--tags', '--abbrev=0'], { cwd });
+  return tag ? `${tag}..HEAD` : 'HEAD';
 }
 
 function printWhy(file, line, r) {

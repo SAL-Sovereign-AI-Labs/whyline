@@ -67,6 +67,16 @@ test('why --json on a human line and on a missing file never crashes', () => {
   assert.equal(run(dir, ['why', 'bad']).status, 1);
 });
 
+test('bom and report report their missing module with exit 1 when it is absent', () => {
+  const dir = repoWithItem();
+  const fs2 = require('node:fs');
+  const missing = ['bom', 'report'].filter(m => !fs2.existsSync(path.join(__dirname, '..', 'lib', `${m}.js`)));
+  for (const m of missing) {
+    const r = run(dir, [m]);
+    assert.equal(r.status, 1); assert.match(r.stderr, new RegExp(`${m} is not built yet`));
+  }
+});
+
 test('the shell hook entry is a no-op without whyline on PATH and never fails', () => {
   const dir = repoWithItem();
   const hook = path.join(__dirname, '..', 'lib', 'agents', 'shared', 'hook-entry.sh');
