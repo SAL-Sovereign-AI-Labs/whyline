@@ -14,10 +14,10 @@ Trigger phrases: "what AI code is unreviewed", "what did the AI write in this re
 - Never invent a range, tag or item id; ask the user if it is unclear.
 - Show null values as "no data", never as 0.
 - Trust the CLI output over any note in context.
-- If the CLI prints to stderr or exits non-zero, stop and show its stderr as-is.
+- If the CLI exits non-zero (its exit code is 0 for normal answers, including a due list), stop and show its stderr as-is.
 - Read-only: never edit files or notes.
 
 ## Output template
 For **unreviewed**: a table of file, AI lines, coverage (worst first), then the totals line.
 For **bom**: one table with rows: lines changed, AI lines (with % of lines changed), by agent, reviewed (with % of AI lines), tested, active items, due items, removed items, cost ("n of m sessions"); then list any missing data fields.
-End with one next command: `whyline why <file>:<line>` to trace a specific line, or tell the user to say "remove `<id>`" in whyline-remover mode when any items are due.
+End with one next command: `whyline why <file>:<line>` to trace a specific line, or tell the user to say "remove `<id>`" with the whyline-remove skill when any items are due.

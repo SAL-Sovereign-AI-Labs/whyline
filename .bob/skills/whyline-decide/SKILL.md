@@ -48,7 +48,7 @@ Do not run the command until the user says yes (or equivalent).
 ### Step 3 -- run the command
 Run the confirmed command with execute_command and show its output verbatim.
 
-If the CLI prints to stderr or exits non-zero, stop and show its stderr as-is.
+If the CLI exits non-zero (its exit code is 0 for normal answers, including a due list), stop and show its stderr as-is.
 
 ### Step 4 -- confirm the change
 Run `whyline check --json` again and find the item. Show its new condition and state.
@@ -60,4 +60,4 @@ Run `whyline check --json` again and find the item. Show its new condition and s
 - Show null values as "no data", never as 0.
 - Trust the CLI output over any note in context.
 - These commands change recorded state in git notes. They are not reversible with a simple undo. Say so in the confirmation prompt.
-- Do not use this skill to remove items; that is handled by the whyline-remover mode.
+- Do not use this skill to remove items; that is handled by the whyline-remove skill.

@@ -1,11 +1,12 @@
 # Whyline
 
-Provenance for AI-written code. Every line keeps the prompt that caused it.
+`git blame` tells you who. Whyline tells you why.
 
-`git blame` tells you who. Whyline tells you why: the prompt, the session, the cost, the other files that
-task touched, whether a human reviewed it, and whether the code was meant to be temporary.
+Every line an AI agent writes keeps the prompt that caused it, the session, the cost, the other files that task touched, whether a human edited it since, and whether it was meant to be temporary. Temporary code gets a lifecycle: it is recorded at birth, becomes due when its condition is met, and Bob removes it with evidence and your approval.
 
-Built for IBM Bob 2.0. Bob's free lifecycle hooks record every write; Whyline turns that into answers.
+Built for IBM Bob 2.0. Bob's free lifecycle hooks record every write; six skills turn the records into answers inside Bob; git notes store everything. Last year's winner, Pedigree, proved that a commit was AI-written, for auditors. Whyline keeps why each line exists and acts on it, for developers.
+
+![Whyline architecture: Bob writes, hooks record, a commit seals a git note, commands answer, Bob acts](docs/architecture.svg)
 
 ## Install in a repo
 
@@ -65,13 +66,15 @@ Hackathon build (IBM Bob 2.0 Hackathon, 25 to 27 Sep 2026). See docs/ for the re
 | `whyline seed [--dry-run] [--by-name]` | on an existing repo, record code carrying TODO remove, FIXME, HACK, temporary or until markers, with its age from git; `--by-name` also records mock_, compat_, examples/ and fixtures/ names | 0 |
 | `whyline keep <item> "<reason>"` | mark an item permanent; `<item>` is a file, symbol, kind or id | 0 |
 | `whyline until <item> <YYYY-MM-DD>` | set a date condition | 0 |
+| `whyline bom [A..B] [--json]` | AI bill of materials for a commit range: lines changed, AI lines by agent, reviewed, items shipped, cost | 0 |
+| `whyline report [--out file]` | one offline HTML page with every answer; regenerated after each commit | 0 |
 | `whyline capture`, `whyline session-start`, `whyline commit` | hook entry points, always exit 0 | 0 |
 
 `--json` prints machine-readable output with no ANSI codes. Environment: `WHYLINE_DEBUG=1` prints stack traces to stderr, `WHYLINE_BOB_DB` overrides the Bob database path.
 
 ## Known limitations
 
-- Squash merges drop the notes of the squashed commits. Amend and rebase keep them (init sets `notes.rewriteRef`).
+- When git metadata is stripped: a squash merge creates a new commit without the notes of the squashed ones, and a repo copied without `refs/notes/whyline` has no notes at all. The fix is to keep merge commits (or copy notes onto the squash commit with `git notes --ref whyline copy`), and to push and fetch the notes ref, which the installed pre-push and post-merge hooks do. Amend and rebase keep notes because init sets `notes.rewriteRef`.
 - The reference check is text search (git grep for the symbol and the module name). Code reached only through strings or reflection can look unreferenced, which is why removal always goes through Bob's evidence step and your approval.
 - "Unreviewed" means no human edit since the agent wrote the line. Review comments and PR approvals are not read yet.
 - Recording starts at `whyline init`. Code written before that has no note and shows as human. `whyline seed` recovers temporary-looking code from before that point, but not who wrote it or why beyond the comment.
@@ -79,7 +82,15 @@ Hackathon build (IBM Bob 2.0 Hackathon, 25 to 27 Sep 2026). See docs/ for the re
 
 ## Speed
 
-Measured on this repo's demo, median of 10 runs on a MacBook Pro with an Apple M1 Pro: capture hook 166 ms, `check` 129 ms, session-start line 277 ms. Recording costs 0 Bobcoins.
+`npm run bench` builds the demo repo and times each command, median of 10. On a MacBook Pro with an Apple M1 Pro, Node 26: capture hook 165 ms (the only thing on Bob's write path), `why` 267 ms, `check` 344 ms, `bom` 560 ms, `unreviewed` 592 ms, session-start line 899 ms, `report` 2.0 s (runs in the background after a commit). Recording costs 0 Bobcoins.
+
+## Built with IBM Bob
+
+Bob is inside the product (three lifecycle hooks, six skills, the session-start line, removal through Bob's own approval prompt) and Bob built part of it: 16 Bob IDE tasks across two developers, 29 Bobcoins, task summaries in [bob_sessions/](bob_sessions/) with costs in [bob_sessions/costs.md](bob_sessions/costs.md). Bob also used Whyline on Whyline's own repository and reported five issues; three became fixes (docs/04, section 11). The rest of the code, tests and docs were written by the team with other tools.
+
+## Business model
+
+The CLI is free and MIT. Organisations pay for policy: enforced hooks rolled out to every developer (Bob's EnforcedHooks group policy) and the report as a compliance record per release.
 
 ## Troubleshooting
 

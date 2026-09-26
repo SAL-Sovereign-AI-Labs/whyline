@@ -19,7 +19,8 @@
   "scripts": {
     "test": "node --test cli/test/*.test.js",
     "coverage": "node --test --experimental-test-coverage cli/test/*.test.js",
-    "smoke": "node cli/index.js --help >/dev/null && node cli/index.js --version"
+    "smoke": "node cli/index.js --help >/dev/null && node cli/index.js --version",
+    "bench": "node cli/bench.js"
   },
   "keywords": [
     "ibm-bob",

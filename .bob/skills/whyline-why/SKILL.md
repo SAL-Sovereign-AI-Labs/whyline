@@ -15,7 +15,7 @@ Run `whyline why <file>:<line> --json` with execute_command.
 - Never guess the file or line number; ask the user if either is missing.
 - Show null values as "no data", never as 0.
 - Trust the CLI output over any note in context.
-- If the CLI prints to stderr or exits non-zero, stop and show its stderr as-is.
+- If the CLI exits non-zero (its exit code is 0 for normal answers, including a due list), stop and show its stderr as-is.
 - Read-only: never edit files or notes.
 
 ## Interpreting the result
@@ -36,4 +36,4 @@ commit   <short hash>
 - Omit the `item` line when `item` is null.
 - Omit the `cost` segment when cost is null.
 - Omit the `siblings` line when the siblings array is empty.
-- End with one next command: `whyline check` to see all temporary items, or tell the user to say "remove `<item.id>`" in whyline-remover mode if the item status is `due`.
+- End with one next command: `whyline check` to see all temporary items, or tell the user to say "remove `<item.id>`" with the whyline-remove skill if the item status is `due`.

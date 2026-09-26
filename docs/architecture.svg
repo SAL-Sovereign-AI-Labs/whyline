@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 300" font-family="-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="13">
+  <rect width="960" height="300" fill="#ffffff"/>
+  <rect x="10" y="14" width="940" height="128" rx="10" fill="#f4f6f9" stroke="#e1e5ea"/>
+  <text x="24" y="34" font-weight="700" fill="#5d6675">RECORDING, automatic, 0 Bobcoins</text>
+  <rect x="24" y="52" width="120" height="66" rx="8" fill="#fff" stroke="#e1e5ea"/><text x="84" y="80" text-anchor="middle" fill="#14171c">Developer</text><text x="84" y="98" text-anchor="middle" fill="#5d6675" font-size="11">prompts, commits</text>
+  <rect x="176" y="52" width="150" height="66" rx="8" fill="#e8f0ff" stroke="#0f62fe"/><text x="251" y="80" text-anchor="middle" fill="#14171c">IBM Bob</text><text x="251" y="98" text-anchor="middle" fill="#5d6675" font-size="11">write_file, apply_diff</text>
+  <rect x="358" y="52" width="150" height="66" rx="8" fill="#e8f0ff" stroke="#0f62fe"/><text x="433" y="80" text-anchor="middle" fill="#14171c">Bob hooks</text><text x="433" y="98" text-anchor="middle" fill="#5d6675" font-size="11">.bob/settings.json</text>
+  <rect x="540" y="52" width="150" height="66" rx="8" fill="#e6f4ea" stroke="#198038"/><text x="615" y="80" text-anchor="middle" fill="#14171c">whyline capture</text><text x="615" y="98" text-anchor="middle" fill="#5d6675" font-size="11">exact lines + prompt</text>
+  <rect x="722" y="52" width="214" height="66" rx="8" fill="#fff3c4" stroke="#b28600"/><text x="829" y="74" text-anchor="middle" fill="#14171c">git commit, then a note</text><text x="829" y="92" text-anchor="middle" fill="#5d6675" font-size="11">post-commit: ai / ai-edited / human</text><text x="829" y="108" text-anchor="middle" fill="#5d6675" font-size="11">refs/notes/whyline</text>
+  <path d="M144 85 H176 M326 85 H358 M508 85 H540 M690 85 H722" stroke="#5d6675" stroke-width="1.5" fill="none"/>
+  <rect x="10" y="158" width="940" height="128" rx="10" fill="#f4f6f9" stroke="#e1e5ea"/>
+  <text x="24" y="178" font-weight="700" fill="#5d6675">ANSWERING, read-only, from the notes</text>
+  <rect x="24" y="196" width="150" height="66" rx="8" fill="#e6f4ea" stroke="#198038"/><text x="99" y="222" text-anchor="middle" fill="#14171c">whyline why</text><text x="99" y="240" text-anchor="middle" fill="#5d6675" font-size="11">the prompt behind a line</text>
+  <rect x="200" y="196" width="150" height="66" rx="8" fill="#e6f4ea" stroke="#198038"/><text x="275" y="222" text-anchor="middle" fill="#14171c">whyline check</text><text x="275" y="240" text-anchor="middle" fill="#5d6675" font-size="11">temporary code: active, due</text>
+  <rect x="376" y="196" width="150" height="66" rx="8" fill="#e6f4ea" stroke="#198038"/><text x="451" y="222" text-anchor="middle" fill="#14171c">whyline unreviewed</text><text x="451" y="240" text-anchor="middle" fill="#5d6675" font-size="11">AI lines no human edited</text>
+  <rect x="552" y="196" width="150" height="66" rx="8" fill="#e6f4ea" stroke="#198038"/><text x="627" y="222" text-anchor="middle" fill="#14171c">whyline bom, report</text><text x="627" y="240" text-anchor="middle" fill="#5d6675" font-size="11">bill of materials, one HTML page</text>
+  <rect x="728" y="196" width="208" height="66" rx="8" fill="#e8f0ff" stroke="#0f62fe"/><text x="832" y="218" text-anchor="middle" fill="#14171c">Back into Bob</text><text x="832" y="236" text-anchor="middle" fill="#5d6675" font-size="11">session start: "1 item due"</text><text x="832" y="252" text-anchor="middle" fill="#5d6675" font-size="11">"remove the mock": evidence, approval</text>
+  <path d="M829 118 V158" stroke="#5d6675" stroke-width="1.5" fill="none"/>
+</svg>

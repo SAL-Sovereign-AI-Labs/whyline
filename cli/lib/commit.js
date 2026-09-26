@@ -27,7 +27,7 @@ function foldWrites(writes) {
 }
 
 // A commit whose message names an item ("remove L-1a2b3c: ...") records that item as removed, whether the
-// deletion was typed by a human or made by Bob's remover mode. The item's file must be gone or its lines changed.
+// deletion was typed by a human or made by Bob through the whyline-remove skill. The item's file must be gone or its lines changed.
 function recordRemovals(cwd, rev) {
   const msg = git.tryGit(['log', '-1', '--format=%B', rev], { cwd }) || '';
   if (!/\bremov/i.test(msg)) return [];

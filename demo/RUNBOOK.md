@@ -3,7 +3,9 @@
 Tagline: git blame tells you who. Whyline tells you why.
 Runtime: under 3 minutes. Reset between takes with `demo/reset.sh`. Everything shown comes from a real run on this demo repo.
 
-Before every take: `cd ~/projects/whyline && npm test` green, `whyline --version` works, Bob IDE open on `~/projects/whyline-demo-shop` with the hackathon account, `demo/reset.sh` run.
+Before every take: `cd ~/projects/whyline && npm test` green, `whyline --version` works, `sh demo/take.sh` run, then in Bob IDE (already open on `~/projects/whyline-demo-shop`) Cmd+Shift+P, Developer: Reload Window, once.
+
+Timing: record Act 4 (the Bob removal) as its own take and cut it to about 35 seconds; the full task runs longer than a minute live. Record the terminal acts afterwards. The video must stay under 3:00 with at least 90 seconds of the product on screen.
 
 ## Act 1: the pain (0:00 to 0:20)
 Screen: `git log --oneline` of the demo repo and `git blame src/payments/mock_gateway.py`.
@@ -17,8 +19,8 @@ Then in the terminal: `git add . && git commit -m "cart helper (Bob)"` and `git 
 Say: "A free lifecycle hook records exactly which lines Bob wrote and the prompt that caused them. On commit, that becomes a git note. Nothing to type, nothing to click, zero Bobcoins."
 
 ## Act 3: why (0:50 to 1:10)
-Screen: `whyline why src/payments/checkout.py:2`
-Say: "Weeks later, anyone can ask why. The prompt is the documentation. It also shows the item this line belongs to: a mock that was meant to go when payments-v2 lands."
+Screen: `whyline why src/shop/cart.py:1` (the file Bob wrote in Act 2: origin ai, the prompt, and a real Bobcoin cost), then `whyline why src/payments/mock_gateway.py:2` (its item line: L-… mock, active, "until payments-v2 lands").
+Say: "Weeks later, anyone can ask why. The prompt is the documentation, with what it cost. And this line belongs to an item: a mock that was meant to go when payments-v2 lands."
 
 ## Act 4: the lifecycle, and Bob removes with approval (1:10 to 2:10)
 Screen: `whyline check` (one item already due: the demo script nobody references). Then `git merge payments-v2`, the post-merge hook runs `whyline check`: the mock is now due.
