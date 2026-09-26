@@ -13,7 +13,7 @@ Live demo report (the demo shop after the payments-v2 merge, rebuilt by CI): htt
 ## Install in a repo
 
 ```sh
-npm install -g SAL-Sovereign-AI-Labs/whyline   # from GitHub (npm release coming: npm install -g whyline)
+npm install -g whyline
 cd your-repo
 whyline init                  # writes .bob/ (hooks and skills) and git hooks
 git add .bob && git commit -m "add whyline"
