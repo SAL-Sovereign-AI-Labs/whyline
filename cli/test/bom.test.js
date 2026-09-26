@@ -129,6 +129,23 @@ test('cost sums the sessions that have one, rounded, and names how many had it',
   assert.match(bom.format(r), /0\.3 Bobcoin \(2 of 3 sessions\)/);
 });
 
+test('a repo with no notes: unknown is null with the fix named, never a zero', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'whyline-bom-empty-'));
+  sh(dir, 'git', ['init', '-q', '-b', 'main']);
+  humanWrite(dir, 'a.py', 'x = 1\n');
+  sh(dir, 'git', ['add', '.']); sh(dir, 'git', ['commit', '-q', '-m', 'a']);
+  const r = bom.run(dir, undefined);
+  assert.equal(r.linesChanged, 1, 'lines changed is known from git alone');
+  assert.deepEqual(r.ai, { total: null, byAgent: {} });
+  assert.deepEqual(r.reviewed, { lines: null, percent: null });
+  assert.deepEqual(r.items, { active: null, due: null, removed: null });
+  assert.ok(r.missing.includes('notes'));
+  const out = bom.format(r);
+  assert.match(out, /AI lines\s+no data/);
+  assert.match(out, /no notes yet \(commit something Bob wrote/);
+  assert.doesNotMatch(out, /null/);
+});
+
 test('an unknown rev throws with the fix named', () => {
   assert.throws(() => bom.run(fx.dir, 'nope..HEAD'), /nope.*(git log|tag|commit)/i);
 });

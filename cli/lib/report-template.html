@@ -315,9 +315,9 @@ if (bom) {
   document.getElementById('bomTitle').textContent = 'AI Bill of Materials: ' + (bom.range || 'all history');
   var bomRows = [
     ['Lines changed', nd(bom.linesChanged)],
-    ['AI-written', bom.ai.total + (aiPct != null ? ' (' + aiPct + '%)' : '')],
+    ['AI-written', nd(bom.ai.total) + (aiPct != null ? ' (' + aiPct + '%)' : '')],
     ['By agent', Object.keys(bom.ai.byAgent).map(function(a) { return esc(a) + ' ' + bom.ai.byAgent[a]; }).join(' &middot; ') || 'no data'],
-    ['AI lines reviewed', bom.reviewed.lines + (bom.reviewed.percent != null ? ' (' + bom.reviewed.percent + '%)' : ' (no data)')],
+    ['AI lines reviewed', bom.reviewed.lines == null ? 'no data' : bom.reviewed.lines + (bom.reviewed.percent != null ? ' (' + bom.reviewed.percent + '%)' : ' (no data)')],
     ['AI lines covered by tests', bom.tested.lines != null ? String(bom.tested.lines) : 'no data'],
     ['Temporary items (active)', nd(bom.items.active)],
     ['Temporary items (due)', nd(bom.items.due)],
