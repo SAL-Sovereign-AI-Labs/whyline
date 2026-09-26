@@ -62,7 +62,7 @@ Hackathon build (IBM Bob 2.0 Hackathon, 25 to 27 Sep 2026). See docs/ for the re
 | `whyline unreviewed [--json]` | AI lines with no human edit since, per file, coverage from coverage.xml or lcov.info | 0 |
 | `whyline watch <item> --symbol Name` | change the symbol the reference check searches for | 0 |
 | `whyline removed <item>` | record a removal done by hand (a commit message naming the file or id records it automatically) | 0 |
-| `whyline seed [--dry-run]` | on an existing repo, record temporary-looking code that predates whyline (comment markers, mock and compat names, examples and fixtures folders) with its age from git | 0 |
+| `whyline seed [--dry-run] [--by-name]` | on an existing repo, record code carrying TODO remove, FIXME, HACK, temporary or until markers, with its age from git; `--by-name` also records mock_, compat_, examples/ and fixtures/ names | 0 |
 | `whyline keep <item> "<reason>"` | mark an item permanent; `<item>` is a file, symbol, kind or id | 0 |
 | `whyline until <item> <YYYY-MM-DD>` | set a date condition | 0 |
 | `whyline capture`, `whyline session-start`, `whyline commit` | hook entry points, always exit 0 | 0 |
