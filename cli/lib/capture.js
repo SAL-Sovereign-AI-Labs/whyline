@@ -1,59 +1,45 @@
 'use strict';
-// Turns one Bob (or Claude Code) hook payload into session lines. Must be cheap: one file read, one git call.
+// Agent-agnostic capture: a raw hook payload is handed to the matching adapter, which returns a normalized event.
+// Must be cheap: one file read, one git call.
 const fs = require('node:fs');
 const path = require('node:path');
 const git = require('./git');
 const session = require('./session');
 const patch = require('./patch');
+const agents = require('./agents');
 
-const WRITE_TOOLS = new Set(['write_file', 'write_to_file', 'apply_diff', 'insert_content', 'search_and_replace', 'Write', 'Edit', 'MultiEdit']);
-
-// Accept both payload spellings: {hook_event_name, tool_name, tool_input, tool_response} and {event, tool, input, output}.
-function normalize(p) {
-  return {
-    event: p.hook_event_name || p.event || '',
-    session: String(p.session_id || ''),
-    tool: p.tool_name || p.tool || '',
-    input: p.tool_input || p.input || {},
-    response: p.tool_response || p.output || '',
-    prompt: p.prompt,
-    cwd: p.cwd,
-  };
-}
-
-function handle(payload, { cwd, now = new Date() } = {}) {
-  const p = normalize(payload);
+// opts.agent: adapter id from the installed hook command (--agent bob). Falls back to detection by payload shape.
+function handle(payload, { cwd, agent, now = new Date() } = {}) {
+  const adapter = (agent && agents.byId(agent)) || agents.detect(payload);
+  if (!adapter) return 'ignored';
+  const ev = adapter.parseEvent(payload);
+  if (!ev) return 'ignored';
   const ts = now.toISOString();
-  const workdir = p.cwd && fs.existsSync(p.cwd) ? p.cwd : cwd;
-  if (p.event === 'UserPromptSubmit' && p.prompt) {
-    const has = session.readAll(workdir).some(l => l.t === 'prompt' && l.session === p.session);
-    if (!has) session.append(workdir, { t: 'prompt', session: p.session, ts, agent: guessAgent(payload), prompt: String(p.prompt).slice(0, 4000) });
+  const workdir = ev.cwd && fs.existsSync(ev.cwd) ? ev.cwd : cwd;
+
+  if (ev.type === 'prompt') {
+    const has = session.readAll(workdir).some(l => l.t === 'prompt' && l.session === ev.session);
+    if (!has) session.append(workdir, { t: 'prompt', session: ev.session, ts, agent: adapter.id, prompt: ev.prompt.slice(0, 4000) });
     return 'prompt';
   }
-  if (p.event !== 'PostToolUse' || !WRITE_TOOLS.has(p.tool)) return 'ignored';
-  const filePath = p.input.path || p.input.file_path;
-  if (!filePath) return 'ignored';
-  const rel = git.relPath(workdir, filePath);
+  if (ev.type !== 'write') return 'ignored';
+
+  const rel = git.relPath(workdir, ev.file);
   if (!rel) return 'outside';
   const abs = path.join(git.repoRoot(workdir), rel);
   if (!fs.existsSync(abs) || isBinary(abs)) return 'skipped';
   const total = countLines(abs);
-  let ranges, approx = false;
-  if (p.tool === 'write_file' || p.tool === 'write_to_file' || p.tool === 'Write') {
+  let ranges, approx = false, hunks = [];
+  if (adapter.isWholeFileTool(ev.tool)) {
     ranges = [[1, total]];
   } else {
-    ranges = patch.addedRanges(patch.patchFromResponse(p.response));
-    if (!ranges.length) { ranges = [[1, total]]; approx = true; }
+    hunks = patch.parseHunks(ev.patch);
+    ranges = patch.addedRanges(ev.patch);
+    if (!ranges.length) { ranges = [[1, total]]; approx = true; hunks = []; }
   }
-  const hunks = patch.parseHunks(patch.patchFromResponse(p.response));
   const hash = git.hashObject(workdir, abs);
-  session.append(workdir, { t: 'write', session: p.session, ts, file: rel, tool: p.tool, ranges, hunks: approx ? [] : hunks, hash, total, approx });
+  session.append(workdir, { t: 'write', session: ev.session, ts, agent: adapter.id, file: rel, tool: ev.tool, ranges, hunks, hash, total, approx });
   return 'write';
-}
-
-function guessAgent(p) {
-  if (p.tool_name === 'Write' || p.tool_name === 'Edit' || p.transcript_path) return 'claude-code';
-  return 'bob';
 }
 
 function countLines(abs) {
@@ -73,4 +59,4 @@ function isBinary(abs) {
   return false;
 }
 
-module.exports = { handle, normalize, countLines };
+module.exports = { handle, countLines };

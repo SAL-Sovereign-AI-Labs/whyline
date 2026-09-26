@@ -19,9 +19,9 @@ npm run smoke       # help and version
 ## Project layout
 ```
 cli/index.js      command router
-cli/lib/          one module per concern: git, session, capture, patch, classify, commit, cost, lenses, init
+cli/lib/          one module per concern: git, session, capture, patch, classify, commit, lenses, init
+cli/lib/agents/   one adapter folder per agent (bob/ today) plus shared/ helpers; see docs/08-adapters.md
 cli/test/         node:test files and fixtures (real Bob hook payloads)
-bob/              files installed into a repo's .bob/ by `whyline init`
 docs/             research, evidence, architecture
 ```
 

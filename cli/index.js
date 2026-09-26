@@ -5,8 +5,8 @@ const fs = require('node:fs');
 
 const USAGE = `whyline <command> [--json]
 
-  init                      install Bob hooks (.bob/) and git hooks in this repo
-  capture                   hook: read a Bob/Claude payload on stdin, record the write
+  init [--agent bob]        install the agent's hooks (.bob/) and git hooks in this repo
+  capture [--agent bob]     hook: read a hook payload on stdin, record the write
   session-start             hook: print a one-line summary for Bob's context
   commit                    git post-commit: attach the provenance note to HEAD
   why <file>:<line>         who wrote this line, and why
@@ -38,7 +38,13 @@ function dispatch(argv) {
   const [cmd, ...rest] = argv;
   const cwd = process.cwd();
   const json = rest.includes('--json');
-  const args = rest.filter(a => a !== '--json');
+  const agentIds = [];
+  const args = [];
+  for (let i = 0; i < rest.length; i++) {
+    if (rest[i] === '--json') continue;
+    if (rest[i] === '--agent') { if (rest[i + 1]) agentIds.push(rest[++i]); continue; }
+    args.push(rest[i]);
+  }
   switch (cmd) {
     case '--version': case '-v':
       console.log(require('../package.json').version);
@@ -50,7 +56,7 @@ function dispatch(argv) {
       const session = require('./lib/session');
       try {
         const payload = JSON.parse(readStdin() || '{}');
-        require('./lib/capture').handle(payload, { cwd });
+        require('./lib/capture').handle(payload, { cwd, agent: agentIds[0] });
       } catch (e) { session.logError(cwd, `capture: ${e.message}`); debug('capture', e.stack || ''); }
       return 0;
     }
@@ -98,7 +104,7 @@ function dispatch(argv) {
       return 0;
     }
     case 'init':
-      return require('./lib/init').run(cwd, { claude: args.includes('--claude') });
+      return require('./lib/init').run(cwd, { agentIds: agentIds.length ? agentIds : ['bob'] });
     default:
       if (!cmd) { process.stdout.write(USAGE); return 0; }
       process.stderr.write(`Unknown command: ${cmd}\nRun whyline --help for usage.\n`);

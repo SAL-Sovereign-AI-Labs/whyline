@@ -6,13 +6,15 @@ const git = require('./git');
 const session = require('./session');
 const patch = require('./patch');
 const classify = require('./classify');
-const cost = require('./cost');
+const agents = require('./agents');
+
+function isWholeFile(w) { const a = agents.byId(w.agent || 'bob'); return a ? a.isWholeFileTool(w.tool) : false; }
 
 // Fold writes on one file, in order, into ranges relative to the last agent state.
 function foldWrites(writes) {
   let ranges = [], lastHash = null, sessions = new Set();
   for (const w of writes) {
-    if (w.tool === 'write_file' || w.tool === 'write_to_file' || w.tool === 'Write' || w.approx) {
+    if (isWholeFile(w) || w.approx) {
       ranges = w.ranges.map(r => [...r]);
     } else {
       const mapped = patch.mapRanges(ranges, w.hunks || []);
@@ -54,7 +56,7 @@ function run(cwd, { rev = 'HEAD' } = {}) {
     usedSessions.add(sessionId);
 
     const promptText = prompts.get(sessionId)?.prompt || '';
-    const created = writes.some(w => w.tool === 'write_file' || w.tool === 'write_to_file' || w.tool === 'Write') && !git.blobAt(cwd, `${rev}~1`, file);
+    const created = writes.some(isWholeFile) && !git.blobAt(cwd, `${rev}~1`, file);
     const temp = ai.length ? classify.temporary(promptText, file, { created }) : null;
     if (temp) {
       const content = rangeText(cwd, rev, file, ai);
@@ -66,7 +68,9 @@ function run(cwd, { rev = 'HEAD' } = {}) {
 
   for (const s of usedSessions) {
     const p = prompts.get(s);
-    note.sessions[s] = { agent: p?.agent || 'bob', author, ts: p?.ts || null, prompt: p?.prompt || null, cost: cost.forSession(s) };
+    const agentId = p?.agent || lines.find(l => l.t === 'write' && l.session === s)?.agent || 'bob';
+    const adapter = agents.byId(agentId);
+    note.sessions[s] = { agent: agentId, author, ts: p?.ts || null, prompt: p?.prompt || null, cost: adapter ? adapter.sessionCost(s) : null };
   }
   git.notesAdd(cwd, commit, note);
   const remaining = lines.filter(l => !(l.t === 'write' && byFile.has(l.file)));

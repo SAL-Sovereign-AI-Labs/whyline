@@ -10,7 +10,6 @@
   "files": [
     "cli/index.js",
     "cli/lib",
-    "bob",
     "README.md",
     "LICENSE"
   ],

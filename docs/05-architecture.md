@@ -15,6 +15,7 @@ Version 1, 26 Sep 2026. Companion to docs/04-feasibility.md (evidence). Everythi
 ```
 cli/index.js            command router, arg parsing (process.argv only), exit codes
 cli/lib/git.js          run git (execFileSync), repoRoot(), head(), stagedFiles(), blame(), notesAdd/Show/List, fetch/push notes ref
+cli/lib/agents/         adapter registry: index.js, shared/ (hook-entry.sh, install.js), bob/ (index.js + assets/). See docs/08-adapters.md
 cli/lib/session.js      read/append .git/whyline/session.jsonl, group by session_id, prune after commit
 cli/lib/capture.js      turn a hook payload into session lines (write_file, apply_diff, insert_content, search_and_replace)
 cli/lib/patch.js        parse unified diff hunks ("@@ -a,b +c,d @@") into new-file line ranges

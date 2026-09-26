@@ -69,7 +69,7 @@ test('why --json on a human line and on a missing file never crashes', () => {
 
 test('the shell hook entry is a no-op without whyline on PATH and never fails', () => {
   const dir = repoWithItem();
-  const hook = path.join(__dirname, '..', '..', 'bob', 'hooks', 'whyline.sh');
+  const hook = path.join(__dirname, '..', 'lib', 'agents', 'shared', 'hook-entry.sh');
   const r = spawnSync('sh', [hook, 'capture'], { cwd: dir, input: '{}', encoding: 'utf8', env: { PATH: '/usr/bin:/bin' } });
   assert.equal(r.status, 0, r.stderr);
 });
