@@ -31,4 +31,4 @@ Cost is the task's own figure from its task summary (click New task before each 
 
 ## Totals
 
-Faisal: 8.04 · Atiq: 4.05 · team: 12.09 of 80.
+Faisal: 8.04 · Atiq: 21.11 · team: 29.15 of 80 (the "B tasks01-07" row is a thread summary, not added twice).
