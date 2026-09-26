@@ -10,7 +10,7 @@ Built for IBM Bob 2.0. Bob's free lifecycle hooks record every write; Whyline tu
 ## Install in a repo
 
 ```sh
-npm install -g whyline        # or: npx whyline init
+npm install -g SAL-Sovereign-AI-Labs/whyline   # from GitHub (npm release coming: npm install -g whyline)
 cd your-repo
 whyline init                  # writes .bob/ (hooks, a mode, skills) and git hooks
 git add .bob && git commit -m "add whyline"
