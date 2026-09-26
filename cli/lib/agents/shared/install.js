@@ -32,9 +32,25 @@ function mergeHooks(srcFile, dstFile) {
   return dstFile;
 }
 
+// A whyline hook is identified by its script path and subcommand ("sh .bob/hooks/whyline.sh capture"), so an
+// older install with different flags is replaced in place instead of duplicated. Unrelated hooks are never touched.
+function hookKey(command) {
+  const m = String(command).match(/^(.*whyline\.sh\s+[a-z-]+)/);
+  return m ? m[1] : command;
+}
+
 function addHook(hooks, event, matcher, command, timeout = 5) {
   hooks[event] = hooks[event] || [];
-  if (hooks[event].some(g => (g.hooks || []).some(h => h.command === command))) return false;
+  const key = hookKey(command);
+  for (const g of hooks[event]) {
+    const h = (g.hooks || []).find(x => hookKey(x.command) === key);
+    if (h) {
+      if (h.command === command && g.matcher === matcher) return false;
+      h.command = command; h.timeout = timeout;
+      if (matcher) g.matcher = matcher; else delete g.matcher;
+      return true;
+    }
+  }
   const group = { hooks: [{ type: 'command', command, timeout }] };
   if (matcher) group.matcher = matcher;
   hooks[event].push(group);

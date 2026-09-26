@@ -50,9 +50,16 @@ test('bob adapter: install writes .bob and is idempotent; installedIn reflects i
   assert.ok(first.includes(path.join('.bob', 'settings.json')));
   assert.ok(first.includes(path.join('.bob', 'hooks', 'whyline.sh')));
   assert.ok(first.some(f => f.endsWith(path.join('skills', 'whyline-remove', 'SKILL.md'))));
+  // simulate an older install whose command lacked --agent: it must be replaced, not duplicated
+  const f = path.join(dir, '.bob', 'settings.json');
+  const old = JSON.parse(fs.readFileSync(f, 'utf8'));
+  old.hooks.PostToolUse[0].hooks[0].command = 'sh .bob/hooks/whyline.sh capture';
+  old.hooks.Stop = [{ hooks: [{ type: 'command', command: 'echo user-hook' }] }];
+  fs.writeFileSync(f, JSON.stringify(old));
   bob.install(dir);
-  const s = JSON.parse(fs.readFileSync(path.join(dir, '.bob', 'settings.json'), 'utf8'));
+  const s = JSON.parse(fs.readFileSync(f, 'utf8'));
   assert.equal(s.hooks.PostToolUse.length, 1);
+  assert.equal(s.hooks.Stop[0].hooks[0].command, 'echo user-hook', 'unrelated hooks untouched');
   assert.match(s.hooks.PostToolUse[0].hooks[0].command, /--agent bob/);
   assert.equal(bob.installedIn(dir), true);
   assert.ok(fs.statSync(path.join(dir, '.bob', 'hooks', 'whyline.sh')).mode & 0o111, 'hook entry is executable');
