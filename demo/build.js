@@ -24,7 +24,13 @@ function main(argv) {
 
   if (fs.existsSync(target)) {
     if (!fs.existsSync(path.join(target, MARKER))) throw new Error(`${target} exists and is not a whyline demo folder; refusing to delete it`);
-    fs.rmSync(target, { recursive: true, force: true });
+    // a background `whyline report` from the previous build's post-commit hook may still be writing: retry briefly
+    for (let attempt = 0; ; attempt++) {
+      try { fs.rmSync(target, { recursive: true, force: true }); break; } catch (e) {
+        if (attempt >= 10) throw e;
+        Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 300);
+      }
+    }
   }
   fs.mkdirSync(target, { recursive: true });
   fs.cpSync(TEMPLATE, target, { recursive: true });

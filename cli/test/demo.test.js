@@ -31,7 +31,8 @@ test('demo builds deterministically; merge of payments-v2 makes the mock due', (
   assert.ok(![...c.due, ...c.active].some(i => i.file.includes('rates.py')));
   // second build gives the same ids
   const ids1 = [...c.due, ...c.active].map(i => i.id).sort();
-  spawnSync(process.execPath, [BUILD, target], { encoding: 'utf8', env });
+  const b2 = spawnSync(process.execPath, [BUILD, target], { encoding: 'utf8', env });
+  assert.equal(b2.status, 0, b2.stderr);
   const ids2 = [...check().due, ...check().active].map(i => i.id).sort();
   assert.deepEqual(ids1, ids2);
   execFileSync('git', ['merge', '-q', '--no-edit', 'payments-v2'], { cwd: target, env: { ...env, GIT_AUTHOR_NAME: 'demo', GIT_COMMITTER_NAME: 'demo', GIT_AUTHOR_EMAIL: 'd@example.invalid', GIT_COMMITTER_EMAIL: 'd@example.invalid' } });
