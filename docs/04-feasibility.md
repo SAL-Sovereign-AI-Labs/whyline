@@ -1,4 +1,4 @@
-# AI Code Ledger: feasibility evidence and tech stack decision
+# Whyline: feasibility evidence and tech stack decision
 
 Date: 26 Sep 2026, 12:20 am. Sources: live experiments on the installed Bob Shell 2.0.5, Bob Shell source (bob.js), bob.ibm.com docs (171 pages fetched), 15 GitHub repos fetched with gh. Raw material in the session scratchpad: feas-docs.md (docs matrix, 30 KB), ship-research.md (GitHub practices), exp-bob/hooklog/*.log (captured hook payloads).
 
@@ -27,7 +27,7 @@ Spent: about 0.15 Bobcoins total on the account this Shell is logged into. Task 
 | Hooks cost Bobcoins | No | Cost only moved when the model ran; hook-only steps did not change the counter |
 | Per-task cost is readable locally | Yes, for Shell | `~/.bob/db/bob.db` tasks.costs = `{"cost":0.10197,"contextTokens":11142}`; per-message spend in messages._meta.spend |
 | Headless `bob run` | Needs BOB_API_KEY | Error text: "Bob API key is required. Set BOB_API_KEY environment variable." The IBMid login only serves `bob chat`. For automation in the demo, use `bob chat` in a terminal or create an API key in the hackathon account. |
-| git notes on a custom ref | Yes | Note added on refs/notes/ai-ledger, read back, survived a file rename through blame, pushed to a bare remote, 83 bytes |
+| git notes on a custom ref | Yes | Note added on refs/notes/whyline, read back, survived a file rename through blame, pushed to a bare remote, 83 bytes |
 
 ## 3. Docs matrix summary (bob.ibm.com, verbatim quotes in feas-docs.md)
 
@@ -37,9 +37,9 @@ Spent: about 0.15 Bobcoins total on the account this Shell is logged into. Task 
 | Events | IDE: SessionStart, UserPromptSubmit, PreToolUse, PostToolUse, Stop. Shell adds PreCompact, PostCompact. | Use only the five common ones. |
 | Blocking | Exit 2 blocks UserPromptSubmit and PreToolUse only. Stdout injected as context only from SessionStart and UserPromptSubmit. No input rewriting. | Push gate is a PreToolUse hook on execute_command matching `git push`. |
 | Enterprise | EnforcedHooks policy, "cannot be overridden by users", IDE only. | The org-wide story is real and documented. |
-| Custom modes | `.bob/custom_modes.yaml`. Fields slug, name, description, roleDefinition, whenToUse, customInstructions, groups (edit with fileRegex), allowedSubagents. Invoked as `/<slug>` or via switch_mode. Mode rules in `.bob/rules-<slug>/`. | Ship one mode: ledger-remover, groups read, edit, execute, skill. |
-| Skills | `.bob/skills/<name>/SKILL.md`, front matter name and description only, supporting files readable. | Ship 2 skills: ledger-remove (evidence procedure), ledger-seed (stretch). |
-| Slash commands | `.bob/commands/<name>.md`, $1 $2 args, identical in IDE and Shell. | Optional `/ledger-check` command. |
+| Custom modes | `.bob/custom_modes.yaml`. Fields slug, name, description, roleDefinition, whenToUse, customInstructions, groups (edit with fileRegex), allowedSubagents. Invoked as `/<slug>` or via switch_mode. Mode rules in `.bob/rules-<slug>/`. | Ship one mode: whyline-remover, groups read, edit, execute, skill. |
+| Skills | `.bob/skills/<name>/SKILL.md`, front matter name and description only, supporting files readable. | Ship 2 skills: whyline-remove (evidence procedure), ledger-seed (stretch). |
+| Slash commands | `.bob/commands/<name>.md`, $1 $2 args, identical in IDE and Shell. | Optional `/whyline-check` command. |
 | Plugins | Only one changelog line (IDE 2.2.0): skills, modes, rules and MCP can live in a `plugins/` subdirectory. No plugin.json, no marketplace, no `bob plugin` command documented. Hooks are not part of it. | Distribution is "files in the repo" installed by our CLI. Do not promise a marketplace. |
 | Approvals | Per tool group in `~/.bob/settings/settings.json` `approval`. allowedExecutors with approvedCommands and deniedCommands. `bob run` pre-approves all tools. | The removal mode ends in Bob's normal approval prompt in the IDE. |
 | Git features | Commit message, /review with Bob Findings, /create-pr: IDE only. "Track code attribution with git notes" is one changelog line with no details. | Inspect the IDE's notes ref during hour 0 in the IDE; do not depend on it. |
@@ -66,21 +66,21 @@ One language, zero runtime dependencies, one npm package.
 | Layer | Choice | Why (evidence) |
 |---|---|---|
 | Capture hook (every tool call) | POSIX `sh` line in settings.json calling `node cli/index.js capture`, guarded with `command -v node || exit 0` | IBM's demo uses sh + jq. Node startup is about 50 ms, well inside the 10 s timeout and invisible next to model latency. One language means one test suite. The guard means teammates without Node are never blocked (entire.io pattern). |
-| CLI | Single-file Node, `node:test`, no dependencies, `"bin": {"ai-code-ledger": "cli/index.js"}`, `engines.node >= 20` | ccusage, claude-hud and cloudflare validators all ship this way. Node 24 is already required by Bob Shell. |
-| State during a session | `.git/ai-code-ledger/session.jsonl`, one line per write: session, prompt hash, file, ranges, content hash | agentdiff shape. Inside .git so it never appears in the tree or in diffs. |
-| Durable state | One JSON note per commit on `refs/notes/ai-code-ledger`; prompts stored once per session in the same note | Verified locally. Matches Bob IDE's own attribution convention (git notes). agentblame and agentdiff do the same. |
-| Sync | post-merge and pre-push hooks run `git fetch/push origin refs/notes/ai-code-ledger` | Standard. Squash-merge loss is a known limitation shared by every tool in this space; documented, not solved in 48 h. |
+| CLI | Single-file Node, `node:test`, no dependencies, `"bin": {"whyline": "cli/index.js"}`, `engines.node >= 20` | ccusage, claude-hud and cloudflare validators all ship this way. Node 24 is already required by Bob Shell. |
+| State during a session | `.git/whyline/session.jsonl`, one line per write: session, prompt hash, file, ranges, content hash | agentdiff shape. Inside .git so it never appears in the tree or in diffs. |
+| Durable state | One JSON note per commit on `refs/notes/whyline`; prompts stored once per session in the same note | Verified locally. Matches Bob IDE's own attribution convention (git notes). agentblame and agentdiff do the same. |
+| Sync | post-merge and pre-push hooks run `git fetch/push origin refs/notes/whyline` | Standard. Squash-merge loss is a known limitation shared by every tool in this space; documented, not solved in 48 h. |
 | Reference check for expiry | `git grep` for the symbol and file name, plus a Python and JS import regex | Deterministic, no tree-sitter in 48 h. Good enough for the demo repo. |
 | Review signals | git blame (human edit after AI write), `gh api` PR reviews and comments | Both already on the machine. |
 | Coverage | Read coverage.xml or lcov.info if present, else "no data" | Never guess. |
-| Report | `ledger report` writes one static HTML file with inline data. No server. | Read-only by decision. |
-| Bob integration | `.bob/settings.json` hooks, `.bob/custom_modes.yaml` (ledger-remover), `.bob/skills/ledger-remove/SKILL.md`, `.bob/rules-ledger-remover/`, optional `.bob/commands/ledger-check.md` | All verified to load in Shell; all documented for the IDE. |
+| Report | `whyline report` writes one static HTML file with inline data. No server. | Read-only by decision. |
+| Bob integration | `.bob/settings.json` hooks, `.bob/custom_modes.yaml` (whyline-remover), `.bob/skills/whyline-remove/SKILL.md`, `.bob/rules-whyline-remover/`, optional `.bob/commands/whyline-check.md` | All verified to load in Shell; all documented for the IDE. |
 | Claude Code (stretch) | `claude/hooks/hooks.json` with the same command and matcher `Edit|Write|MultiEdit` | Identical hooks.json shape (verified in anthropics/claude-code plugins). |
 
 ## 6. Repository layout
 
 ```
-ai-code-ledger/
+whyline/
   package.json                 # bin, files, engines, scripts: test
   cli/
     index.js                   # capture | commit | check | why | unreviewed | bom | report | init | keep | until
@@ -88,17 +88,17 @@ ai-code-ledger/
     test/                      # node:test, fixtures with a tiny git repo
   bob/                         # copied into a target repo's .bob/ by init
     settings.json              # hooks
-    custom_modes.yaml          # ledger-remover
-    rules-ledger-remover/01-evidence.md
-    skills/ledger-remove/SKILL.md
-    commands/ledger-check.md
+    custom_modes.yaml          # whyline-remover
+    rules-whyline-remover/01-evidence.md
+    skills/whyline-remove/SKILL.md
+    commands/whyline-check.md
   claude/hooks/hooks.json      # stretch, same command
   demo/                        # the seeded demo repo used in the video
   bob_sessions/                # hackathon evidence PNGs
   README.md
 ```
 
-Install for a user: `npx ai-code-ledger init` inside a repo. It copies `bob/` into `.bob/` (merging hooks into an existing settings.json), installs `.git/hooks/pre-commit`, `post-merge` and `pre-push`, and prints "commit .bob/ so your team gets the hooks". No marketplace, no global install.
+Install for a user: `npx whyline init` inside a repo. It copies `bob/` into `.bob/` (merging hooks into an existing settings.json), installs `.git/hooks/pre-commit`, `post-merge` and `pre-push`, and prints "commit .bob/ so your team gets the hooks". No marketplace, no global install.
 
 ## 7. Hook-level design, from the real payloads
 
@@ -108,9 +108,9 @@ Install for a user: `npx ai-code-ledger init` inside a repo. It copies `bob/` in
 | PostToolUse, matcher `write_file|apply_diff|insert_content|search_and_replace` | write_file: record path, line count, content hash. apply_diff: parse the unified patch in tool_response for exact ranges. Append `{session_id, tool, file, ranges, hash}` | 0 |
 | SessionStart | Print one line: "ledger: N items due, M files unreviewed". Bob injects it into context (proven) | 0 |
 | git pre-commit | For each staged file with pending ranges: compare content hash → ai / ai-edited / human. Classify temporary by rules. Write the note on the commit (post-commit does the actual `git notes add` since the commit id exists only then) | 0 |
-| git post-merge | fetch notes ref, run `ledger check` | 0 |
+| git post-merge | fetch notes ref, run `whyline check` | 0 |
 | PreToolUse on execute_command matching `git push` (stretch) | Exit 2 with a reason when unreviewed AI lines exceed the threshold | 0 |
-| Bob mode ledger-remover | Reads `ledger check --json`, gathers evidence (references, tests, Bob findings), proposes the diff, ends in Bob's approval prompt | Bobcoins, about 0.5 to 1 per removal |
+| Bob mode whyline-remover | Reads `whyline check --json`, gathers evidence (references, tests, Bob findings), proposes the diff, ends in Bob's approval prompt | Bobcoins, about 0.5 to 1 per removal |
 
 ## 8. What remains uncertain
 
@@ -122,5 +122,5 @@ Install for a user: `npx ai-code-ledger init` inside a repo. It copies `bob/` in
 
 1. Open the demo repo in Bob IDE on the hackathon account. Run one tiny task. Confirm hooklog files appear and the Tasks list shows the cost.
 2. Run `git notes --ref` listing after a commit made with Bob's commit button to see whether the IDE writes attribution notes and where.
-3. Confirm `/ledger-remover` appears as a slash command and the skill loads.
+3. Confirm `/whyline-remover` appears as a slash command and the skill loads.
 4. Take the first bob_sessions screenshot.

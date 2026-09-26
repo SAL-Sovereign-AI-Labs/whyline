@@ -1,0 +1,27 @@
+[
+ {
+  "_note": "Reconstructed from payloads captured live from Bob Shell 2.0.5 on 26 Sep 2026 (hooklog was on a temp disk). Field names and the write_file/apply_diff input shapes are exact; the apply_diff response body is rebuilt from the observed 'Patch of edit: <patch> @@ -1,' prefix and the resulting file.",
+  "session_id": "14b88c1d170bc6b0763b01259b68609e",
+  "cwd": "/tmp/exp-bob",
+  "hook_event_name": "UserPromptSubmit",
+  "prompt": "Create hello.py containing a function add(a, b) that returns a + b. Do not run anything."
+ },
+ {
+  "session_id": "14b88c1d170bc6b0763b01259b68609e",
+  "cwd": "/tmp/exp-bob",
+  "hook_event_name": "PostToolUse",
+  "tool_name": "write_file",
+  "tool_input": { "path": "/tmp/exp-bob/hello.py", "content": "# SKILL_MARKER_OK\n\ndef add(a, b):\n    return a + b\n", "line_count": 4 },
+  "tool_response": "Created file: hello.py\n\n<result>\n# SKILL_MARKER_OK\n\ndef add(a, b):\n    return a + b\n\n</result>",
+  "tool_use_id": "tooluse_6A4wzCjtLOTsTnrzUKhN2a"
+ },
+ {
+  "session_id": "b7d0c3e1a4f2596e8d1c0b2a3f4e5d6c",
+  "cwd": "/tmp/exp-bob",
+  "hook_event_name": "PostToolUse",
+  "tool_name": "apply_diff",
+  "tool_input": { "path": "/tmp/exp-bob/hello.py", "diff": "<<<<<<< SEARCH\n:start_line:4\n-------\n    return a + b\n=======\n    return a + b\n\n\ndef sub(a, b):\n    return a - b\n>>>>>>> REPLACE\n" },
+  "tool_response": "Edited file: hello.py\n\nYou do not need to re-read the file, as you have seen all changes. Proceed with the task using these changes as the new baseline.\n\nPatch of edit:\n\n<patch>\n@@ -1,4 +1,8 @@\n # SKILL_MARKER_OK\n \n def add(a, b):\n     return a + b\n+\n+\n+def sub(a, b):\n+    return a - b\n</patch>",
+  "tool_use_id": "tooluse_reconstructed"
+ }
+]

@@ -1,4 +1,4 @@
-# AI Code Ledger: low-level architecture
+# Whyline: low-level architecture
 
 Version 1, 26 Sep 2026. Companion to docs/04-feasibility.md (evidence). Everything here is sized for 2 people in 48 hours. Anything marked STRETCH is not in the must list.
 
@@ -15,7 +15,7 @@ Version 1, 26 Sep 2026. Companion to docs/04-feasibility.md (evidence). Everythi
 ```
 cli/index.js            command router, arg parsing (process.argv only), exit codes
 cli/lib/git.js          run git (execFileSync), repoRoot(), head(), stagedFiles(), blame(), notesAdd/Show/List, fetch/push notes ref
-cli/lib/session.js      read/append .git/ai-code-ledger/session.jsonl, group by session_id, prune after commit
+cli/lib/session.js      read/append .git/whyline/session.jsonl, group by session_id, prune after commit
 cli/lib/capture.js      turn a hook payload into session lines (write_file, apply_diff, insert_content, search_and_replace)
 cli/lib/patch.js        parse unified diff hunks ("@@ -a,b +c,d @@") into new-file line ranges
 cli/lib/classify.js     at commit: ai / ai-edited / human per range; temporary rules; item ids
@@ -42,7 +42,7 @@ Target size: about 1,200 lines of JavaScript in total. If a module passes 250 li
 ```
 Docs show older names (event, tool, input, output). `capture` reads both: `p.tool_name ?? p.tool`, `p.tool_input ?? p.input`, `p.tool_response ?? p.output`, `p.hook_event_name ?? p.event`.
 
-### 2.2 session.jsonl (one line per event, inside .git/ai-code-ledger/)
+### 2.2 session.jsonl (one line per event, inside .git/whyline/)
 
 ```json
 {"t":"prompt","session":"14b88c1d","ts":"2026-09-26T00:06:02+05:00","agent":"bob","prompt":"Create hello.py …"}
@@ -51,7 +51,7 @@ Docs show older names (event, tool, input, output). `capture` reads both: `p.too
 ```
 Rules: paths are repo-relative with forward slashes. `hash` is `git hash-object` of the file as it exists right after the write (read from disk in the hook, not from the payload, so it is correct for every tool). Lines outside a git repo are dropped. The file is truncated after a successful commit note.
 
-### 2.3 Git note (one per commit, ref `refs/notes/ai-code-ledger`)
+### 2.3 Git note (one per commit, ref `refs/notes/whyline`)
 
 ```json
 {"v":1,
@@ -66,16 +66,16 @@ Rules: paths are repo-relative with forward slashes. `hash` is `git hash-object`
 ```
 - `origin` values: `ai` (content identical to what the agent wrote), `ai-edited` (range still overlaps an agent write but content changed before commit), never `human` (human lines are simply absent from notes).
 - `cost` is filled when readable from `~/.bob/db/bob.db` tasks.costs for that session id, else null.
-- Item ids: `L-` plus a 4-digit counter stored in `refs/notes/ai-code-ledger` on an empty "meta" note attached to the root commit. Simpler alternative used if time is short: id = first 7 chars of sha1(file + lines + session).
+- Item ids: `L-` plus a 4-digit counter stored in `refs/notes/whyline` on an empty "meta" note attached to the root commit. Simpler alternative used if time is short: id = first 7 chars of sha1(file + lines + session).
 - Item state changes (`kept`, `until`, `removed`) are recorded as a new note on the commit that made the change, with `"items":[{"id":"L-0193","status":"removed","by":"faisal-fida","reason":"…"}]`. Readers fold all notes newest-last, so the latest status wins.
 
 ### 2.4 Note index (in memory, built by every read command)
 
 ```
-notes = git notes --ref ai-ledger list  → [{commit, note}]
+notes = git notes --ref whyline list  → [{commit, note}]
 index = { byFile: {file: [range+commit]}, sessions: {id: session+commit}, items: {id: latest item state} }
 ```
-Built in one pass over `git log --format=%H` intersected with the notes list, so ordering is commit order. Cached to `.git/ai-code-ledger/index.json` keyed by HEAD sha (STRETCH; skip if the repo is small).
+Built in one pass over `git log --format=%H` intersected with the notes list, so ordering is commit order. Cached to `.git/whyline/index.json` keyed by HEAD sha (STRETCH; skip if the repo is small).
 
 ### 2.5 Temporary rules (classify.js)
 
@@ -99,7 +99,7 @@ All commands run from anywhere inside the repo. Output is human text by default,
 
 | Command | Input | Output | Notes |
 |---|---|---|---|
-| `capture` | hook payload on stdin | nothing | Appends to session.jsonl. Always exits 0, even on bad input (logs to `.git/ai-code-ledger/capture.log`). Must finish under 200 ms. |
+| `capture` | hook payload on stdin | nothing | Appends to session.jsonl. Always exits 0, even on bad input (logs to `.git/whyline/capture.log`). Must finish under 200 ms. |
 | `session-start` | hook payload on stdin | one line to stdout | Prints "ledger: N items due, M files unreviewed" or nothing if zero. Reads the cached index only. Exits 0 always. |
 | `commit` | none (called from post-commit) | nothing | Builds and attaches the note for HEAD from staged-and-committed files versus session.jsonl. Prunes session lines for committed files. |
 | `check` | `--json` | due items list | Evaluates each active item's condition. Exit 2 if any is due. |
@@ -120,23 +120,23 @@ All commands run from anywhere inside the repo. Output is human text by default,
 ```json
 {
   "hooks": {
-    "SessionStart": [{ "hooks": [{ "type": "command", "command": "sh .bob/hooks/ledger.sh session-start", "timeout": 5 }] }],
-    "UserPromptSubmit": [{ "hooks": [{ "type": "command", "command": "sh .bob/hooks/ledger.sh capture", "timeout": 5 }] }],
+    "SessionStart": [{ "hooks": [{ "type": "command", "command": "sh .bob/hooks/whyline.sh session-start", "timeout": 5 }] }],
+    "UserPromptSubmit": [{ "hooks": [{ "type": "command", "command": "sh .bob/hooks/whyline.sh capture", "timeout": 5 }] }],
     "PostToolUse": [{ "matcher": "^(write_file|apply_diff|insert_content|search_and_replace)$",
-                      "hooks": [{ "type": "command", "command": "sh .bob/hooks/ledger.sh capture", "timeout": 5 }] }]
+                      "hooks": [{ "type": "command", "command": "sh .bob/hooks/whyline.sh capture", "timeout": 5 }] }]
   }
 }
 ```
 
-### 4.2 .bob/hooks/ledger.sh (the only shell file)
+### 4.2 .bob/hooks/whyline.sh (the only shell file)
 
 ```sh
 #!/bin/sh
 # Bob lifecycle hook entry. Never fails the agent: any error exits 0.
 command -v node >/dev/null 2>&1 || exit 0
-BIN="$(git rev-parse --show-toplevel 2>/dev/null)/node_modules/.bin/ai-code-ledger"
-[ -x "$BIN" ] || BIN="$(command -v ai-code-ledger)" || exit 0
-exec "$BIN" "$1" 2>>"$(git rev-parse --git-dir)/ai-code-ledger/hook.err" || exit 0
+BIN="$(git rev-parse --show-toplevel 2>/dev/null)/node_modules/.bin/whyline"
+[ -x "$BIN" ] || BIN="$(command -v whyline)" || exit 0
+exec "$BIN" "$1" 2>>"$(git rev-parse --git-dir)/whyline/hook.err" || exit 0
 ```
 Resolution order: repo-local install, then global. If neither exists the hook is a no-op. This is the entire.io guard pattern.
 
@@ -144,9 +144,9 @@ Resolution order: repo-local install, then global. If neither exists the hook is
 
 | Hook | Runs |
 |---|---|
-| post-commit | `ai-code-ledger commit` |
-| post-merge | `git fetch origin refs/notes/ai-code-ledger:refs/notes/ai-code-ledger 2>/dev/null; ai-code-ledger check` (exit code ignored, output shown) |
-| pre-push | `git push origin refs/notes/ai-code-ledger 2>/dev/null` (never blocks) |
+| post-commit | `whyline commit` |
+| post-merge | `git fetch origin refs/notes/whyline:refs/notes/whyline 2>/dev/null; whyline check` (exit code ignored, output shown) |
+| pre-push | `git push origin refs/notes/whyline 2>/dev/null` (never blocks) |
 
 If a hook file already exists, init appends a call instead of overwriting, and says so.
 
@@ -173,12 +173,12 @@ PreToolUse on `execute_command`, matcher `^execute_command$`; the CLI inspects `
 2. For each file with pending write lines: `blob = git rev-parse HEAD:<file>`; hash of committed content.
 3. For each pending range on that file:
    - If the committed hash equals the hash recorded right after the last agent write → all ranges `ai`.
-   - Else compute a diff between the last agent-written content (kept as `.git/ai-code-ledger/blobs/<hash>` written by capture, STRETCH: otherwise reuse `git hash-object -w` to store it in the object database, which is what agentblame does) and the committed content; ranges that survived unchanged are `ai`, ranges that changed are `ai-edited`, ranges that disappeared are dropped.
+   - Else compute a diff between the last agent-written content (kept as `.git/whyline/blobs/<hash>` written by capture, STRETCH: otherwise reuse `git hash-object -w` to store it in the object database, which is what agentblame does) and the committed content; ranges that survived unchanged are `ai`, ranges that changed are `ai-edited`, ranges that disappeared are dropped.
    - Must-list simplification: without the blob store, use `git diff` between the hash object and the committed blob (`git diff <hash> HEAD:<file>`); since `git hash-object -w` stores the object, this works with one extra flag in capture. So the blob store is free: capture uses `git hash-object -w`.
 4. Build sessions from prompt lines (only sessions that have at least one range in this commit).
 5. Temporary classification on each `ai` range whose session prompt or file matches a rule → item with condition.
 6. Cost: open `~/.bob/db/bob.db` read-only with `sqlite3` CLI if present (`sqlite3 -readonly … "select costs from tasks where id=?"`), else null. No sqlite dependency in Node.
-7. `git notes --ref ai-ledger add -f -F - HEAD`.
+7. `git notes --ref whyline add -f -F - HEAD`.
 8. Remove consumed lines from session.jsonl.
 
 ### 5.3 check
@@ -186,7 +186,7 @@ PreToolUse on `execute_command`, matcher `^execute_command$`; the CLI inspects `
 For each item with the latest status `active`:
 - `date`: due when today ≥ on.
 - `no_references`: `git grep -n -w <symbol> -- ':!<file>' ':!tests/**'` and `git grep -n <module> -- ':!<file>'` (import lines); due when both return nothing. For a folder item (kind demo), due when nothing outside the folder references its stem.
-Output rows: id, kind, file, condition, since (first day found due, stored in `.git/ai-code-ledger/due.json`), reason.
+Output rows: id, kind, file, condition, since (first day found due, stored in `.git/whyline/due.json`), reason.
 
 ### 5.4 why
 
@@ -197,7 +197,7 @@ Output rows: id, kind, file, condition, since (first day found due, stored in `.
 
 ### 5.5 unreviewed
 
-Walk the note index for ranges with `origin: ai` (ai-edited counts as reviewed). For each, evaluate the three signals once per file and cache the PR lookup for 10 minutes in `.git/ai-code-ledger/gh-cache.json`. Join coverage per line. Sort by AI lines desc.
+Walk the note index for ranges with `origin: ai` (ai-edited counts as reviewed). For each, evaluate the three signals once per file and cache the PR lookup for 10 minutes in `.git/whyline/gh-cache.json`. Join coverage per line. Sort by AI lines desc.
 
 ### 5.6 bom
 
@@ -209,7 +209,7 @@ Walk the note index for ranges with `origin: ai` (ai-edited counts as reviewed).
 
 ### 5.7 report
 
-One HTML file. Template is a JS template string in report.js with `<script>const DATA = …</script>`. Views: Overview, Why (file picker limited to files with AI ranges, line table), Expiry, Unreviewed, BOM, Status. Design and copy follow ai-code-ledger-dashboard.html on the Desktop, with the mock data replaced by DATA.
+One HTML file. Template is a JS template string in report.js with `<script>const DATA = …</script>`. Views: Overview, Why (file picker limited to files with AI ranges, line table), Expiry, Unreviewed, BOM, Status. Design and copy follow whyline-dashboard.html on the Desktop, with the mock data replaced by DATA.
 
 ## 6. Bob integration files (shipped in bob/, installed to .bob/)
 
@@ -217,19 +217,19 @@ One HTML file. Template is a JS template string in report.js with `<script>const
 
 ```yaml
 customModes:
-  - slug: ledger-remover
+  - slug: whyline-remover
     name: Ledger Remover
-    description: Remove temporary code the AI Code Ledger says is due, with evidence and human approval.
+    description: Remove temporary code the Whyline says is due, with evidence and human approval.
     roleDefinition: >-
       You remove temporary code safely. You never delete without evidence and you never
-      skip the approval step. You work only on items listed by `ai-code-ledger check --json`.
+      skip the approval step. You work only on items listed by `whyline check --json`.
     whenToUse: When the user asks to remove a ledger item (for example "remove L-0193") or to clean up due temporary code.
     customInstructions: >-
-      1. Run `ai-code-ledger check --json` and pick the requested item. If it is not due, stop and say so.
-      2. Load the ledger-remove skill and follow it exactly.
+      1. Run `whyline check --json` and pick the requested item. If it is not due, stop and say so.
+      2. Load the whyline-remove skill and follow it exactly.
       3. Show the evidence table and the proposed diff before editing.
       4. Apply the edit only after the user approves. Then run the test command from the skill.
-      5. Finish with `ai-code-ledger keep` or a commit that records the removal, as the skill says.
+      5. Finish with `whyline keep` or a commit that records the removal, as the skill says.
     groups:
       - read
       - edit
@@ -237,38 +237,38 @@ customModes:
       - skill
 ```
 
-### 6.2 rules-ledger-remover/01-evidence.md
+### 6.2 rules-whyline-remover/01-evidence.md
 
 - Evidence before edits. Every claim cites a command and its output.
 - Never widen scope: only the item's files, plus a test file that tests nothing else.
 - If tests fail after removal, revert and report; do not fix unrelated code.
 - Never run git push.
 
-### 6.3 skills/ledger-remove/SKILL.md
+### 6.3 skills/whyline-remove/SKILL.md
 
 ```
 ---
-name: ledger-remove
-description: Procedure to remove one due temporary item from the AI Code Ledger with evidence (references, tests, scanners) and human approval.
+name: whyline-remove
+description: Procedure to remove one due temporary item from the Whyline with evidence (references, tests, scanners) and human approval.
 ---
-Input: an item id from `ai-code-ledger check --json`.
+Input: an item id from `whyline check --json`.
 Steps:
-1. references: run `ai-code-ledger check --json` and quote the item's condition result. Run `git grep -n -w <symbol>`; there must be no hits outside the item's files and their own tests.
+1. references: run `whyline check --json` and quote the item's condition result. Run `git grep -n -w <symbol>`; there must be no hits outside the item's files and their own tests.
 2. plan: list the exact files and line ranges to delete. If a test file only tests the item, include it.
 3. dry run: remove the ranges, run the project's test command (read it from package.json scripts.test, Makefile test, or pytest), record pass/fail counts.
 4. scanners: if Bob Findings is available, run /review on the diff and quote any new finding.
 5. present the evidence table (condition, references, tests, scanners, files, -lines) and ask for approval using the normal approval prompt.
-6. after approval: keep the edit, commit with message "remove <id>: <reason>", then run `ai-code-ledger commit` is automatic via the git hook. Say which PR command to run next (/create-pr).
+6. after approval: keep the edit, commit with message "remove <id>: <reason>", then run `whyline commit` is automatic via the git hook. Say which PR command to run next (/create-pr).
 Never delete anything before step 5 is approved.
 ```
 
-### 6.4 commands/ledger-check.md
+### 6.4 commands/whyline-check.md
 
 ```
 ---
 description: List temporary code that is due for removal
 ---
-Run `ai-code-ledger check` and summarise the due items in one table. Do not edit anything.
+Run `whyline check` and summarise the due items in one table. Do not edit anything.
 ```
 
 ## 7. Demo repository (demo/)
@@ -303,5 +303,5 @@ A small Python Flask or FastAPI shop backend, about 30 files, with:
 | Squash merges | Notes on squashed commits are lost; documented limitation, same as every tool in this space |
 | Binary files | Skipped by capture |
 | Repo without `origin` | notes fetch and push are silent no-ops |
-| Windows | Hooks run via cmd /c on Windows in Bob; ledger.sh is POSIX. Out of scope for 48 h, stated in README |
+| Windows | Hooks run via cmd /c on Windows in Bob; whyline.sh is POSIX. Out of scope for 48 h, stated in README |
 | Cost unavailable (IDE database not found) | null, reported as "n of m sessions with cost" |

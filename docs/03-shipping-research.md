@@ -2,15 +2,15 @@
 
 Research date: 26 Sep 2026. All quotes fetched via `gh api` (raw contents) or WebFetch. Star counts from `gh repo view` on the same day.
 
-## 0. Quick verdict for AI Code Ledger
+## 0. Quick verdict for Whyline
 
 | Decision | Recommendation | Strongest evidence |
 |---|---|---|
 | Hook language | POSIX `sh` + `jq` for the per-tool-call capture (like IBM's own galaxium-travels Bob demo), calling a single-file Node CLI only for git hooks and reports | `IBM/galaxium-travels/.bob/hooks/record-tool.sh`: "Runs on EVERY tool call, so it has to stay cheap -- two jq passes and an append" |
 | Hook declaration | `.bob/settings.json` `hooks` key, same shape as Claude Code `hooks.json`; one file works for both | Bob docs (via the-main-thread): "Bob merges configuration from ... `.bob/settings.json`"; Claude plugin `hooks/hooks.json` uses identical `{"hooks":{"PostToolUse":[{"matcher":..,"hooks":[{"type":"command",...}]}]}}` |
 | State | Append-only JSONL under `.git/` for capture; git notes `refs/notes/<tool>` at commit time | agentdiff: `.git/agentdiff/session.jsonl`, `git notes --ref=agentdiff add -f -F - <commit>`; agentblame: `refs/notes/agentblame` JSON |
-| CLI packaging | Single npm package, `bin` in package.json, `npx ai-code-ledger` | ccusage README line 95: `npx ccusage@latest`; codeburn README: `npx codeburn` |
-| Install path | `npx ai-code-ledger init` writes `.bob/` files and git hooks (agentblame `ab init`, agentdiff `init`, entire `enable` all do exactly this) | agentblame README: "`ab init` ... sets up ... Editor hooks ... Git post-commit hook" |
+| CLI packaging | Single npm package, `bin` in package.json, `npx whyline` | ccusage README line 95: `npx ccusage@latest`; codeburn README: `npx codeburn` |
+| Install path | `npx whyline init` writes `.bob/` files and git hooks (agentblame `ab init`, agentdiff `init`, entire `enable` all do exactly this) | agentblame README: "`ab init` ... sets up ... Editor hooks ... Git post-commit hook" |
 | Skills | `SKILL.md` with `name` + `description` frontmatter, optional `scripts/`; same folder is readable by Bob, Claude Code and Codex | anthropics/skills `template/SKILL.md`; Codex docs: "A skill is a directory with a `SKILL.md` file plus optional scripts and references" |
 
 ---
@@ -370,10 +370,10 @@ Recommendation: write the capture hook as one POSIX `sh` script that uses `jq` t
 Copy the patterns already seen: open-code-review (one repo, `plugins/<name>/{claude-code,...}` plus canonical `skills/`), ccusage (`apps/<cli>` with a `bin` launcher), galaxium (`.bob/` with `settings.json`, `hooks/`, `skills/`, `custom_modes.yaml`).
 
 ```
-ai-code-ledger/
-├── package.json                 # name ai-code-ledger, "bin": {"ai-code-ledger": "cli/index.js"}, "files": ["cli","hooks","bob","claude"]
+whyline/
+├── package.json                 # name whyline, "bin": {"whyline": "cli/index.js"}, "files": ["cli","hooks","bob","claude"]
 ├── hooks/                       # shared, agent-neutral
-│   ├── record-tool.sh           # PostToolUse capture, sh + jq, appends .git/ai-code-ledger/session.jsonl
+│   ├── record-tool.sh           # PostToolUse capture, sh + jq, appends .git/whyline/session.jsonl
 │   ├── pre-commit.sh            # calls: node cli/index.js check --staged
 │   └── post-merge.sh            # calls: node cli/index.js sync-notes
 ├── bob/                         # what `init` copies into <repo>/.bob/
@@ -381,18 +381,18 @@ ai-code-ledger/
 │   ├── custom_modes.yaml        # customModes: [ {slug: ledger-reviewer, groups: [read, command, skill]} ]
 │   ├── rules-ledger-reviewer/AGENTS.md
 │   └── skills/
-│       ├── ledger-why/SKILL.md      # "run `ai-code-ledger why <file> --json`"
-│       └── ledger-review/SKILL.md   # "run `ai-code-ledger unreviewed --json`, then ..."
+│       ├── ledger-why/SKILL.md      # "run `whyline why <file> --json`"
+│       └── ledger-review/SKILL.md   # "run `whyline unreviewed --json`, then ..."
 ├── claude/                      # Claude Code plugin root
 │   ├── .claude-plugin/plugin.json
 │   ├── hooks/hooks.json         # same JSON as bob/settings.json with matcher "Edit|Write|MultiEdit|NotebookEdit" and "${CLAUDE_PLUGIN_ROOT}/../hooks/record-tool.sh"
 │   └── skills -> ../bob/skills  # or copy at build time (open-code-review avoids symlinks: "plugin installs may only materialize the plugin subtree")
-├── .claude-plugin/marketplace.json   # {"name":"ai-code-ledger","plugins":[{"name":"ai-code-ledger","source":"./claude"}]}
+├── .claude-plugin/marketplace.json   # {"name":"whyline","plugins":[{"name":"whyline","source":"./claude"}]}
 ├── cli/
 │   ├── index.js                 # #!/usr/bin/env node, ESM, zero deps; subcommands init|why|check|unreviewed|bom|report
 │   ├── lib/{ledger,notes,git}.js
 │   └── *.test.js                # node:test, fixtures/ with a jsonl and a tiny git repo built in a temp dir
-└── demo/                        # sample repo with a prepared .git/ai-code-ledger/session.jsonl and notes
+└── demo/                        # sample repo with a prepared .git/whyline/session.jsonl and notes
 ```
 
 Keep `skills/` canonical in one place and have `init` copy it into `.bob/skills/` and `.claude/skills/` (or `.agents/skills/` for Codex; vercel `skills` CLI and Codex both read `.agents/skills`).
@@ -405,7 +405,7 @@ What the field does:
 - Guard pattern so a teammate without the tool is not broken: entire's `sh -c 'if ! command -v entire >/dev/null 2>&1; then exit 0; fi; exec entire hooks ...'`; agentblame's `command -v bunx ... || true`.
 - Plugin marketplaces are Claude-only and require the user to run `/plugin marketplace add owner/repo` then `/plugin install name@marketplace` (anthropics/skills README, claude-hud README). They do not install git hooks. Bob has no marketplace in anything I fetched; every Bob example is a checked-in `.bob/` folder.
 
-Recommendation: `npx ai-code-ledger init` in the target repo does three things: copy `bob/` to `.bob/` (merge into existing `.bob/settings.json` `hooks` the way agentdiff's `configure/claude.rs` and agentblame `hooks.ts` merge and dedupe by command substring), copy `hooks/record-tool.sh` to `.bob/hooks/`, and install `.git/hooks/pre-commit` and `post-merge` that run `npx --no-install ai-code-ledger check` guarded with `command -v`. Tell users to commit `.bob/` so the team gets the hooks (agentblame README step 3: "Commit the generated config files so your team gets the hooks"). Optionally add `.claude-plugin/marketplace.json` so Claude users can `/plugin marketplace add <owner>/ai-code-ledger`; it costs one JSON file.
+Recommendation: `npx whyline init` in the target repo does three things: copy `bob/` to `.bob/` (merge into existing `.bob/settings.json` `hooks` the way agentdiff's `configure/claude.rs` and agentblame `hooks.ts` merge and dedupe by command substring), copy `hooks/record-tool.sh` to `.bob/hooks/`, and install `.git/hooks/pre-commit` and `post-merge` that run `npx --no-install whyline check` guarded with `command -v`. Tell users to commit `.bob/` so the team gets the hooks (agentblame README step 3: "Commit the generated config files so your team gets the hooks"). Optionally add `.claude-plugin/marketplace.json` so Claude users can `/plugin marketplace add <owner>/whyline`; it costs one JSON file.
 
 ### Q4. Exact hooks.json shape to mirror for Bob
 
@@ -476,7 +476,7 @@ Sessions carry `agent` (`"cursor" | "claude" | "opencode"`), `model`, `conversat
 
 **block/aittributor** (6 stars, Rust): prepare-commit-msg hook that appends `Co-authored-by: Claude Code <noreply@anthropic.com>` by process-tree and breadcrumb detection. Trailer-only, no line data.
 
-Recommendation for the ledger: capture JSONL in `.git/ai-code-ledger/session.jsonl` (agentdiff shape, plus `before_blob`/`after_blob` via `git hash-object` like agentblame), and at pre-commit write one JSON note to `refs/notes/ai-code-ledger` on the commit with `{version, files:[{path, lines, agent, model, session, prompt_hash, reviewed:false}]}`. `post-merge` fetches notes (`git fetch origin refs/notes/ai-code-ledger:refs/notes/ai-code-ledger`). `unreviewed` lists note entries with `reviewed:false`; `check` fails the commit if staged AI lines lack a review mark. Squash-merge loss of notes is a known limitation; both agentblame and agentdiff needed a CI step for it, so defer it.
+Recommendation for the ledger: capture JSONL in `.git/whyline/session.jsonl` (agentdiff shape, plus `before_blob`/`after_blob` via `git hash-object` like agentblame), and at pre-commit write one JSON note to `refs/notes/whyline` on the commit with `{version, files:[{path, lines, agent, model, session, prompt_hash, reviewed:false}]}`. `post-merge` fetches notes (`git fetch origin refs/notes/whyline:refs/notes/whyline`). `unreviewed` lists note entries with `reviewed:false`; `check` fails the commit if staged AI lines lack a review mark. Squash-merge loss of notes is a known limitation; both agentblame and agentdiff needed a CI step for it, so defer it.
 
 ---
 
