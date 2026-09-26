@@ -22,7 +22,7 @@ Say: "Weeks later, anyone can ask why. The prompt is the documentation. It also 
 
 ## Act 4: the lifecycle, and Bob removes with approval (1:10 to 2:10)
 Screen: `whyline check` (one item already due: the demo script nobody references). Then `git merge payments-v2`, the post-merge hook runs `whyline check`: the mock is now due.
-Then in Bob IDE: switch to the whyline-remover mode and type `remove L-<id of the mock>`.
+Then in Bob IDE: switch to the whyline-remover mode and type `remove the mock payment gateway`.
 What happens: Bob runs `whyline check --json`, greps for the symbol, removes the ranges, runs pytest, shows the evidence table, asks for approval. Approve. Bob commits.
 Say: "Whyline never guesses. The condition was recorded at birth: no references left. The merge made it true. Bob gathers the evidence, and a human approves. Nothing is deleted on its own."
 

@@ -14,7 +14,7 @@ Trigger phrases: "what AI code is unreviewed", "what did the AI write in this re
 - Never invent a range, tag or item id; ask the user if it is unclear.
 - Show null values as "no data", never as 0.
 - Trust the CLI output over any note in context.
-- If the CLI prints to stderr or exits non-zero, stop and show its stderr as-is.
+- If the CLI exits non-zero (its exit code is 0 for normal answers, including a due list), stop and show its stderr as-is.
 - Read-only: never edit files or notes.
 
 ## Output template

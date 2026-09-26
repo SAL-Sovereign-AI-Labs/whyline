@@ -15,7 +15,7 @@ Run `whyline why <file>:<line> --json` with execute_command.
 - Never guess the file or line number; ask the user if either is missing.
 - Show null values as "no data", never as 0.
 - Trust the CLI output over any note in context.
-- If the CLI prints to stderr or exits non-zero, stop and show its stderr as-is.
+- If the CLI exits non-zero (its exit code is 0 for normal answers, including a due list), stop and show its stderr as-is.
 - Read-only: never edit files or notes.
 
 ## Interpreting the result

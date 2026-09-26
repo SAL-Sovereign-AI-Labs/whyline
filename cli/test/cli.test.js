@@ -33,15 +33,18 @@ test('no args prints usage and exits 0; unknown command exits 1', () => {
   assert.equal(run(os.tmpdir(), ['nope']).status, 1);
 });
 
-test('check exits 2 with a due item, keep makes it 0, until moves it to a future date', () => {
+test('check exits 0 by default and 2 only with --gate; keep and until accept a file name', () => {
   const dir = repoWithItem();
   let r = run(dir, ['check']);
-  assert.equal(r.status, 2, r.stdout + r.stderr);
-  assert.match(r.stdout, /due\s+L-[0-9a-f]{6}\s+demo/);
+  assert.equal(r.status, 0, r.stdout + r.stderr);
+  assert.match(r.stdout, /DUE for removal \(1\)/);
+  assert.match(r.stdout, /L-[0-9a-f]{6}\s+demo\s+demo_seed\.py/);
+  assert.equal(run(dir, ['check', '--gate']).status, 2);
   const id = r.stdout.match(/L-[0-9a-f]{6}/)[0];
-  r = run(dir, ['keep', id, 'kept for the sales team']);
+  r = run(dir, ['keep', 'demo_seed.py', 'kept for the sales team']);
   assert.equal(r.status, 0, r.stderr);
-  assert.equal(run(dir, ['check']).status, 0);
+  assert.match(r.stdout, /demo_seed\.py \(L-/);
+  assert.equal(run(dir, ['check', '--gate']).status, 0);
   r = run(dir, ['until', id, '2099-01-01']);
   assert.equal(r.status, 0, r.stderr);
   const j = JSON.parse(run(dir, ['check', '--json']).stdout);
@@ -54,7 +57,8 @@ test('session-start prints one line only when something is due, and always exits
   const dir = repoWithItem();
   const r = run(dir, ['session-start']);
   assert.equal(r.status, 0);
-  assert.match(r.stdout, /^whyline: 1 temporary item\(s\) due/);
+  assert.match(r.stdout, /^whyline: 1 temporary item\(s\) due for removal: demo_seed\.py \(L-/);
+  assert.match(r.stdout, /say "remove demo_seed\.py"/);
   assert.equal(run(os.tmpdir(), ['session-start']).stdout, '');
 });
 

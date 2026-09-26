@@ -30,10 +30,12 @@ function foldWrites(writes) {
 // deletion was typed by a human or made by Bob's remover mode. The item's file must be gone or its lines changed.
 function recordRemovals(cwd, rev) {
   const msg = git.tryGit(['log', '-1', '--format=%B', rev], { cwd }) || '';
-  const ids = [...new Set((msg.match(/\bL-[0-9a-f]{6}\b/g) || []))];
-  if (!ids.length || !/\bremov/i.test(msg)) return [];
+  if (!/\bremov/i.test(msg)) return [];
   const lenses = require('./lenses');
   const { items } = lenses.index(cwd);
+  // ids named in the message, plus any item whose file is deleted in this commit and is named in the message
+  const ids = new Set(msg.match(/\bL-[0-9a-f]{6}\b/g) || []);
+  for (const it of items.values()) if (it.status !== 'removed' && msg.includes(it.file.split('/').pop())) ids.add(it.id);
   const removed = [];
   for (const id of ids) {
     const it = items.get(id);

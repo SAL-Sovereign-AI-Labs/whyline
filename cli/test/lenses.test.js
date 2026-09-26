@@ -48,10 +48,15 @@ test('check carries lifecycle state and counts; watch changes the searched symbo
   fs.writeFileSync(path.join(dir, 'app.py'), 'x = Clock()\n'); git(dir, ['commit', '-qam', 'use clock']);
   assert.equal(cli(dir, ['watch', id, '--symbol', 'Clock']).status, 0);
   r = lenses.check(dir);
-  assert.equal(r.active.length, 1); assert.match(r.active[0].evidence, /Clock/);
+  assert.equal(r.active.length, 1);
+  assert.equal(r.active[0].evidence.references.length, 1); assert.match(r.active[0].evidence.summary, /1 reference: app\.py:1/);
   assert.equal(cli(dir, ['watch', 'L-nope', '--symbol', 'X']).status, 1, 'unknown item is an error with its fix');
   const text = cli(dir, ['check']).stdout;
-  assert.match(text, /lifecycle: 1 active · 0 due · 0 kept · 0 removed/);
+  assert.match(text, /1 active, 0 due, 0 kept, 0 removed/);
+  // resolution by symbol and by kind
+  assert.equal(lenses.resolveItem(dir, 'Clock').id, id);
+  assert.equal(lenses.resolveItem(dir, 'mock').id, id);
+  assert.throws(() => lenses.resolveItem(dir, 'nothing-like-this'), /no item matches/);
 });
 
 test('unreviewed: unchanged AI lines count, human-edited lines do not, coverage joins when a report exists', () => {
@@ -90,7 +95,7 @@ test('session-start names the due item and the remover mode, and mentions unrevi
   agentWrite(dir, 'demo_seed.py', 'def seed():\n    pass\n', 's3', 'Add a demo seed script.');
   git(dir, ['add', '.']); git(dir, ['commit', '-q', '-m', 'seed']); assert.ok(commit.run(dir).attached);
   const out = cli(dir, ['session-start']).stdout;
-  assert.match(out, /due for removal: L-[0-9a-f]{6}\. To act, switch to the whyline-remover mode and say "remove L-/);
+  assert.match(out, /due for removal: demo_seed\.py \(L-[0-9a-f]{6}\)\. To act, switch to the whyline-remover mode and say "remove demo_seed\.py"/);
   assert.match(out, /2 AI-written line\(s\) in 1 file\(s\)/);
 });
 
@@ -99,6 +104,7 @@ test('a commit whose message says "remove L-xxxxxx" records the removed state; a
   agentWrite(dir, 'examples/old_demo.py', 'print("demo")\n', 's4', 'Add a quick demo script for the board.');
   git(dir, ['add', '.']); git(dir, ['commit', '-q', '-m', 'demo']); assert.ok(commit.run(dir).attached);
   const id = lenses.check(dir).due[0].id;
+  assert.equal(lenses.check(dir).due[0].evidence.summary, 'no references outside the file and its tests');
   // a commit that only mentions the id but changes nothing in the item's file must not mark it removed
   fs.writeFileSync(path.join(dir, 'NOTES.md'), 'x\n'); git(dir, ['add', '.']); git(dir, ['commit', '-q', '-m', `talk about remove ${id}`]);
   commit.run(dir);
@@ -109,7 +115,7 @@ test('a commit whose message says "remove L-xxxxxx" records the removed state; a
   assert.deepEqual(r.removed, [id]);
   const c = lenses.check(dir);
   assert.equal(c.counts.removed, 1); assert.equal(c.other[0].state, 'removed');
-  assert.match(cli(dir, ['check']).stdout, /removed\s+L-/);
+  assert.match(cli(dir, ['check']).stdout, /DECIDED[\s\S]*removed/);
   // explicit fallback command on another item
   agentWrite(dir, 'mocks/fake.py', 'def fake():\n    pass\n', 's5', 'Add a fake stub.');
   git(dir, ['add', '.']); git(dir, ['commit', '-q', '-m', 'stub']); commit.run(dir);
@@ -140,4 +146,14 @@ test('notes.displayRef is added with the first note, not at init, so git never w
   commit.run(dir); // the installed post-commit hook may already have attached the note when whyline is on the PATH
   assert.ok(require('../lib/git').notesShow(dir, 'HEAD'), 'note on HEAD');
   assert.equal(get(), 'refs/notes/whyline');
+});
+
+test('mentions in docs, .bob config and skills are not references', () => {
+  const dir = repo();
+  agentWrite(dir, 'mocks/fake_api.py', 'def fake_api():\n    return {}\n', 's8', 'Add a fake API stub until the real service is ready.');
+  fs.mkdirSync(path.join(dir, '.bob/skills/x'), { recursive: true });
+  fs.writeFileSync(path.join(dir, '.bob/skills/x/SKILL.md'), 'Say "remove fake_api.py" to remove the fake_api stub.\n');
+  fs.writeFileSync(path.join(dir, 'NOTES.md'), 'fake_api is temporary.\n');
+  git(dir, ['add', '.']); git(dir, ['commit', '-q', '-m', 'stub']); assert.ok(commit.run(dir).attached);
+  assert.equal(lenses.check(dir).due.length, 1, 'only docs mention it, so it is due');
 });

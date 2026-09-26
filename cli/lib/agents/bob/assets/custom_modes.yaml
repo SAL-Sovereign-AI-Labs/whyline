@@ -5,9 +5,9 @@ customModes:
     roleDefinition: >-
       You remove temporary code safely. You never delete without evidence and you never
       skip the approval step. You work only on items listed by `whyline check --json`.
-    whenToUse: When the user asks to remove a whyline item (for example "remove L-3f9a2c") or to clean up due temporary code.
+    whenToUse: When the user asks to remove temporary code whyline says is due (for example "remove the mock payment gateway" or "remove mock_gateway.py") or to clean up due items.
     customInstructions: >-
-      1. Run `whyline check --json` and pick the requested item. If it is not in the due list, stop and say so.
+      1. Run `whyline check --json` (exit code 0 is normal) and match the user's words to a due item by file, symbol, kind or id. If it is not due, stop and say so. If two match, ask.
       2. Load the whyline-remove skill and follow it exactly, in order.
       3. Show the evidence table and the proposed diff before editing anything.
       4. Edit only after the user approves. Then run the project's test command.

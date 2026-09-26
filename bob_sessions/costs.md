@@ -12,6 +12,7 @@ Cost is the task's own figure from its task summary (click New task before each 
 | A task03 | whyline-decide skill (keep, until, watch in plain words, never guesses an id); badge 1.67 minus 1.18 | 0.49 | whyline_a_task03_manage_skill.png |
 | A task04 | whyline-setup skill (user-invocable, checks the binary, runs init, tells what to commit); badge 2.35 minus 1.67 | 0.68 | whyline_a_task04_setup_skill.png |
 | A task05 | dogfood: whyline installed on whyline itself, used on Bob's own work, 5 issues reported (see docs/04 section 11); badge 5.79 minus 2.35 | 3.44 | whyline_a_task05_dogfood.png |
+| A task06 | removal take in the whyline-remover mode on the demo shop: evidence, dry run, approval, commit bdf52fd, item recorded removed; new task, cost from Bob's database | 0.687 | whyline_a_task06_removal.png |
 
 ## Atiq
 
@@ -25,4 +26,4 @@ Cost is the task's own figure from its task summary (click New task before each 
 
 ## Totals
 
-Faisal: 6.56 · Atiq: 3.21 · team: 9.77 of 80.
+Faisal: 7.25 · Atiq: 4.05 · team: 11.30 of 80.

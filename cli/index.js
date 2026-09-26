@@ -10,20 +10,23 @@ const USAGE = `whyline <command> [--json]
   session-start             hook: print a one-line summary for Bob's context
   commit                    git post-commit: attach the provenance note to HEAD
   why <file>:<line>         who wrote this line, and why
-  check [--json]            temporary items and their lifecycle state (exit 2 when any is due)
+  check [--json] [--gate]   temporary items and their lifecycle state (--gate: exit 2 when any is due, for hooks and CI)
   unreviewed [--json]       AI lines no human has edited since, per file, with coverage if a report exists
   bom [A..B] [--json]       AI bill of materials for a commit range (default: last tag..HEAD, else all)
   report [--out file]       write the read-only HTML report (.whyline-report.html)
-  keep <id> "<reason>"      decision: keep permanently          (due -> kept)
-  until <id> <YYYY-MM-DD>   change the condition to a date       (stays active)
-  watch <id> --symbol Name  fix the symbol the reference check searches for
-  removed <id>              record that an item was removed by hand (a commit message "remove <id>" does this automatically)
+  keep <item> "<reason>"    decision: keep permanently          (due -> kept)
+  until <item> <YYYY-MM-DD> change the condition to a date       (stays active)
+  watch <item> --symbol X   fix the symbol the reference check searches for
+  removed <item>            record a removal done by hand (a commit message naming the item does this automatically)
+
+  <item> is a file path (or its last part), a watched symbol, a kind (mock, demo, flag, shim, fixture) when unique,
+  or the id shown by check. People name files; ids are for notes and scripts.
 
 Lifecycle:  active --(condition met)--> due --(you decide)--> kept | removed
             active and due are recomputed from the repo on every check; kept and removed are recorded.
   --version, --help
 
-Exit codes: 0 ok, 1 usage or error, 2 check found due items, 3 not a git repository.
+Exit codes: 0 ok, 1 usage or error, 2 only with check --gate when items are due, 3 not a git repository.
 Env: WHYLINE_DEBUG=1 prints stack traces to stderr. WHYLINE_BOB_DB overrides the Bob database path.
 `;
 
@@ -76,7 +79,7 @@ function dispatch(argv) {
         const lenses = require('./lib/lenses');
         const r = lenses.check(cwd);
         const parts = [];
-        if (r.due.length) parts.push(`${r.due.length} temporary item(s) due for removal: ${r.due.map(i => i.id).join(', ')}. To act, switch to the whyline-remover mode and say "remove ${r.due[0].id}"`);
+        if (r.due.length) parts.push(`${r.due.length} temporary item(s) due for removal: ${r.due.map(i => `${i.file} (${i.id})`).join(', ')}. To act, switch to the whyline-remover mode and say "remove ${r.due[0].file.split('/').pop()}"`);
         const u = lenses.unreviewed(cwd);
         if (u.totals.aiLines) parts.push(`${u.totals.aiLines} AI-written line(s) in ${u.totals.files} file(s) have had no human edit since (run: whyline unreviewed)`);
         if (parts.length) process.stdout.write(`whyline: ${parts.join('. ')}\n`);
@@ -100,15 +103,13 @@ function dispatch(argv) {
       return 0;
     }
     case 'check': {
+      const gate = args.includes('--gate');
       const r = require('./lib/lenses').check(cwd);
-      if (json) { console.log(JSON.stringify(r, null, 2)); return r.due.length ? 2 : 0; }
+      const exit = gate && r.due.length ? 2 : 0;
+      if (json) { console.log(JSON.stringify(r, null, 2)); return exit; }
       if (!r.due.length && !r.active.length && !r.other.length) { console.log('no temporary items yet (commit something Bob wrote, then check again)'); return 0; }
-      for (const it of r.due) console.log(`due     ${it.id}  ${it.kind.padEnd(7)} ${it.file}:${it.lines.map(x => x.join('-')).join(',')}  ${it.evidence}  "${it.reason}"`);
-      for (const it of r.active) console.log(`active  ${it.id}  ${it.kind.padEnd(7)} ${it.file}  ${it.evidence}`);
-      for (const it of r.other) console.log(`${it.state.padEnd(7)} ${it.id}  ${(it.kind || '').padEnd(7)} ${it.file || ''}  ${it.reason ? '"' + it.reason + '"' : ''}`);
-      const c = r.counts;
-      console.log(`lifecycle: ${c.active} active · ${c.due} due · ${c.kept} kept · ${c.removed} removed${r.due.length ? `. Next: tell Bob "remove ${r.due[0].id}" (mode whyline-remover), or whyline keep / until` : ''}`);
-      return r.due.length ? 2 : 0;
+      printCheck(r);
+      return exit;
     }
     case 'unreviewed': {
       const r = require('./lib/lenses').unreviewed(cwd);
@@ -163,16 +164,17 @@ function dispatch(argv) {
     case 'removed': {
       const id = args[0], value = cmd === 'removed' ? (args[1] || 'removed by hand') : (args[1] === '--symbol' ? args[2] : args[1]);
       const usage = { keep: '"<reason>"', until: '<YYYY-MM-DD>', watch: '--symbol <Name>', removed: '' }[cmd];
-      if (!id || !value) { process.stderr.write(`usage: whyline ${cmd} <id> ${usage}\n`); return 1; }
+      if (!id || !value) { process.stderr.write(`usage: whyline ${cmd} <file|symbol|kind|id> ${usage}\n`); return 1; }
       if (cmd === 'until' && !/^\d{4}-\d{2}-\d{2}$/.test(value)) { process.stderr.write('until: date must be YYYY-MM-DD\n'); return 1; }
       const lenses = require('./lib/lenses');
       const change = cmd === 'keep' ? { status: 'kept', reason: value }
         : cmd === 'until' ? { status: 'active', condition: { type: 'date', on: value } }
         : cmd === 'watch' ? { status: 'active', condition: { type: 'no_references', symbol: value } }
         : { status: 'removed', reason: value };
-      const head = lenses.recordItemChange(cwd, id, change);
+      const item = lenses.resolveItem(cwd, id);
+      const head = lenses.recordItemChange(cwd, item.id, change);
       const said = { keep: 'kept permanently', until: `due on ${value}`, watch: `now watching symbol ${value}`, removed: 'recorded as removed' }[cmd];
-      console.log(`${id}: ${said} (recorded on ${head.slice(0, 7)})`);
+      console.log(`${item.file} (${item.id}): ${said} (recorded on ${head.slice(0, 7)})`);
       return 0;
     }
     case 'init':
@@ -203,6 +205,18 @@ function defaultRange(cwd) {
   const git = require('./lib/git');
   const tag = git.tryGit(['describe', '--tags', '--abbrev=0'], { cwd });
   return tag ? `${tag}..HEAD` : undefined;
+}
+
+function printCheck(r) {
+  const col = (s, n) => String(s == null ? '' : s).padEnd(n).slice(0, n);
+  const row = it => `  ${col(it.id, 9)} ${col(it.kind, 8)} ${col(it.file, 38)} ${col(it.evidence ? it.evidence.summary : (it.reason || ''), 60)}`;
+  const section = (title, list) => { if (!list.length) return; console.log(`${title} (${list.length})`); console.log(`  ${col('id', 9)} ${col('kind', 8)} ${col('file', 38)} ${col('evidence', 60)}`); list.forEach(it => console.log(row(it))); };
+  section('DUE for removal', r.due);
+  section('ACTIVE', r.active);
+  section('DECIDED', r.other.map(it => ({ ...it, evidence: { summary: `${it.state}${it.reason ? ': ' + it.reason : ''}` } })));
+  const c = r.counts;
+  const next = r.due.length ? `Next: in Bob's whyline-remover mode say "remove ${r.due[0].file.split('/').pop()}", or whyline keep <file> "<reason>", or whyline why <file>:<line>` : 'Nothing is due.';
+  console.log(`${c.active} active, ${c.due} due, ${c.kept} kept, ${c.removed} removed. ${next}`);
 }
 
 function printWhy(file, line, r) {

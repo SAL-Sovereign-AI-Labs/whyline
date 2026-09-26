@@ -48,7 +48,7 @@ Do not run the command until the user says yes (or equivalent).
 ### Step 3 -- run the command
 Run the confirmed command with execute_command and show its output verbatim.
 
-If the CLI prints to stderr or exits non-zero, stop and show its stderr as-is.
+If the CLI exits non-zero (its exit code is 0 for normal answers, including a due list), stop and show its stderr as-is.
 
 ### Step 4 -- confirm the change
 Run `whyline check --json` again and find the item. Show its new condition and state.

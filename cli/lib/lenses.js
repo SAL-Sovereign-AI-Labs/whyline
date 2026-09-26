@@ -50,11 +50,33 @@ function check(cwd, { today = new Date() } = {}) {
   return { due, active, other, counts };
 }
 
+// Humans and agents name things, not ids. Accepts an id (L-xxxxxx), a file path or its suffix, a watched symbol,
+// or a kind when only one item of that kind exists. Returns the item, or throws with the candidates named.
+function resolveItem(cwd, ref, { items } = index(cwd)) {
+  const all = [...items.values()];
+  const r = String(ref || '').trim();
+  if (!r) throw new Error('name an item: its id, file, symbol or kind (run: whyline check)');
+  const byId = items.get(r);
+  if (byId) return byId;
+  const lower = r.toLowerCase();
+  const live = all.filter(i => i.status !== 'removed');
+  const pick = list => {
+    if (list.length === 1) return list[0];
+    if (list.length > 1) throw new Error(`"${r}" matches ${list.length} items: ${list.map(i => `${i.id} (${i.file})`).join(', ')}. Use the id.`);
+    return null;
+  };
+  return pick(live.filter(i => i.file === r || i.file.endsWith('/' + r) || i.file.toLowerCase().endsWith(lower)))
+    || pick(live.filter(i => i.condition && i.condition.symbol && i.condition.symbol.toLowerCase() === lower))
+    || pick(live.filter(i => i.kind === lower))
+    || pick(live.filter(i => i.file.toLowerCase().includes(lower) || String(i.reason || '').toLowerCase().includes(lower)))
+    || (() => { throw new Error(`no item matches "${r}" (run: whyline check to see ids, files and kinds)`); })();
+}
+
 // Record a decision or a condition change for an item as a note on HEAD (folded by readers, latest wins).
-function recordItemChange(cwd, id, change) {
+function recordItemChange(cwd, ref, change) {
   const head = git.head(cwd);
   if (!head) throw new Error('not a git repository with commits');
-  if (!index(cwd).items.has(id)) throw new Error(`unknown item ${id} (run: whyline check)`);
+  const id = resolveItem(cwd, ref).id;
   const note = git.notesShow(cwd, head) || { v: 1, sessions: {}, ranges: [], items: [] };
   // if the item was born on HEAD itself, keep its original fields and layer the change on top
   const existing = (note.items || []).find(i => i.id === id) || {};
@@ -85,16 +107,21 @@ function evaluate(cwd, it, today) {
   const c = it.condition || {};
   if (c.type === 'date') {
     const on = new Date(c.on + 'T00:00:00');
-    return { due: today >= on, evidence: `date ${c.on}` };
+    const due = today >= on;
+    return { due, evidence: { summary: due ? `date ${c.on} has passed` : `until ${c.on}`, references: [] } };
   }
   if (c.type === 'no_references') {
     // a fixture exists for tests, so references from tests count for it; for everything else tests are excluded
-    const excludes = it.kind === 'fixture' ? [it.file] : [it.file, 'tests/**', 'test/**', '**/*_test.*', '**/test_*'];
+    // documentation, agent config and skills mention things without using them, so they never count as references
+    const docs = ['.bob/**', '.claude/**', '*.md', 'docs/**', '*.txt']; // in git pathspecs '*' also matches '/'
+    const excludes = it.kind === 'fixture' ? [it.file, ...docs] : [it.file, 'tests/**', 'test/**', '**/*_test.*', '**/test_*', ...docs];
     const stem = it.file.split('/').pop().replace(/\.[^.]+$/, '');
     const hits = [...new Set([...(c.symbol ? git.grep(cwd, c.symbol, excludes) : []), ...git.grep(cwd, stem, excludes)])];
-    return { due: hits.length === 0, evidence: hits.length ? `${hits.length} reference(s): ${hits.slice(0, 3).join(' | ')}` : 'no references outside the file and its tests' };
+    const references = hits.map(h => { const m = h.match(/^([^:]+):(\d+):(.*)$/); return m ? { file: m[1], line: +m[2], text: m[3].trim().slice(0, 80) } : { file: h, line: null, text: '' }; });
+    const summary = references.length ? `${references.length} reference${references.length === 1 ? '' : 's'}: ${references.slice(0, 2).map(r => `${r.file}:${r.line}`).join(', ')}${references.length > 2 ? ', ...' : ''}` : 'no references outside the file and its tests';
+    return { due: references.length === 0, evidence: { summary, references } };
   }
-  return { due: false, evidence: 'unknown condition' };
+  return { due: false, evidence: { summary: 'unknown condition', references: [] } };
 }
 
-module.exports = { index, why, check, evaluate, unreviewed, recordItemChange, LIFECYCLE };
+module.exports = { index, why, check, evaluate, unreviewed, recordItemChange, resolveItem, LIFECYCLE };
