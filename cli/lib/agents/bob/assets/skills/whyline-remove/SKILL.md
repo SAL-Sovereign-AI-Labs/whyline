@@ -9,4 +9,4 @@ Input: an item id from `whyline check --json` (for example L-3f9a2c).
 3. Dry run. Remove the ranges, run the project's test command (package.json scripts.test, Makefile test target, or pytest), and record the pass and fail counts. If tests fail, revert immediately and report.
 4. Review. If Bob's /review is available, run it on the diff and quote any new finding.
 5. Present an evidence table: condition, references, tests, review, files, lines removed. Ask for approval with the normal approval prompt. Do not proceed without it.
-6. After approval: keep the edit and commit with the message `remove <id>: <reason>`. The git hook attaches the provenance note automatically. Tell the user the next step is /create-pr.
+6. After approval: keep the edit and commit with the message `remove <id>: <reason>` (the id must appear in the message; the git hook then records the item as removed). Run `whyline check` and confirm the item shows as removed. Tell the user the next step is /create-pr.

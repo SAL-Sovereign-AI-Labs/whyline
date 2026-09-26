@@ -17,6 +17,7 @@ const USAGE = `whyline <command> [--json]
   keep <id> "<reason>"      decision: keep permanently          (due -> kept)
   until <id> <YYYY-MM-DD>   change the condition to a date       (stays active)
   watch <id> --symbol Name  fix the symbol the reference check searches for
+  removed <id>              record that an item was removed by hand (a commit message "remove <id>" does this automatically)
 
 Lifecycle:  active --(condition met)--> due --(you decide)--> kept | removed
             active and due are recomputed from the repo on every check; kept and removed are recorded.
@@ -83,7 +84,8 @@ function dispatch(argv) {
     case 'commit': {
       try {
         const r = require('./lib/commit').run(cwd);
-        if (r.attached) process.stderr.write(`whyline: note attached to ${r.commit.slice(0, 7)} (${r.note.ranges.length} range(s), ${r.note.items.length} item(s))\n`);
+        if (r.removed && r.removed.length) process.stderr.write(`whyline: recorded removed: ${r.removed.join(', ')}\n`);
+        if (r.note) process.stderr.write(`whyline: note attached to ${r.commit.slice(0, 7)} (${r.note.ranges.length} range(s), ${r.note.items.length} item(s))\n`);
       } catch (e) { require('./lib/session').logError(cwd, `commit: ${e.message}`); }
       return 0;
     }
@@ -154,17 +156,19 @@ function dispatch(argv) {
     }
     case 'keep':
     case 'until':
-    case 'watch': {
-      const id = args[0], value = args[1] === '--symbol' ? args[2] : args[1];
-      const usage = { keep: '"<reason>"', until: '<YYYY-MM-DD>', watch: '--symbol <Name>' }[cmd];
+    case 'watch':
+    case 'removed': {
+      const id = args[0], value = cmd === 'removed' ? (args[1] || 'removed by hand') : (args[1] === '--symbol' ? args[2] : args[1]);
+      const usage = { keep: '"<reason>"', until: '<YYYY-MM-DD>', watch: '--symbol <Name>', removed: '' }[cmd];
       if (!id || !value) { process.stderr.write(`usage: whyline ${cmd} <id> ${usage}\n`); return 1; }
       if (cmd === 'until' && !/^\d{4}-\d{2}-\d{2}$/.test(value)) { process.stderr.write('until: date must be YYYY-MM-DD\n'); return 1; }
       const lenses = require('./lib/lenses');
       const change = cmd === 'keep' ? { status: 'kept', reason: value }
         : cmd === 'until' ? { status: 'active', condition: { type: 'date', on: value } }
-        : { status: 'active', condition: { type: 'no_references', symbol: value } };
+        : cmd === 'watch' ? { status: 'active', condition: { type: 'no_references', symbol: value } }
+        : { status: 'removed', reason: value };
       const head = lenses.recordItemChange(cwd, id, change);
-      const said = { keep: 'kept permanently', until: `due on ${value}`, watch: `now watching symbol ${value}` }[cmd];
+      const said = { keep: 'kept permanently', until: `due on ${value}`, watch: `now watching symbol ${value}`, removed: 'recorded as removed' }[cmd];
       console.log(`${id}: ${said} (recorded on ${head.slice(0, 7)})`);
       return 0;
     }

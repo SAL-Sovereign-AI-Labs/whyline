@@ -60,6 +60,7 @@ Hackathon build (IBM Bob 2.0 Hackathon, 25 to 27 Sep 2026). See docs/ for the re
 | `whyline check [--json]` | temporary items with lifecycle state and evidence | 2 when any item is due, else 0 |
 | `whyline unreviewed [--json]` | AI lines with no human edit since, per file, coverage from coverage.xml or lcov.info | 0 |
 | `whyline watch <id> --symbol Name` | change the symbol the reference check searches for | 0 |
+| `whyline removed <id>` | record a removal done by hand (a commit message containing `remove <id>` records it automatically) | 0 |
 | `whyline keep <id> "<reason>"` | mark an item permanent | 0 |
 | `whyline until <id> <YYYY-MM-DD>` | set a date condition | 0 |
 | `whyline capture`, `whyline session-start`, `whyline commit` | hook entry points, always exit 0 | 0 |
@@ -75,6 +76,20 @@ Hackathon build (IBM Bob 2.0 Hackathon, 25 to 27 Sep 2026). See docs/ for the re
 ## Speed
 
 Measured on this repo's demo, median of 10 runs on a MacBook Pro with an Apple M1 Pro: capture hook 166 ms, `check` 129 ms, session-start line 277 ms. Recording costs 0 Bobcoins.
+
+## Troubleshooting
+
+| Symptom | Do this |
+|---|---|
+| `whyline why` says "git blame failed" | The file is not tracked, or you are in the wrong repo. `git ls-files <file>`. |
+| `check` prints "no temporary items yet" | Nothing Bob wrote has been committed since install. Commit once, then `whyline check`. |
+| No note after a commit | `whyline` is not on the PATH for git hooks (`npm link`), or the hooks were not installed (`whyline init`). See `.git/whyline/hook.err`. |
+| Bob does not record anything | The workspace is not trusted (Bob skips workspace hooks in untrusted folders), or `.bob/settings.json` was not committed. `whyline init` again. |
+| Cost shows as null | Bob IDE stores task cost elsewhere than Bob Shell, or sqlite3 is missing. The note is still complete. |
+
+## Uninstall
+
+Delete `.bob/hooks/whyline.sh`, the whyline lines in `.bob/settings.json`, and `.git/hooks/post-commit`, `post-merge`, `pre-push`. Bob and git keep working; the notes stay in the repo under `refs/notes/whyline` until you delete that ref.
 
 ## Requirements
 

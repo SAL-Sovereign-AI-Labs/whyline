@@ -93,3 +93,27 @@ test('session-start names the due item and the remover mode, and mentions unrevi
   assert.match(out, /due for removal: L-[0-9a-f]{6}\. To act, switch to the whyline-remover mode and say "remove L-/);
   assert.match(out, /2 AI-written line\(s\) in 1 file\(s\)/);
 });
+
+test('a commit whose message says "remove L-xxxxxx" records the removed state; a message without a real change does not', () => {
+  const dir = repo();
+  agentWrite(dir, 'examples/old_demo.py', 'print("demo")\n', 's4', 'Add a quick demo script for the board.');
+  git(dir, ['add', '.']); git(dir, ['commit', '-q', '-m', 'demo']); assert.ok(commit.run(dir).attached);
+  const id = lenses.check(dir).due[0].id;
+  // a commit that only mentions the id but changes nothing in the item's file must not mark it removed
+  fs.writeFileSync(path.join(dir, 'NOTES.md'), 'x\n'); git(dir, ['add', '.']); git(dir, ['commit', '-q', '-m', `talk about remove ${id}`]);
+  commit.run(dir);
+  assert.equal(lenses.check(dir).counts.removed, 0);
+  // the real removal
+  git(dir, ['rm', '-q', 'examples/old_demo.py']); git(dir, ['commit', '-q', '-m', `remove ${id}: demo no longer needed`]);
+  const r = commit.run(dir);
+  assert.deepEqual(r.removed, [id]);
+  const c = lenses.check(dir);
+  assert.equal(c.counts.removed, 1); assert.equal(c.other[0].state, 'removed');
+  assert.match(cli(dir, ['check']).stdout, /removed\s+L-/);
+  // explicit fallback command on another item
+  agentWrite(dir, 'mocks/fake.py', 'def fake():\n    pass\n', 's5', 'Add a fake stub.');
+  git(dir, ['add', '.']); git(dir, ['commit', '-q', '-m', 'stub']); commit.run(dir);
+  const id2 = [...lenses.index(dir).items.keys()].find(k => k !== id);
+  assert.equal(cli(dir, ['removed', id2, 'deleted by hand']).status, 0);
+  assert.equal(lenses.check(dir).counts.removed, 2);
+});

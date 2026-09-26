@@ -26,9 +26,30 @@ function foldWrites(writes) {
   return { ranges, lastHash, sessions: [...sessions] };
 }
 
+// A commit whose message names an item ("remove L-1a2b3c: ...") records that item as removed, whether the
+// deletion was typed by a human or made by Bob's remover mode. The item's file must be gone or its lines changed.
+function recordRemovals(cwd, rev) {
+  const msg = git.tryGit(['log', '-1', '--format=%B', rev], { cwd }) || '';
+  const ids = [...new Set((msg.match(/\bL-[0-9a-f]{6}\b/g) || []))];
+  if (!ids.length || !/\bremov/i.test(msg)) return [];
+  const lenses = require('./lenses');
+  const { items } = lenses.index(cwd);
+  const removed = [];
+  for (const id of ids) {
+    const it = items.get(id);
+    if (!it || it.status === 'removed') continue;
+    const stillThere = git.blobAt(cwd, rev, it.file) && git.blobAt(cwd, `${rev}~1`, it.file) === git.blobAt(cwd, rev, it.file);
+    if (stillThere) continue; // message says removed but nothing changed in the item's file: do not record
+    lenses.recordItemChange(cwd, id, { status: 'removed', reason: it.reason, removedIn: git.tryGit(['rev-parse', rev], { cwd }) });
+    removed.push(id);
+  }
+  return removed;
+}
+
 function run(cwd, { rev = 'HEAD' } = {}) {
+  const removed = recordRemovals(cwd, rev);
   const lines = session.readAll(cwd);
-  if (!lines.length) return { attached: false, reason: 'no session lines' };
+  if (!lines.length) return { attached: removed.length > 0, removed, reason: 'no session lines' };
   const commit = git.tryGit(['rev-parse', rev], { cwd });
   const files = git.committedFiles(cwd, rev);
   const byFile = new Map();
@@ -72,11 +93,13 @@ function run(cwd, { rev = 'HEAD' } = {}) {
     const adapter = agents.byId(agentId);
     note.sessions[s] = { agent: agentId, author, ts: p?.ts || null, prompt: p?.prompt || null, cost: adapter ? adapter.sessionCost(s) : null };
   }
+  const existing = git.notesShow(cwd, commit); // a removal note may already sit on this commit
+  if (existing) note.items = [...(existing.items || []), ...note.items];
   git.notesAdd(cwd, commit, note);
   const remaining = lines.filter(l => !(l.t === 'write' && byFile.has(l.file)));
   const liveSessions = new Set(remaining.filter(l => l.t === 'write').map(l => l.session));
   session.rewrite(cwd, remaining.filter(l => l.t !== 'prompt' || liveSessions.has(l.session)));
-  return { attached: true, commit, note };
+  return { attached: true, commit, note, removed };
 }
 
 function rangeText(cwd, rev, file, ranges) {
@@ -85,4 +108,4 @@ function rangeText(cwd, rev, file, ranges) {
   return ranges.map(([s, e]) => all.slice(s - 1, e).join('\n')).join('\n');
 }
 
-module.exports = { run, foldWrites };
+module.exports = { run, foldWrites, recordRemovals };

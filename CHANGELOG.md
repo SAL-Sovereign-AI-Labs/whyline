@@ -15,5 +15,6 @@ All notable changes to this project are documented here. Format: Keep a Changelo
 - Lifecycle state (`active`, `due`, `kept`, `removed`) on every item in `check` and `--json`, with counts.
 - `whyline unreviewed`: AI lines with no human edit since, per file, with coverage from coverage.xml or lcov.info.
 - `whyline watch <id> --symbol Name` to correct the reference check.
+- Removals recorded from commit messages (`remove <id>: ...`) and with `whyline removed <id>`.
 - Adapter registry under cli/lib/agents/ with IBM Bob as the first adapter.
 - `init` sets `notes.rewriteRef` and `notes.displayRef` so notes survive amend and rebase and show in `git log`.
