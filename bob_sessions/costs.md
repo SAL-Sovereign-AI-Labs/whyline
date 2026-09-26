@@ -26,6 +26,8 @@ Cost is the task's own figure from its task summary (click New task before each 
 | B task05 | Overview panels from the mockup: temporary code by kind, AI share by folder, last removal (cli/lib/report-template.html; 53/53 tests green; same Bob thread, badge 9.19 minus 7.45) | 1.74 | whyline_b_task05_overview_panels.png |
 | B task06 | report usable by keyboard and screen reader: focusable code lines with arrow keys, aria-current, aria-pressed, aria-live detail, focus outlines (cli/lib/report-template.html; 54/54 tests green; same Bob thread, badge 11.63 minus 9.19) | 2.44 | whyline_b_task06_keyboard_a11y.png |
 | B task07 | GitHub Pages workflow that builds the demo shop, merges payments-v2 and publishes its report (.github/workflows/pages.yml; ran the steps locally, 54K page; same Bob thread at 180k context, badge 16.89 minus 11.63) | 5.26 | whyline_b_task07_pages.png |
+| B tasks01-07 | the shared thread behind tasks 01 to 07: 180.3k of 270k context tokens, badge 16.89 (the sum of the rows above); context breakdown screenshot | (sum above) | whyline_b_tasks01-07_thread_summary.png |
+| B task08 | Bob code review of bom.js, report.js, report-template.html: 9 findings, 2 real (overview showed "no data" for a real zero) fixed with a test, 7 explained as not bugs; first task in a new thread (72.5k context) | 4.22 | whyline_b_task08_review.png |
 
 ## Totals
 

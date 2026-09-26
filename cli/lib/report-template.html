@@ -273,8 +273,8 @@ var revPct = bom ? bom.reviewed.percent : null;
 var kpis = [
   { v: aiPct != null ? aiPct + '%' : 'no data', l: 'AI-written (% of lines changed)', c: '' },
   { v: revPct != null ? revPct + '%' : 'no data', l: 'AI lines reviewed', c: 'color:var(--warn)' },
-  { v: nd(counts.active + counts.due || null), l: 'temporary items tracked', c: 'color:var(--accent2)' },
-  { v: nd(sessions.length || null), l: 'sessions on record', c: '' }
+  { v: nd(counts.active != null ? counts.active + counts.due : null), l: 'temporary items tracked', c: 'color:var(--accent2)' },
+  { v: nd(sessions.length), l: 'sessions on record', c: '' }
 ];
 var kpiHtml = '';
 kpis.forEach(function(k) {
