@@ -1,5 +1,7 @@
 # Whyline: low-level architecture
 
+Status note (26 Sep 2026, 4:30 pm PKT): this is the design as planned on Saturday morning. Three things changed during the build and are recorded in the code, README and docs/04 section 11: (1) there is no custom mode, removal is the `whyline-remove` skill in Agent mode; (2) `check` exits 0, `check --gate` exits 2; (3) commands take a file, symbol or kind, not only an id. Everything else below still matches the code.
+
 Version 1, 26 Sep 2026. Companion to docs/04-feasibility.md (evidence). Everything here is sized for 2 people in 48 hours. Anything marked STRETCH is not in the must list.
 
 ## 0. Principles

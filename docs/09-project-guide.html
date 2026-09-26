@@ -111,7 +111,7 @@ summary{cursor:pointer;font-weight:600}
 <rect class="node ans new" x="390" y="320" width="150" height="50" rx="10"/><text x="465" y="342" text-anchor="middle">bom</text><text class="lbl" x="465" y="360" text-anchor="middle">AI bill of materials</text>
 <rect class="node ans new" x="200" y="285" width="150" height="50" rx="10"/><text x="275" y="307" text-anchor="middle">report</text><text class="lbl" x="275" y="325" text-anchor="middle">one offline HTML page</text>
 <path class="edge" d="M770 275 H730"/><path class="edge" d="M770 285 C750 285 750 345 730 345"/><path class="edge" d="M580 275 H540"/><path class="edge" d="M580 345 H540"/><path class="edge" d="M390 285 C370 285 370 310 350 310"/><path class="edge" d="M390 335 C370 335 370 310 350 310"/>
-<rect class="node bob" x="30" y="285" width="130" height="66" rx="10"/><text x="95" y="308" text-anchor="middle">Back into Bob</text><text class="lbl" x="95" y="326" text-anchor="middle">"1 item due" at start</text><text class="lbl" x="95" y="342" text-anchor="middle">whyline-remover mode</text>
+<rect class="node bob" x="30" y="285" width="130" height="66" rx="10"/><text x="95" y="308" text-anchor="middle">Back into Bob</text><text class="lbl" x="95" y="326" text-anchor="middle">"1 item due" at start</text><text class="lbl" x="95" y="342" text-anchor="middle">whyline-remove skill</text>
 <path class="edge back" d="M580 360 C470 400 200 400 160 340"/>
 <text class="lbl" x="360" y="398">check feeds Bob: session start line, and the removal mode reads check --json</text>
 </svg></div>
@@ -123,7 +123,7 @@ summary{cursor:pointer;font-weight:600}
 <h2><span class="n">2</span>Four layers, and who owns each</h2>
 <div class="diag"><svg viewBox="0 0 1000 330" xmlns="http://www.w3.org/2000/svg">
 <rect class="node" x="10" y="10" width="980" height="62" rx="10"/><text class="ttl" x="26" y="34">PEOPLE</text><text class="lbl" x="26" y="54">Developer: "why is this here?" · Teammate: "is this still needed?" · Team lead: "what has nobody reviewed?" · Release manager: "how much of this release is AI?"</text>
-<rect class="node bob" x="10" y="88" width="980" height="62" rx="10"/><text class="ttl" x="26" y="112">IBM BOB (IDE or Shell)</text><text class="lbl" x="26" y="132">Agent mode writes code · lifecycle hooks call Whyline · session start shows "N items due" · whyline-remover mode removes with evidence and Bob's own approval prompt</text>
+<rect class="node bob" x="10" y="88" width="980" height="62" rx="10"/><text class="ttl" x="26" y="112">IBM BOB (IDE or Shell)</text><text class="lbl" x="26" y="132">Agent mode writes code · lifecycle hooks call Whyline · session start shows "N items due" · whyline-remove skill removes with evidence and Bob's own approval prompt</text>
 <rect class="node ans" x="10" y="166" width="980" height="78" rx="10"/><text class="ttl" x="26" y="190">WHYLINE CLI · deterministic · local · 0 Bobcoins</text>
 <text class="lbl" x="26" y="210">Record: capture · commit · temporary rules · init</text><text class="lbl" x="26" y="228">Answer: why · check · keep · until (built) · unreviewed · bom · report (new)</text>
 <text class="lbl" x="640" y="210">Adapters: cli/lib/agents/&lt;id&gt;/ (bob built; claude-code, codex, cursor later)</text><text class="lbl" x="640" y="228">Everything else is agent-agnostic and reads normalized events</text>
@@ -145,7 +145,7 @@ summary{cursor:pointer;font-weight:600}
 <g><circle cx="380" cy="120" r="8" fill="var(--warn)"/><rect class="node git" x="320" y="20" width="120" height="70" rx="8"/><text x="380" y="42" text-anchor="middle">git commit</text><text class="lbl" x="380" y="58" text-anchor="middle">ai / ai-edited</text><text class="lbl" x="380" y="74" text-anchor="middle">note + item L-…</text><text class="lbl" x="380" y="150" text-anchor="middle">rules: "mock", "until"</text></g>
 <g><circle cx="530" cy="120" r="8" fill="var(--warn)"/><rect class="node git" x="470" y="20" width="120" height="70" rx="8"/><text x="530" y="42" text-anchor="middle">git push / merge</text><text class="lbl" x="530" y="58" text-anchor="middle">notes travel too</text><text class="lbl" x="530" y="74" text-anchor="middle">post-merge: check</text><text class="lbl" x="530" y="150" text-anchor="middle">weeks pass</text></g>
 <g><circle cx="680" cy="120" r="8" fill="var(--ok)"/><rect class="node ans" x="620" y="20" width="120" height="70" rx="8"/><text x="680" y="42" text-anchor="middle">check: due</text><text class="lbl" x="680" y="58" text-anchor="middle">no references left</text><text class="lbl" x="680" y="74" text-anchor="middle">exit code 2</text><text class="lbl" x="680" y="150" text-anchor="middle">payments-v2 merged</text></g>
-<g><circle cx="830" cy="120" r="8" fill="var(--accent)"/><rect class="node bob" x="770" y="20" width="120" height="70" rx="8"/><text x="830" y="42" text-anchor="middle">Bob removes</text><text class="lbl" x="830" y="58" text-anchor="middle">evidence, tests</text><text class="lbl" x="830" y="74" text-anchor="middle">your approval</text><text class="lbl" x="830" y="150" text-anchor="middle">"remove L-…"</text></g>
+<g><circle cx="830" cy="120" r="8" fill="var(--accent)"/><rect class="node bob" x="770" y="20" width="120" height="70" rx="8"/><text x="830" y="42" text-anchor="middle">Bob removes</text><text class="lbl" x="830" y="58" text-anchor="middle">evidence, tests</text><text class="lbl" x="830" y="74" text-anchor="middle">your approval</text><text class="lbl" x="830" y="150" text-anchor="middle">"remove &lt;file&gt;"</text></g>
 <g><circle cx="940" cy="120" r="8" fill="var(--warn)"/><text class="lbl" x="940" y="150" text-anchor="middle">note: removed</text></g>
 <text class="lbl" x="30" y="200">Any time in between, anyone can run <tspan font-weight="700">whyline why file:line</tspan> and read the prompt. A teammate without Whyline installed changes nothing: the hook is a silent no-op.</text>
 <text class="lbl" x="30" y="222">Overrides are commands, not buttons: <tspan font-weight="700">whyline keep L-… "reason"</tspan> or <tspan font-weight="700">whyline until L-… 2027-01-01</tspan>. Both are recorded as notes.</text>
@@ -163,7 +163,7 @@ summary{cursor:pointer;font-weight:600}
 <tr><td>Commit step</td><td><code>commit</code>: ai / ai-edited, git note, cost from Bob's DB</td></tr>
 <tr><td>Temporary rules</td><td>mock, demo, flag, shim, fixture; date or no_references</td></tr>
 <tr><td>Answers</td><td><code>why</code>, <code>check</code>, <code>keep</code>, <code>until</code>, <code>session-start</code></td></tr>
-<tr><td>Bob mode and skills</td><td>whyline-remover, whyline-remove, whyline-check</td></tr>
+<tr><td>Bob skills</td><td>whyline-why, whyline-check, whyline-decide, whyline-remove, whyline-setup, whyline-status. No custom mode: everything runs in Agent mode</td></tr>
 <tr><td>Adapter registry</td><td>bob adapter, shared installer and hook entry, contract tests</td></tr>
 <tr><td>Repo hygiene</td><td>CI, license, changelog, contributing, templates, docs 01 to 08</td></tr>
 </table></div>
@@ -251,7 +251,7 @@ commit   a0f2cde
 <div class="step"><b>1 · Monday, Bob IDE</b>Developer asks for a mock payment gateway "until payments-v2 lands". Bob writes the file.<div class="w">hooks → capture → session.jsonl</div></div>
 <div class="step"><b>2 · Monday, commit</b>Lines arrived unchanged, so they are "ai". Words "mock" and "until" make item L-… with condition no_references.<div class="w">post-commit → whyline commit → git note</div></div>
 <div class="step"><b>3 · Three weeks later</b>A teammate runs <code>whyline why</code> on a line and reads the original prompt and the item.<div class="w">git blame → note → answer</div></div>
-<div class="step"><b>4 · payments-v2 day</b>The merge removes the last use. <code>check</code> says due. Bob's next session opens with "1 item due". In whyline-remover: "remove L-…". Evidence, tests, approval, commit.<div class="w">post-merge → check → Bob</div></div>
+<div class="step"><b>4 · payments-v2 day</b>The merge removes the last use. <code>check</code> says due. Bob's next session opens with "1 item due". In whyline-remover: "remove &lt;file&gt;". Evidence, tests, approval, commit.<div class="w">post-merge → check → Bob</div></div>
 <div class="step new"><b>5 · Friday, team lead</b><code>whyline unreviewed</code>: AI lines nobody edited since, worst files first, with coverage.<div class="w">notes + blame + coverage</div></div>
 <div class="step new"><b>6 · Release day</b><code>whyline bom v0.1.0..HEAD</code> for the numbers and <code>whyline report</code> for one page everyone can open.<div class="w">notes → JSON + HTML</div></div>
 </div>
@@ -267,7 +267,7 @@ commit   a0f2cde
 <tr><td>Note format v1</td><td>Every reader depends on it. Add fields, never rename.</td></tr>
 <tr><td>Hook identity</td><td>The installer recognises a Whyline hook by script path plus subcommand (<code>whyline.sh capture</code>), so flags may change; the script name may not.</td></tr>
 <tr><td>Hooks never fail</td><td><code>capture</code>, <code>commit</code>, <code>session-start</code> always exit 0.</td></tr>
-<tr><td><code>check</code> exits 2 when due</td><td>The merge hook and the Bob mode rely on it.</td></tr>
+<tr><td><code>check</code> exits 0; <code>check --gate</code> exits 2 when due</td><td>Agents never see a due list as an error; hooks and CI use the gate.</td></tr>
 <tr><td>Removal path</td><td>Evidence, tests, then Bob's own approval. Never auto-delete.</td></tr>
 <tr><td>Zero dependencies, no network</td><td>Anything that talks to GitHub is opt-in.</td></tr>
 </table></div>
