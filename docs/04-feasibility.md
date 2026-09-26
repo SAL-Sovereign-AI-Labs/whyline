@@ -124,3 +124,11 @@ Install for a user: `npx whyline init` inside a repo. It copies `bob/` into `.bo
 2. Run `git notes --ref` listing after a commit made with Bob's commit button to see whether the IDE writes attribution notes and where.
 3. Confirm `/whyline-remover` appears as a slash command and the skill loads.
 4. Take the first bob_sessions screenshot.
+
+
+## 10. Bob IDE results (26 Sep 2026, 2:22 pm PKT, task "add a cart module")
+
+- Hooks fire in Bob IDE 2.2 with the same payload shape as Bob Shell: UserPromptSubmit, PostToolUse write_file (path, content, line_count) and apply_diff (path, diff; tool_response carries the `<patch>` block). Raw payloads saved as cli/test/fixtures/bob-ide-payloads.json.
+- The IDE and the Shell share `~/.bob/db/bob.db` (IDE log: "Task store opened /Users/.../.bob/db/bob.db"). The IDE keeps rows in the write-ahead log while it runs, so the cost lookup opens with `mode=ro` first (WAL-aware) and falls back to `immutable=1`. The cart task cost 0.768 Bobcoins for 21,254 context tokens.
+- `attribution_logs` stays empty from the IDE as well ("Attribution store opened" is logged, no rows written). Hooks remain the only source.
+- Note attached by the post-commit hook, and `git log` shows it under the commit thanks to `notes.displayRef`.

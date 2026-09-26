@@ -45,17 +45,21 @@ function parseEvent(p) {
 
 function isWholeFileTool(tool) { return WHOLE_FILE_TOOLS.has(tool); }
 
-// Bob Shell keeps per-task cost in ~/.bob/db/bob.db (tasks.costs JSON). Read-only via the sqlite3 CLI. Null when unavailable.
+// Bob IDE and Bob Shell share ~/.bob/db/bob.db (tasks.costs JSON; verified 26 Sep 2026 from the IDE log "Task store opened").
+// Read-only via the sqlite3 CLI. mode=ro sees rows still in the write-ahead log (the IDE keeps a WAL open while running);
+// immutable=1 is the fallback when the WAL cannot be opened. Null when unavailable.
 function sessionCost(session) {
   const db = process.env.WHYLINE_BOB_DB || path.join(os.homedir(), '.bob', 'db', 'bob.db');
   if (!fs.existsSync(db) || !/^[0-9a-f]{8,64}$/.test(session)) return null;
-  try {
-    // immutable=1 opens the file without taking locks or needing a writable journal, which -readonly fails on while Bob runs.
-    const out = execFileSync('sqlite3', [`file:${db}?mode=ro&immutable=1`, `select costs from tasks where id='${session}' limit 1;`],
-      { encoding: 'utf8', timeout: 2000, stdio: ['ignore', 'pipe', 'pipe'] }).trim();
-    const j = out ? JSON.parse(out) : null;
-    return j && typeof j.cost === 'number' ? j.cost : null;
-  } catch { return null; }
+  const sql = `select costs from tasks where id='${session}' limit 1;`;
+  for (const uri of [`file:${db}?mode=ro`, `file:${db}?mode=ro&immutable=1`]) {
+    try {
+      const out = execFileSync('sqlite3', [uri, sql], { encoding: 'utf8', timeout: 2000, stdio: ['ignore', 'pipe', 'pipe'] }).trim();
+      const j = out ? JSON.parse(out) : null;
+      if (j && typeof j.cost === 'number') return j.cost;
+    } catch { /* try the next open mode */ }
+  }
+  return null;
 }
 
 // Writes .bob/ (hooks merged into settings.json, mode, rules, skills) and the shared hook entry script.

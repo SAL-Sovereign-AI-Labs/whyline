@@ -1,0 +1,49 @@
+[
+ {
+  "_note": "Captured live from Bob IDE 2.2 on 26 Sep 2026 (task: add a cart module). Paths rewritten to /tmp. Field names and tool_response shapes are exact."
+ },
+ {
+  "session_id": "69ce37db9ded29efc9a2dfade7b6539c",
+  "cwd": "/tmp/whyline-demo-shop",
+  "hook_event_name": "UserPromptSubmit",
+  "prompt": "Add a cart module to this shop. A Cart should let me add items with a price and quantity, tell me the item count and the total, and hand off to checkout. Follow the style of the existing shop code and add tests. Run the tests."
+ },
+ {
+  "session_id": "69ce37db9ded29efc9a2dfade7b6539c",
+  "cwd": "/tmp/whyline-demo-shop",
+  "hook_event_name": "PostToolUse",
+  "tool_name": "write_file",
+  "tool_input": {
+   "path": "src/shop/cart.py",
+   "content": "from dataclasses import dataclass, field\n\n\n@dataclass\nclass CartItem:\n    name: str\n    price: float\n    quantity: int\n\n\n@dataclass\nclass Cart:\n    _items: list = field(default_factory=list, repr=False)\n\n    def add(self, name, price, quantity=1):\n        for item in self._items:\n            if item.name == name:\n                item.quantity += quantity\n                return\n        self._items.append(CartItem(name=name, price=price, quantity=quantity))\n\n    def item_count(self):\n        return sum(item.quantity for item in self._items)\n\n    def total(self):\n        return round(sum(item.price * item.quantity for item in self._items), 2)\n\n    def checkout(self, region=\"pk\"):\n        from ..payments.checkout import checkout\n        from .orders import Order\n\n        order = Order(items=[(item.price, item.quantity) for item in self._items])\n        return checkout(order, region)\n",
+   "line_count": 30
+  },
+  "tool_response": "Created file: src/shop/cart.py\n\n<result>\nfrom dataclasses import dataclass, field\n\n\n@dataclass\nclass CartItem:\n\n...29 lines truncated. You do not need to re-read the file. The complete file was written successfully. Use read_file if you need to see the full contents.\n</result>",
+  "tool_use_id": "tooluse_m8QF6ShpnGB7ebmGTF6aQL"
+ },
+ {
+  "session_id": "69ce37db9ded29efc9a2dfade7b6539c",
+  "cwd": "/tmp/whyline-demo-shop",
+  "hook_event_name": "PostToolUse",
+  "tool_name": "write_file",
+  "tool_input": {
+   "content": "from src.shop.cart import Cart\n\n\ndef test_add_item():\n    cart = Cart()\n    cart.add(\"Widget\", 9.99, 2)\n    assert cart.item_count() == 2\n\n\ndef test_add_same_item_twice_merges():\n    cart = Cart()\n    cart.add(\"Widget\", 9.99, 1)\n    cart.add(\"Widget\", 9.99, 3)\n    assert cart.item_count() == 4\n\n\ndef test_add_multiple_items():\n    cart = Cart()\n    cart.add(\"Widget\", 9.99, 1)\n    cart.add(\"Gadget\", 4.50, 2)\n    assert cart.item_count() == 3\n\n\ndef test_total():\n    cart = Cart()\n    cart.add(\"Widget\", 9.99, 2)\n    assert cart.total() == 19.98\n\n\ndef test_total_multiple_items():\n    cart = Cart()\n    cart.add(\"Widget\", 9.99, 2)\n    cart.add(\"Gadget\", 4.50, 1)\n    assert cart.total() == 24.48\n\n\ndef test_empty_cart_count():\n    cart = Cart()\n    assert cart.item_count() == 0\n\n\ndef test_empty_cart_total():\n    cart = Cart()\n    assert cart.total() == 0\n\n\ndef test_checkout_returns_total_with_tax():\n    cart = Cart()\n    cart.add(\"Widget\", 100.00, 1)\n    charged = cart.checkout(region=\"pk\")\n    assert charged == 117.0\n",
+   "line_count": 47,
+   "path": "tests/test_cart.py"
+  },
+  "tool_response": "Created file: tests/test_cart.py\n\n<result>\nfrom src.shop.cart import Cart\n\n\ndef test_add_item():\n    cart = Cart()\n\n...47 lines truncated. You do not need to re-read the file. The complete file was written successfully. Use read_file if you need to see the full contents.\n</result>",
+  "tool_use_id": "tooluse_Pd7TfKJDErC6lqLvzTaaxJ"
+ },
+ {
+  "session_id": "69ce37db9ded29efc9a2dfade7b6539c",
+  "cwd": "/tmp/whyline-demo-shop",
+  "hook_event_name": "PostToolUse",
+  "tool_name": "apply_diff",
+  "tool_input": {
+   "path": "pytest.ini",
+   "diff": "<<<<<<< SEARCH\n:start_line:1\n-------\n[pytest]\ntestpaths = tests\n=======\n[pytest]\ntestpaths = tests\npythonpath = .\n>>>>>>> REPLACE\n"
+  },
+  "tool_response": "Edited file: pytest.ini\n\nYou do not need to re-read the file, as you have seen all changes.\nProceed with the task using these changes as the new baseline.\n\nIf the user's edits have addressed part of the task or changed the requirements, adjust your approach accordingly.\n\nPatch of edit:\n\n<patch>\n@@ -1,2 +1,3 @@\n [pytest]\n testpaths = tests\n+pythonpath = .\n\n</patch>\n\nMaking multiple related changes in a single apply_diff is more efficient. If other changes are needed in this file, please include them as additional SEARCH/REPLACE blocks.",
+  "tool_use_id": "tooluse_AD1jHvfD9Uf806mUa6OhNl"
+ }
+]

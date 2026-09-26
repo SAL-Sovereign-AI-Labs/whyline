@@ -41,6 +41,18 @@ test('bob adapter: detection and normalization of the real payload fixture', () 
   assert.equal(bob.parseEvent({ hook_event_name: 'PostToolUse', session_id: 'x', tool_name: 'read_file', tool_input: { path: '/r/a.py' } }), null);
 });
 
+test('bob adapter: real Bob IDE 2.2 payloads (cart task, 26 Sep 2026) normalize like the Shell ones', () => {
+  const bob = agents.byId('bob');
+  const payloads = require('./fixtures/bob-ide-payloads.json').filter(p => !p._note);
+  assert.equal(payloads.length, 4);
+  for (const p of payloads) assert.equal(agents.detect(p), bob);
+  const kinds = payloads.map(p => bob.parseEvent(p)).map(e => e && `${e.type}:${e.tool || ''}`);
+  assert.deepEqual(kinds, ['prompt:', 'write:write_file', 'write:write_file', 'write:apply_diff']);
+  const ad = bob.parseEvent(payloads[3]);
+  assert.match(ad.patch, /^@@ /m, 'the IDE returns the same <patch> block as the Shell');
+  assert.equal(bob.isWholeFileTool('apply_diff'), false);
+});
+
 test('bob adapter: install writes .bob and is idempotent; installedIn reflects it', () => {
   const bob = agents.byId('bob');
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'whyline-agent-'));
