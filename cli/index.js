@@ -6,7 +6,7 @@ const fs = require('node:fs');
 const USAGE = `whyline <command> [--json]
 
   init [--agent bob]        install the agent's hooks (.bob/) and git hooks in this repo
-  capture [--agent bob]     hook: read a hook payload on stdin, record the write
+  capture [--agent bob]     hook: read a hook payload on stdin, record the write (--dump or WHYLINE_DUMP=1 keeps raw payloads in .git/whyline/raw/)
   session-start             hook: print a one-line summary for Bob's context
   commit                    git post-commit: attach the provenance note to HEAD
   why <file>:<line>         who wrote this line, and why
@@ -63,7 +63,9 @@ function dispatch(argv) {
     case 'capture': {
       const session = require('./lib/session');
       try {
-        const payload = JSON.parse(readStdin() || '{}');
+        const raw = readStdin() || '{}';
+        if (args.includes('--dump') || process.env.WHYLINE_DUMP) dumpRaw(cwd, raw);
+        const payload = JSON.parse(raw);
         require('./lib/capture').handle(payload, { cwd, agent: agentIds[0] });
       } catch (e) { session.logError(cwd, `capture: ${e.message}`); debug('capture', e.stack || ''); }
       return 0;
@@ -179,6 +181,17 @@ function dispatch(argv) {
       process.stderr.write(`Unknown command: ${cmd}\nRun whyline --help for usage.\n`);
       return 1;
   }
+}
+
+// Keep raw hook payloads for fixtures (one file per event). Never throws.
+function dumpRaw(cwd, raw) {
+  try {
+    const dir = require('./lib/session').dir(cwd);
+    if (!dir) return;
+    const d = require('node:path').join(dir, 'raw');
+    fs.mkdirSync(d, { recursive: true });
+    fs.writeFileSync(require('node:path').join(d, `${Date.now()}-${process.pid}.json`), raw);
+  } catch { /* fixtures are a convenience */ }
 }
 
 // Modules owned by the other developer may not exist yet on this branch.

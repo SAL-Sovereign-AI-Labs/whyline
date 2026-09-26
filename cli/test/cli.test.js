@@ -83,3 +83,12 @@ test('the shell hook entry is a no-op without whyline on PATH and never fails', 
   const r = spawnSync('sh', [hook, 'capture'], { cwd: dir, input: '{}', encoding: 'utf8', env: { PATH: '/usr/bin:/bin' } });
   assert.equal(r.status, 0, r.stderr);
 });
+
+test('capture --dump keeps the raw payload for fixtures', () => {
+  const dir = repoWithItem();
+  const r = run(dir, ['capture', '--dump', '--agent', 'bob'], JSON.stringify({ hook_event_name: 'SessionStart', session_id: 'abc', cwd: dir, source: 'startup' }));
+  assert.equal(r.status, 0);
+  const raw = fs.readdirSync(path.join(dir, '.git', 'whyline', 'raw'));
+  assert.equal(raw.length, 1);
+  assert.equal(JSON.parse(fs.readFileSync(path.join(dir, '.git', 'whyline', 'raw', raw[0]), 'utf8')).source, 'startup');
+});
