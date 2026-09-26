@@ -3,11 +3,34 @@
   "version": "0.1.0",
   "description": "Provenance for AI-written code. Every line keeps the prompt that caused it. Built for IBM Bob.",
   "license": "MIT",
-  "bin": { "whyline": "cli/index.js" },
-  "files": ["cli", "bob", "README.md"],
-  "engines": { "node": ">=20" },
-  "scripts": {
-    "test": "node --test cli/test/"
+  "bin": {
+    "whyline": "cli/index.js"
   },
-  "keywords": ["ibm-bob", "ai", "provenance", "attribution", "git-notes", "hooks"]
+  "files": [
+    "cli/index.js",
+    "cli/lib",
+    "bob",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "node --test cli/test/",
+    "coverage": "node --test --experimental-test-coverage cli/test/"
+  },
+  "keywords": [
+    "ibm-bob",
+    "ai",
+    "provenance",
+    "attribution",
+    "git-notes",
+    "hooks"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SAL-Sovereign-AI-Labs/whyline"
+  },
+  "homepage": "https://github.com/SAL-Sovereign-AI-Labs/whyline#readme"
 }
