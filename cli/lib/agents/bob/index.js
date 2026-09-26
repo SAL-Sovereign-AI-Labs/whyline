@@ -50,7 +50,9 @@ function sessionCost(session) {
   const db = process.env.WHYLINE_BOB_DB || path.join(os.homedir(), '.bob', 'db', 'bob.db');
   if (!fs.existsSync(db) || !/^[0-9a-f]{8,64}$/.test(session)) return null;
   try {
-    const out = execFileSync('sqlite3', ['-readonly', db, `select costs from tasks where id='${session}' limit 1;`], { encoding: 'utf8', timeout: 2000 }).trim();
+    // immutable=1 opens the file without taking locks or needing a writable journal, which -readonly fails on while Bob runs.
+    const out = execFileSync('sqlite3', [`file:${db}?mode=ro&immutable=1`, `select costs from tasks where id='${session}' limit 1;`],
+      { encoding: 'utf8', timeout: 2000, stdio: ['ignore', 'pipe', 'pipe'] }).trim();
     const j = out ? JSON.parse(out) : null;
     return j && typeof j.cost === 'number' ? j.cost : null;
   } catch { return null; }
