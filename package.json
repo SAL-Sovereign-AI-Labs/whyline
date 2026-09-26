@@ -20,7 +20,8 @@
     "test": "node --test cli/test/*.test.js",
     "coverage": "node --test --experimental-test-coverage cli/test/*.test.js",
     "smoke": "node cli/index.js --help >/dev/null && node cli/index.js --version",
-    "bench": "node cli/bench.js"
+    "bench": "node cli/bench.js",
+    "prepublishOnly": "npm test && npm run smoke"
   },
   "keywords": [
     "ibm-bob",
@@ -32,7 +33,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/SAL-Sovereign-AI-Labs/whyline"
+    "url": "git+https://github.com/SAL-Sovereign-AI-Labs/whyline.git"
   },
   "homepage": "https://github.com/SAL-Sovereign-AI-Labs/whyline#readme",
   "bugs": {
