@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Whyline Project Guide</title>
+<style>
+:root{--bg:#f4f6f9;--card:#fff;--ink:#14171c;--muted:#5d6675;--line:#e1e5ea;--accent:#0f62fe;--accent2:#8a3ffc;--ok:#198038;--warn:#b28600;--bad:#da1e28;--term:#111418;--termink:#d6dde6;--ai:#e8f0ff;--human:#e6f4ea;--mixed:#fff3c4;--pur:#f0e6ff}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#0f1216;--card:#181d24;--ink:#e6e9ee;--muted:#98a2b3;--line:#2a313b;--accent:#4589ff;--accent2:#be95ff;--ok:#42be65;--warn:#f1c21b;--bad:#fa4d56;--term:#0a0c0f;--termink:#d6dde6;--ai:#1d2a45;--human:#16301f;--mixed:#3a3212;--pur:#2b1d45}}
+:root[data-theme="dark"]{--bg:#0f1216;--card:#181d24;--ink:#e6e9ee;--muted:#98a2b3;--line:#2a313b;--accent:#4589ff;--accent2:#be95ff;--ok:#42be65;--warn:#f1c21b;--bad:#fa4d56;--term:#0a0c0f;--termink:#d6dde6;--ai:#1d2a45;--human:#16301f;--mixed:#3a3212;--pur:#2b1d45}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+header{position:sticky;top:0;z-index:10;background:var(--card);border-bottom:1px solid var(--line)}
+.hwrap{max-width:1080px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.brand{font-weight:700}.brand small{color:var(--muted);font-weight:400;margin-left:8px}
+nav{display:flex;gap:4px;flex-wrap:wrap;margin-left:auto}
+nav a{color:var(--muted);text-decoration:none;font-size:12.5px;padding:5px 9px;border-radius:14px;border:1px solid transparent}
+nav a:hover{border-color:var(--line);color:var(--ink)}
+main{max-width:1080px;margin:0 auto;padding:18px 16px 60px}
+section{margin:26px 0}
+h1{font-size:28px;margin:8px 0 6px}
+h2{font-size:21px;margin:0 0 6px}
+h2 .n{display:inline-block;width:28px;height:28px;border-radius:50%;background:var(--accent);color:#fff;font-size:14px;text-align:center;line-height:28px;margin-right:8px;vertical-align:2px}
+h3{font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin:16px 0 6px}
+.lead{color:var(--muted);font-size:16px;margin:0 0 12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px;margin:12px 0}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.kpi{border:1px solid var(--line);border-radius:10px;padding:12px;background:var(--card)}
+.kpi b{display:block;font-size:22px}.kpi span{color:var(--muted);font-size:12px}
+.tag{display:inline-block;font-size:11px;padding:2px 7px;border-radius:5px;font-weight:600;white-space:nowrap;vertical-align:1px}
+.tag.ok{background:rgba(25,128,56,.15);color:var(--ok)}.tag.warn{background:rgba(178,134,0,.15);color:var(--warn)}.tag.bad{background:rgba(218,30,40,.15);color:var(--bad)}.tag.info{background:var(--ai);color:var(--accent)}.tag.pur{background:rgba(138,63,252,.15);color:var(--accent2)}.tag.dim{background:var(--line);color:var(--muted)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin:8px 0}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-2px;margin-right:4px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{text-align:left;padding:8px 9px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--muted);font-weight:600;font-size:12px}
+code{background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:1px 5px;font-size:12.5px}
+.term{background:var(--term);color:var(--termink);border-radius:10px;padding:12px 14px;font:12.5px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap;overflow-x:auto}
+.term .g{color:#42be65}.term .y{color:#f1c21b}.term .d{color:#8d96a5}.term .p{color:#82cfff}.term .m{color:#be95ff}
+.diag{width:100%;overflow-x:auto;margin-top:8px}
+.diag svg{min-width:720px;width:100%;height:auto}
+svg text{font:12.5px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:var(--ink)}
+svg .lbl{font-size:11px;fill:var(--muted)}
+svg .ttl{font-weight:700;font-size:13px}
+svg .node{fill:var(--card);stroke:var(--line);stroke-width:1.2}
+svg .bob{fill:var(--ai);stroke:var(--accent)}
+svg .git{fill:var(--mixed);stroke:var(--warn)}
+svg .ans{fill:var(--human);stroke:var(--ok)}
+svg .new{stroke:var(--accent2);stroke-dasharray:5 3}
+svg .fut{fill:var(--pur);stroke:var(--accent2);stroke-dasharray:5 3}
+svg .band{fill:var(--bg);stroke:var(--line)}
+svg .edge{fill:none;stroke:var(--muted);stroke-width:1.6;marker-end:url(#ar)}
+svg .edge.live{stroke:var(--accent);stroke-dasharray:6 6;animation:dash 1.2s linear infinite}
+svg .edge.back{stroke:var(--ok)}
+svg .dot{fill:var(--accent)}
+@keyframes dash{to{stroke-dashoffset:-48}}
+.tree{font:12.5px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;background:var(--term);color:var(--termink);border-radius:10px;padding:14px;overflow-x:auto;white-space:pre}
+.tree .b{color:#42be65}.tree .e{color:#f1c21b}.tree .nw{color:#be95ff}.tree .d{color:#8d96a5}
+.story{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;margin-top:8px}
+.step{border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--bg);font-size:13px;position:relative}
+.step b{display:block;margin-bottom:3px}
+.step .w{font-size:11px;color:var(--muted)}
+.step.new{border-color:var(--accent2);background:var(--pur)}
+.note{border-left:3px solid var(--accent);background:var(--ai);border-radius:0 8px 8px 0;padding:8px 12px;font-size:13px;margin:10px 0}
+.warnbox{border-left:3px solid var(--warn);background:var(--mixed);border-radius:0 8px 8px 0;padding:8px 12px;font-size:13px;margin:10px 0}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:760px){.two{grid-template-columns:1fr}h1{font-size:23px}}
+details{border:1px solid var(--line);border-radius:10px;padding:8px 12px;margin:8px 0;background:var(--card)}
+summary{cursor:pointer;font-weight:600}
+</style>
+</head>
+<body>
+<header><div class="hwrap"><div class="brand">Whyline <small>project guide · IBM Bob 2.0 Hackathon · 26 Sep 2026</small></div>
+<nav><a href="#zoom">Zoom out</a><a href="#layers">Layers</a><a href="#life">Data life</a><a href="#status">Status</a><a href="#repo">Repo</a><a href="#future">Future agents</a><a href="#story">Story</a><a href="#rules">Rules</a></nav></div></header>
+<main>
+
+<h1>Whyline: every AI-written line keeps the prompt that caused it</h1>
+<p class="lead"><code>git blame</code> tells you who. Whyline tells you why: the Bob prompt behind a line, whether a human changed it since, whether it was meant to be temporary, and what a release is made of. One command line tool, zero dependencies, nothing leaves the laptop.</p>
+<div class="kpis">
+  <div class="kpi"><b>0</b><span>runtime dependencies, no build step</span></div>
+  <div class="kpi"><b>20 / 20</b><span>tests passing, CI green (macOS, Linux, Node 20 to 24)</span></div>
+  <div class="kpi"><b>0 Bobcoins</b><span>to record; Bob is only used for removals</span></div>
+  <div class="kpi"><b>1 adapter</b><span>IBM Bob today; a new agent is one folder</span></div>
+  <div class="kpi"><b>5 of 9</b><span>commands built: init, why, check, keep, until</span></div>
+</div>
+<div class="legend"><span><i style="background:var(--human);border:1px solid var(--ok)"></i>built and tested</span><span><i style="background:var(--pur);border:1px dashed var(--accent2)"></i>new for the hackathon</span><span><i style="background:var(--ai);border:1px solid var(--accent)"></i>IBM Bob</span><span><i style="background:var(--mixed);border:1px solid var(--warn)"></i>git storage</span></div>
+
+<!-- 1 ZOOM OUT -->
+<section id="zoom"><div class="card">
+<h2><span class="n">1</span>Zoom out: the whole thing on one screen</h2>
+<p>A loop. The top half records automatically while people work in Bob. The bottom half answers questions from what was recorded, and feeds one of those answers back into Bob.</p>
+<div class="diag"><svg viewBox="0 0 1000 420" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="var(--muted)"/></marker></defs>
+<rect class="band" x="10" y="20" width="980" height="170" rx="12"/><text class="ttl" x="26" y="42">RECORDING · automatic · 0 Bobcoins · built</text>
+<rect class="band" x="10" y="215" width="980" height="190" rx="12"/><text class="ttl" x="26" y="237">ANSWERING · read-only · built + new</text>
+<rect class="node" x="30" y="80" width="130" height="66" rx="10"/><text x="95" y="106" text-anchor="middle">Developer</text><text class="lbl" x="95" y="124" text-anchor="middle">prompts, commits</text>
+<rect class="node bob" x="200" y="80" width="150" height="66" rx="10"/><text x="275" y="106" text-anchor="middle">IBM Bob</text><text class="lbl" x="275" y="124" text-anchor="middle">writes files</text>
+<rect class="node bob" x="390" y="80" width="150" height="66" rx="10"/><text x="465" y="106" text-anchor="middle">Bob hooks</text><text class="lbl" x="465" y="124" text-anchor="middle">.bob/settings.json</text>
+<rect class="node ans" x="580" y="80" width="150" height="66" rx="10"/><text x="655" y="106" text-anchor="middle">whyline capture</text><text class="lbl" x="655" y="124" text-anchor="middle">lines + prompt</text>
+<rect class="node git" x="770" y="80" width="200" height="66" rx="10"/><text x="870" y="100" text-anchor="middle">git commit → note</text><text class="lbl" x="870" y="118" text-anchor="middle">whyline commit (post-commit hook)</text><text class="lbl" x="870" y="134" text-anchor="middle">refs/notes/whyline</text>
+<path id="z1" class="edge live" d="M160 113 H200"/><path id="z2" class="edge live" d="M350 113 H390"/><path id="z3" class="edge live" d="M540 113 H580"/><path id="z4" class="edge live" d="M730 113 H770"/>
+<circle class="dot" r="4"><animateMotion dur="1.4s" repeatCount="indefinite"><mpath href="#z1"/></animateMotion></circle>
+<circle class="dot" r="4"><animateMotion dur="1.4s" repeatCount="indefinite" begin=".35s"><mpath href="#z2"/></animateMotion></circle>
+<circle class="dot" r="4"><animateMotion dur="1.4s" repeatCount="indefinite" begin=".7s"><mpath href="#z3"/></animateMotion></circle>
+<circle class="dot" r="4"><animateMotion dur="1.4s" repeatCount="indefinite" begin="1.05s"><mpath href="#z4"/></animateMotion></circle>
+<path class="edge" d="M870 146 V215"/>
+<rect class="node git" x="770" y="250" width="200" height="50" rx="10"/><text x="870" y="272" text-anchor="middle">Git notes</text><text class="lbl" x="870" y="290" text-anchor="middle">one note per commit, shared by push</text>
+<rect class="node ans" x="580" y="250" width="150" height="50" rx="10"/><text x="655" y="272" text-anchor="middle">why</text><text class="lbl" x="655" y="290" text-anchor="middle">the prompt behind a line</text>
+<rect class="node ans" x="580" y="320" width="150" height="50" rx="10"/><text x="655" y="342" text-anchor="middle">check</text><text class="lbl" x="655" y="360" text-anchor="middle">temporary code now due</text>
+<rect class="node ans new" x="390" y="250" width="150" height="50" rx="10"/><text x="465" y="272" text-anchor="middle">unreviewed</text><text class="lbl" x="465" y="290" text-anchor="middle">AI code no human touched</text>
+<rect class="node ans new" x="390" y="320" width="150" height="50" rx="10"/><text x="465" y="342" text-anchor="middle">bom</text><text class="lbl" x="465" y="360" text-anchor="middle">AI bill of materials</text>
+<rect class="node ans new" x="200" y="285" width="150" height="50" rx="10"/><text x="275" y="307" text-anchor="middle">report</text><text class="lbl" x="275" y="325" text-anchor="middle">one offline HTML page</text>
+<path class="edge" d="M770 275 H730"/><path class="edge" d="M770 285 C750 285 750 345 730 345"/><path class="edge" d="M580 275 H540"/><path class="edge" d="M580 345 H540"/><path class="edge" d="M390 285 C370 285 370 310 350 310"/><path class="edge" d="M390 335 C370 335 370 310 350 310"/>
+<rect class="node bob" x="30" y="285" width="130" height="66" rx="10"/><text x="95" y="308" text-anchor="middle">Back into Bob</text><text class="lbl" x="95" y="326" text-anchor="middle">"1 item due" at start</text><text class="lbl" x="95" y="342" text-anchor="middle">whyline-remover mode</text>
+<path class="edge back" d="M580 360 C470 400 200 400 160 340"/>
+<text class="lbl" x="360" y="398">check feeds Bob: session start line, and the removal mode reads check --json</text>
+</svg></div>
+<div class="note"><b>In one line:</b> Bob writes, a free hook records, a commit seals a git note, and every answer reads that note. New work only adds readers (unreviewed, bom, report). The recorder is not touched.</div>
+</div></section>
+
+<!-- 2 LAYERS -->
+<section id="layers"><div class="card">
+<h2><span class="n">2</span>Four layers, and who owns each</h2>
+<div class="diag"><svg viewBox="0 0 1000 330" xmlns="http://www.w3.org/2000/svg">
+<rect class="node" x="10" y="10" width="980" height="62" rx="10"/><text class="ttl" x="26" y="34">PEOPLE</text><text class="lbl" x="26" y="54">Developer: "why is this here?" · Teammate: "is this still needed?" · Team lead: "what has nobody reviewed?" · Release manager: "how much of this release is AI?"</text>
+<rect class="node bob" x="10" y="88" width="980" height="62" rx="10"/><text class="ttl" x="26" y="112">IBM BOB (IDE or Shell)</text><text class="lbl" x="26" y="132">Agent mode writes code · lifecycle hooks call Whyline · session start shows "N items due" · whyline-remover mode removes with evidence and Bob's own approval prompt</text>
+<rect class="node ans" x="10" y="166" width="980" height="78" rx="10"/><text class="ttl" x="26" y="190">WHYLINE CLI · deterministic · local · 0 Bobcoins</text>
+<text class="lbl" x="26" y="210">Record: capture · commit · temporary rules · init</text><text class="lbl" x="26" y="228">Answer: why · check · keep · until (built) · unreviewed · bom · report (new)</text>
+<text class="lbl" x="640" y="210">Adapters: cli/lib/agents/&lt;id&gt;/ (bob built; claude-code, codex, cursor later)</text><text class="lbl" x="640" y="228">Everything else is agent-agnostic and reads normalized events</text>
+<rect class="node git" x="10" y="260" width="980" height="62" rx="10"/><text class="ttl" x="26" y="284">GIT · the only storage · shared with the team</text><text class="lbl" x="26" y="304">.git/whyline/session.jsonl (until commit) · refs/notes/whyline (permanent, pushed by hook) · .whyline-report.html (generated, not committed)</text>
+<path class="edge" d="M500 72 V88"/><path class="edge" d="M500 150 V166"/><path class="edge" d="M500 244 V260"/>
+<path class="edge back" d="M520 260 V244"/><path class="edge back" d="M520 166 V150"/>
+<text class="lbl" x="530" y="80">prompts, approvals down · answers up</text>
+</svg></div>
+</div></section>
+
+<!-- 3 DATA LIFE -->
+<section id="life"><div class="card">
+<h2><span class="n">3</span>The life of one temporary line</h2>
+<p>From the moment Bob writes a mock until Bob removes it. Every box is a real command or file; nothing here needs a server.</p>
+<div class="diag"><svg viewBox="0 0 1000 250" xmlns="http://www.w3.org/2000/svg">
+<line x1="30" y1="120" x2="970" y2="120" stroke="var(--line)" stroke-width="2"/>
+<g><circle cx="80" cy="120" r="8" fill="var(--accent)"/><rect class="node bob" x="20" y="20" width="120" height="70" rx="8"/><text x="80" y="42" text-anchor="middle">Bob writes</text><text class="lbl" x="80" y="58" text-anchor="middle">write_file</text><text class="lbl" x="80" y="74" text-anchor="middle">mock_gateway.py</text><text class="lbl" x="80" y="150" text-anchor="middle">Monday 10:15 am</text></g>
+<g><circle cx="230" cy="120" r="8" fill="var(--ok)"/><rect class="node ans" x="170" y="20" width="120" height="70" rx="8"/><text x="230" y="42" text-anchor="middle">hook → capture</text><text class="lbl" x="230" y="58" text-anchor="middle">lines 1-4, prompt</text><text class="lbl" x="230" y="74" text-anchor="middle">session.jsonl</text><text class="lbl" x="230" y="150" text-anchor="middle">same second, 0 coins</text></g>
+<g><circle cx="380" cy="120" r="8" fill="var(--warn)"/><rect class="node git" x="320" y="20" width="120" height="70" rx="8"/><text x="380" y="42" text-anchor="middle">git commit</text><text class="lbl" x="380" y="58" text-anchor="middle">ai / ai-edited</text><text class="lbl" x="380" y="74" text-anchor="middle">note + item L-…</text><text class="lbl" x="380" y="150" text-anchor="middle">rules: "mock", "until"</text></g>
+<g><circle cx="530" cy="120" r="8" fill="var(--warn)"/><rect class="node git" x="470" y="20" width="120" height="70" rx="8"/><text x="530" y="42" text-anchor="middle">git push / merge</text><text class="lbl" x="530" y="58" text-anchor="middle">notes travel too</text><text class="lbl" x="530" y="74" text-anchor="middle">post-merge: check</text><text class="lbl" x="530" y="150" text-anchor="middle">weeks pass</text></g>
+<g><circle cx="680" cy="120" r="8" fill="var(--ok)"/><rect class="node ans" x="620" y="20" width="120" height="70" rx="8"/><text x="680" y="42" text-anchor="middle">check: due</text><text class="lbl" x="680" y="58" text-anchor="middle">no references left</text><text class="lbl" x="680" y="74" text-anchor="middle">exit code 2</text><text class="lbl" x="680" y="150" text-anchor="middle">payments-v2 merged</text></g>
+<g><circle cx="830" cy="120" r="8" fill="var(--accent)"/><rect class="node bob" x="770" y="20" width="120" height="70" rx="8"/><text x="830" y="42" text-anchor="middle">Bob removes</text><text class="lbl" x="830" y="58" text-anchor="middle">evidence, tests</text><text class="lbl" x="830" y="74" text-anchor="middle">your approval</text><text class="lbl" x="830" y="150" text-anchor="middle">"remove L-…"</text></g>
+<g><circle cx="940" cy="120" r="8" fill="var(--warn)"/><text class="lbl" x="940" y="150" text-anchor="middle">note: removed</text></g>
+<text class="lbl" x="30" y="200">Any time in between, anyone can run <tspan font-weight="700">whyline why file:line</tspan> and read the prompt. A teammate without Whyline installed changes nothing: the hook is a silent no-op.</text>
+<text class="lbl" x="30" y="222">Overrides are commands, not buttons: <tspan font-weight="700">whyline keep L-… "reason"</tspan> or <tspan font-weight="700">whyline until L-… 2027-01-01</tspan>. Both are recorded as notes.</text>
+</svg></div>
+</div></section>
+
+<!-- 4 STATUS -->
+<section id="status"><div class="card">
+<h2><span class="n">4</span>What exists, what is new, what is optional</h2>
+<div class="two">
+<div><h3>Built and tested <span class="tag ok">20 tests, real Bob output</span></h3>
+<table>
+<tr><td>Bob hooks + installer</td><td><code>whyline init</code>, idempotent, upgrade-safe</td></tr>
+<tr><td>Recorder</td><td><code>capture</code>: exact ranges from write_file and apply_diff</td></tr>
+<tr><td>Commit step</td><td><code>commit</code>: ai / ai-edited, git note, cost from Bob's DB</td></tr>
+<tr><td>Temporary rules</td><td>mock, demo, flag, shim, fixture; date or no_references</td></tr>
+<tr><td>Answers</td><td><code>why</code>, <code>check</code>, <code>keep</code>, <code>until</code>, <code>session-start</code></td></tr>
+<tr><td>Bob mode and skills</td><td>whyline-remover, whyline-remove, whyline-check</td></tr>
+<tr><td>Adapter registry</td><td>bob adapter, shared installer and hook entry, contract tests</td></tr>
+<tr><td>Repo hygiene</td><td>CI, license, changelog, contributing, templates, docs 01 to 08</td></tr>
+</table></div>
+<div><h3>New for the hackathon <span class="tag pur">read-only, on top of notes</span></h3>
+<table>
+<tr><td><code>unreviewed</code></td><td>AI ranges with no human edit since (git blame), coverage when a file exists</td></tr>
+<tr><td><code>bom A..B</code></td><td>lines changed, AI share by agent, reviewed share, items shipped, cost</td></tr>
+<tr><td><code>report</code></td><td>one offline HTML file, look from docs/report-mockup.html, prompts escaped</td></tr>
+<tr><td>Demo repo</td><td><code>demo/</code> builder: small shop, 6 temporary items, 1 control file, payments-v2 branch</td></tr>
+<tr><td>Evidence</td><td><code>bob_sessions/</code> PNGs from both members, usage statement, video</td></tr>
+</table>
+<h3>Only if time allows <span class="tag dim">stretch</span></h3>
+<table>
+<tr><td>Claude Code adapter</td><td>one folder, guide in docs/08</td></tr>
+<tr><td>PR approvals as a review signal</td><td>opt-in, via gh</td></tr>
+<tr><td>Push gate</td><td>PreToolUse blocks git push above a threshold</td></tr>
+<tr><td>seed for old repos</td><td>TODO and FIXME comments, flag files, examples/</td></tr>
+</table></div>
+</div>
+<h3>Real output from the live run (26 Sep 2026, Bob Shell, 0.115 Bobcoin)</h3>
+<div class="term"><span class="p">$</span> whyline why src/payments/checkout.py:1
+src/payments/checkout.py:1
+origin   ai (bob) · session 85228906 · faisal-fida · 2026-09-26 · 0.115372 Bobcoin
+prompt   "Add a mock payment gateway in src/payments/mock_gateway.py ... until payments-v2 lands. Then in src/payments/checkout.py ..."
+siblings src/payments/mock_gateway.py:1-4 · src/payments/checkout.py:5-5
+commit   a0f2cde
+
+<span class="p">$</span> whyline check
+<span class="g">active</span>  L-787fa4  mock    src/payments/mock_gateway.py  3 reference(s): src/payments/checkout.py:1:from payments.mock_gateway import MockGateway ...
+<span class="d">1 active, 0 due, 0 kept/removed.</span></div>
+</div></section>
+
+<!-- 5 REPO -->
+<section id="repo"><div class="card">
+<h2><span class="n">5</span>Where everything lives</h2>
+<p>New code slots next to similar files. Two top-level folders are new: <code>demo/</code> and <code>bob_sessions/</code>. This guide lives in <code>docs/</code> with the rest.</p>
+<div class="tree">whyline/
+├── cli/
+│   ├── index.js                      <span class="e">extend</span>  + unreviewed, bom, report
+│   ├── lib/
+│   │   ├── agents/                   <span class="b">built</span>   registry; bob/ (index.js + assets/); shared/ (hook-entry.sh, install.js)
+│   │   ├── capture.js  commit.js     <span class="b">built</span>   record side, agent-agnostic. Do not change.
+│   │   ├── patch.js  session.js      <span class="b">built</span>
+│   │   ├── classify.js  init.js      <span class="b">built</span>
+│   │   ├── git.js                    <span class="e">extend</span>  + a few read-only helpers (numstat, log ranges)
+│   │   ├── lenses.js                 <span class="e">extend</span>  + unreviewed(), bom()
+│   │   ├── review.js                 <span class="nw">new</span>     "has a human touched this range?" (blame; PR approvals opt-in)
+│   │   ├── coverage.js               <span class="nw">new</span>     reads coverage.xml or lcov.info if present
+│   │   ├── report.js                 <span class="nw">new</span>     builds the page from report-template.html
+│   │   └── report-template.html      <span class="nw">new</span>     based on docs/report-mockup.html
+│   └── test/                         <span class="e">extend</span>  + tests for every new piece, fixtures per agent
+├── demo/                             <span class="nw">new</span>     build.sh, shop-backend/, payloads/ (real Bob hook data)
+├── bob_sessions/                     <span class="nw">new</span>     task summary screenshots (rules require them)
+├── docs/                             <span class="b">built</span>   01 context, 02 Bob docs, 03 shipping, 04 feasibility, 05 architecture,
+│                                              06 conventions, 07 integration landscape, 08 adapters, 09 this guide
+├── README.md  CHANGELOG.md           <span class="e">extend</span>
+└── package.json  LICENSE  .github/   <span class="b">built</span>   no change needed</div>
+<div class="note"><b>Why does demo/ build a repo instead of containing one?</b> Whyline's records live inside a repo's own git data. A script that builds a fresh repo gives the same starting point on every laptop and every video take, and the payloads it replays are real Bob hook data.</div>
+</div></section>
+
+<!-- 6 FUTURE AGENTS -->
+<section id="future"><div class="card">
+<h2><span class="n">6</span>Designed for more agents, without touching the core</h2>
+<p>No cross-agent hook SDK exists (docs/07). The credible tools keep one adapter per agent, and so do we. Each adapter answers the same six questions; everything else reads normalized events.</p>
+<div class="diag"><svg viewBox="0 0 1000 300" xmlns="http://www.w3.org/2000/svg">
+<rect class="node bob" x="20" y="30" width="170" height="70" rx="10"/><text x="105" y="56" text-anchor="middle">IBM Bob</text><text class="lbl" x="105" y="74" text-anchor="middle">.bob/settings.json</text><text class="lbl" x="105" y="90" text-anchor="middle">write_file, apply_diff</text>
+<rect class="node fut" x="20" y="115" width="170" height="70" rx="10"/><text x="105" y="141" text-anchor="middle">Claude Code</text><text class="lbl" x="105" y="159" text-anchor="middle">.claude/settings.json</text><text class="lbl" x="105" y="175" text-anchor="middle">Write, Edit, MultiEdit</text>
+<rect class="node fut" x="20" y="200" width="170" height="70" rx="10"/><text x="105" y="226" text-anchor="middle">Codex · Cursor · …</text><text class="lbl" x="105" y="244" text-anchor="middle">.codex/hooks.json, .cursor/hooks.json</text><text class="lbl" x="105" y="260" text-anchor="middle">same shape, camelCase events</text>
+<rect class="node ans" x="260" y="30" width="200" height="70" rx="10"/><text x="360" y="56" text-anchor="middle">agents/bob/</text><text class="lbl" x="360" y="74" text-anchor="middle">matches · parseEvent · install</text><text class="lbl" x="360" y="90" text-anchor="middle">sessionCost · isWholeFileTool</text>
+<rect class="node fut" x="260" y="115" width="200" height="70" rx="10"/><text x="360" y="141" text-anchor="middle">agents/claude-code/</text><text class="lbl" x="360" y="159" text-anchor="middle">same six members</text><text class="lbl" x="360" y="175" text-anchor="middle">+ fixture test</text>
+<rect class="node fut" x="260" y="200" width="200" height="70" rx="10"/><text x="360" y="226" text-anchor="middle">agents/&lt;id&gt;/</text><text class="lbl" x="360" y="244" text-anchor="middle">one folder, one registry line</text><text class="lbl" x="360" y="260" text-anchor="middle">about 150 lines, 1 to 2 hours</text>
+<path class="edge" d="M190 65 H260"/><path class="edge" d="M190 150 H260"/><path class="edge" d="M190 235 H260"/>
+<rect class="node ans" x="530" y="100" width="180" height="100" rx="10"/><text x="620" y="128" text-anchor="middle">Normalized events</text><text class="lbl" x="620" y="148" text-anchor="middle">prompt · write · session-start · stop</text><text class="lbl" x="620" y="166" text-anchor="middle">{session, file, patch, cwd}</text><text class="lbl" x="620" y="184" text-anchor="middle">agent id stored on every line</text>
+<path class="edge" d="M460 65 C500 65 500 150 530 150"/><path class="edge" d="M460 150 H530"/><path class="edge" d="M460 235 C500 235 500 150 530 150"/>
+<rect class="node ans" x="780" y="30" width="200" height="240" rx="10"/><text class="ttl" x="880" y="58" text-anchor="middle">Agent-agnostic core</text><text class="lbl" x="880" y="86" text-anchor="middle">capture · commit · classify</text><text class="lbl" x="880" y="106" text-anchor="middle">session · patch · git notes</text><text class="lbl" x="880" y="134" text-anchor="middle">why · check · keep · until</text><text class="lbl" x="880" y="154" text-anchor="middle">unreviewed · bom · report</text><text class="lbl" x="880" y="190" text-anchor="middle">never contains</text><text class="lbl" x="880" y="208" text-anchor="middle">"if (agent === …)"</text><text class="lbl" x="880" y="240" text-anchor="middle">shared/hook-entry.sh is one script</text><text class="lbl" x="880" y="256" text-anchor="middle">installed by every adapter</text>
+<path class="edge" d="M710 150 H780"/>
+</svg></div>
+<p style="font-size:13px;color:var(--muted)">Contract tests in <code>cli/test/agents.test.js</code> run against every registered adapter. The step-by-step guide is <code>docs/08-adapters.md</code>. Rulesync can write our hook command into ten agents' native configs later; that is an installer option, not a capture layer.</p>
+</div></section>
+
+<!-- 7 STORY -->
+<section id="story"><div class="card">
+<h2><span class="n">7</span>A real user story, six scenes</h2>
+<div class="story">
+<div class="step"><b>1 · Monday, Bob IDE</b>Developer asks for a mock payment gateway "until payments-v2 lands". Bob writes the file.<div class="w">hooks → capture → session.jsonl</div></div>
+<div class="step"><b>2 · Monday, commit</b>Lines arrived unchanged, so they are "ai". Words "mock" and "until" make item L-… with condition no_references.<div class="w">post-commit → whyline commit → git note</div></div>
+<div class="step"><b>3 · Three weeks later</b>A teammate runs <code>whyline why</code> on a line and reads the original prompt and the item.<div class="w">git blame → note → answer</div></div>
+<div class="step"><b>4 · payments-v2 day</b>The merge removes the last use. <code>check</code> says due. Bob's next session opens with "1 item due". In whyline-remover: "remove L-…". Evidence, tests, approval, commit.<div class="w">post-merge → check → Bob</div></div>
+<div class="step new"><b>5 · Friday, team lead</b><code>whyline unreviewed</code>: AI lines nobody edited since, worst files first, with coverage.<div class="w">notes + blame + coverage</div></div>
+<div class="step new"><b>6 · Release day</b><code>whyline bom v0.1.0..HEAD</code> for the numbers and <code>whyline report</code> for one page everyone can open.<div class="w">notes → JSON + HTML</div></div>
+</div>
+</div></section>
+
+<!-- 8 PLAN -->
+
+<!-- 9 RULES -->
+<section id="rules"><div class="two">
+<div class="card"><h2><span class="n">8</span>Do not change</h2>
+<table>
+<tr><td>Recorder and commit step</td><td><code>capture</code>, <code>commit</code>, <code>patch</code>, <code>session</code>. New features only read what they produce.</td></tr>
+<tr><td>Note format v1</td><td>Every reader depends on it. Add fields, never rename.</td></tr>
+<tr><td>Hook identity</td><td>The installer recognises a Whyline hook by script path plus subcommand (<code>whyline.sh capture</code>), so flags may change; the script name may not.</td></tr>
+<tr><td>Hooks never fail</td><td><code>capture</code>, <code>commit</code>, <code>session-start</code> always exit 0.</td></tr>
+<tr><td><code>check</code> exits 2 when due</td><td>The merge hook and the Bob mode rely on it.</td></tr>
+<tr><td>Removal path</td><td>Evidence, tests, then Bob's own approval. Never auto-delete.</td></tr>
+<tr><td>Zero dependencies, no network</td><td>Anything that talks to GitHub is opt-in.</td></tr>
+</table></div>
+<div class="card"><h2>Check first (Bob IDE)</h2>
+<table>
+<tr><td>Hooks in the IDE</td><td>Live tests used Bob Shell. Confirm the IDE fires the same payloads.</td></tr>
+<tr><td>Cost location in the IDE</td><td>Shell keeps it in ~/.bob/db/bob.db. The IDE may not. If absent, cost is null.</td></tr>
+<tr><td>apply_diff response in the IDE</td><td>The fixture is rebuilt from a Shell capture. If the IDE differs, ranges become approximate. Capture one real example and add it as a test.</td></tr>
+<tr><td>Whyline on the PATH</td><td>Git hooks only run when <code>whyline</code> is found. Use <code>npm link</code> during development.</td></tr>
+<tr><td>No squash merges in the demo</td><td>Squash drops notes on the squashed commits.</td></tr>
+</table></div>
+</div></section>
+
+<!-- 10 REVIEW -->
+
+<p style="color:var(--muted);font-size:12.5px">Technical detail (schemas, algorithms, CLI contract): docs/05-architecture.md. Adapter guide: docs/08-adapters.md. Evidence: docs/04-feasibility.md.</p>
+</main>
+</body>
+</html>
