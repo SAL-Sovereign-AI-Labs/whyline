@@ -6,6 +6,8 @@ Every line an AI agent writes keeps the prompt that caused it, the session, the 
 
 Built for IBM Bob 2.0. Bob's free lifecycle hooks record every write; six skills turn the records into answers inside Bob; git notes store everything. Last year's winner, Pedigree, proved that a commit was AI-written, for auditors. Whyline keeps why each line exists and acts on it, for developers.
 
+Live demo report (the demo shop after the payments-v2 merge, rebuilt by CI): https://sal-sovereign-ai-labs.github.io/whyline/
+
 ![Whyline architecture: Bob writes, hooks record, a commit seals a git note, commands answer, Bob acts](docs/architecture.svg)
 
 ## Install in a repo
