@@ -31,11 +31,11 @@ git blame tells you who. Whyline tells you why. Provenance for AI-written code i
 
 ## IBM Bob usage statement
 
-**Bob inside the product.** Whyline ships as an IBM Bob plugin. `whyline init` installs into `.bob/`: lifecycle hooks (SessionStart, UserPromptSubmit, PostToolUse) and six skills: whyline-why, whyline-check, whyline-decide, whyline-remove, whyline-status and whyline-setup.
+**Bob inside the product.** `whyline init` installs a `.bob/` folder: lifecycle hooks (SessionStart, UserPromptSubmit, PostToolUse) and six skills (why, check, decide, remove, status, setup).
 
 - The SessionStart hook puts one line into Bob's context: which items are due and how many AI lines are unreviewed.
-- The whyline-remove skill works in Agent mode: it runs `whyline check --json`, searches for references, deletes the code, runs the tests, shows an evidence table and waits for Bob's normal approval prompt before committing.
-- The skills answer in plain words through the CLI (why is this line here, keep this flag, what is unreviewed, what is in this release) and never guess an id or a range.
+- The whyline-remove skill works in Agent mode: it runs `whyline check --json`, searches for references, runs the tests, shows an evidence table and waits for Bob's approval prompt before deleting and committing.
+- The other skills answer plain questions through the CLI (why is this line here, keep this flag, what is unreviewed, what shipped) and never guess an id.
 - Each note records the session's Bobcoin cost from Bob's task database, so the bill of materials can say what a release cost.
 
 **Bob building the product.** Every task below has a summary screenshot in `bob_sessions/` and a row in `bob_sessions/costs.md`.
@@ -47,6 +47,8 @@ git blame tells you who. Whyline tells you why. Provenance for AI-written code i
 | A task03 | whyline-decide skill | 0.49 |
 | A task04 | whyline-setup skill | 0.68 |
 | A task05 | dogfood: Whyline installed on Whyline, used on Bob's own work | 3.44 |
+| A task06 | removal take in the demo shop: evidence, dry run, approval, commit | 0.687 |
+| A task07 | removal through the whyline-remove skill in Agent mode | 0.794 |
 | B task01 | bill of materials lens (`cli/lib/bom.js`), passing the tests written for it | 0.605 |
 | B task02 | report renderer and template from the design mockup | 1.755 |
 | B task03 | whyline-status skill | 0.85 |
@@ -57,10 +59,9 @@ git blame tells you who. Whyline tells you why. Provenance for AI-written code i
 | B task08 | code review of the report and bom, two fixes | 4.22 |
 | B task09 | Whyline used from Bob: status questions in the demo shop | 0.132 |
 
+Bob also used Whyline: asked what AI code nobody reviewed, it loaded whyline-status itself and ran three commands. On this repository it found three bugs we fixed: skill files flagged as temporary, a git warning after init, a recursive pre-push hook.
 
-Bob also used Whyline. Asked in plain words what AI code nobody reviewed, it loaded whyline-status by itself and ran three whyline commands. On this repository it found three bugs we fixed: skill files flagged as temporary, a git warning after init, a recursive pre-push hook.
-
-**Other tools, stated plainly.** Most of the CLI core (capture, commit classification, patch parsing, the lenses, init, the adapter registry), the tests and the docs were written by the team with other tools, which cost no Bobcoins. The team reviewed Bob's output before merge; in the report renderer that review caught an injection bug and added a regression test. We used Bob where its work is part of the product and the evidence: the Bob side (hooks, skills), the demo sessions, the dogfood run, the removal takes and the report's user interface.
+**Other tools, stated plainly.** Most of the CLI core, the tests and the docs were written by the team with other tools, which cost no Bobcoins; Bob's output was reviewed before merge and that review caught an injection bug in the report renderer. We used Bob where its work is part of the product and the evidence: hooks and skills, the demo sessions, the dogfood run, the removal takes and the report's user interface.
 
 **watsonx.** Not used. Whyline makes no model calls of its own; temporary code is classified by deterministic rules, and Bob is the only AI in the loop.
 
