@@ -3,6 +3,10 @@
 const git = require('./git');
 const lenses = require('./lenses');
 
+// Agent config folders (.bob/ and the like) are Whyline's own install, not the release: left out of every count.
+const CONFIG_DIRS = require('./agents').all().map(a => a.configDir.replace(/\/$/, ''));
+const isConfig = file => CONFIG_DIRS.some(d => file === d || file.startsWith(d + '/'));
+
 function resolveRange(cwd, range) {
   // undefined => whole history (no tag): range is null, diff from empty tree, commits via rev-list HEAD
   if (range === undefined) {
@@ -29,7 +33,7 @@ function resolveRange(cwd, range) {
 }
 
 function linesChanged(cwd, treeA, treeB) {
-  const out = git.tryGit(['diff', '--numstat', treeA, treeB], { cwd }) || '';
+  const out = git.tryGit(['diff', '--numstat', treeA, treeB, '--', '.', ...CONFIG_DIRS.map(d => `:!${d}`)], { cwd }) || '';
   let total = 0;
   for (const line of out.split('\n').filter(Boolean)) {
     const parts = line.split('\t');
@@ -61,7 +65,7 @@ function run(cwd, range) {
   const sessionIds = new Set();
 
   for (const r of idx.ranges) {
-    if (!commits.has(r.commit)) continue;
+    if (!commits.has(r.commit) || isConfig(r.file)) continue;
     const lineCount = r.lines[1] - r.lines[0] + 1;
     const isAI = r.origin === 'ai' || r.origin === 'ai-edited';
     if (!isAI) continue;
