@@ -25,6 +25,7 @@ Cost is the task's own figure from its task summary (click New task before each 
 | B task04 | Why view as the mockup's code viewer: file map, blame-backed code, line detail with prompt and item (cli/lib/report-template.html; 49/49 tests green; same Bob thread, badge 7.45 minus 3.21) | 4.24 | whyline_b_task04_why_viewer.png |
 | B task05 | Overview panels from the mockup: temporary code by kind, AI share by folder, last removal (cli/lib/report-template.html; 53/53 tests green; same Bob thread, badge 9.19 minus 7.45) | 1.74 | whyline_b_task05_overview_panels.png |
 | B task06 | report usable by keyboard and screen reader: focusable code lines with arrow keys, aria-current, aria-pressed, aria-live detail, focus outlines (cli/lib/report-template.html; 54/54 tests green; same Bob thread, badge 11.63 minus 9.19) | 2.44 | whyline_b_task06_keyboard_a11y.png |
+| B task07 | GitHub Pages workflow that builds the demo shop, merges payments-v2 and publishes its report (.github/workflows/pages.yml; ran the steps locally, 54K page; same Bob thread at 180k context, badge 16.89 minus 11.63) | 5.26 | whyline_b_task07_pages.png |
 
 ## Totals
 

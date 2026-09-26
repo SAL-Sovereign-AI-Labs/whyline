@@ -23,7 +23,7 @@ git blame tells you who. Whyline tells you why. Provenance for AI-written code i
 
 **Who uses it and how.** After `whyline init` there is nothing new to type. Developers ask `whyline why file:line` and get the prompt, the session, the sibling files and its temporary item. Leads run `whyline unreviewed`. Release managers run `whyline bom` for an AI bill of materials. Everyone gets a read-only HTML report, regenerated on every commit. In Bob, skills answer the same questions, and every session opens with what is due.
 
-**Proof on the demo shop.** 59 of 205 lines are AI-written (29%) across 7 Bob sessions. Six temporary items were recorded at birth and one is due. Merging the payments-v2 branch leaves the mock gateway unreferenced, `check` reports two due, and the remover mode takes it out after approval. 55 tests pass.
+**Proof on the demo shop.** 59 of 89 lines are AI-written (66%) across 7 Bob sessions. Six temporary items were recorded at birth and one is due. Merging the payments-v2 branch leaves the mock gateway unreferenced, `check` reports two due, and the remover mode takes it out after approval. 55 tests pass.
 
 **Why it is new.** Last hackathon's winner, Pedigree, proved that a commit was AI-written, for auditors. Whyline keeps why each line exists and acts on it, for developers: the prompt per line, the lifecycle of temporary code, what nobody reviewed, and a bill of materials per release. Zero dependencies, no servers, nothing leaves the laptop. Squash merges drop notes, a stated limitation; amend and rebase keep them, and a pre-push hook shares them.
 

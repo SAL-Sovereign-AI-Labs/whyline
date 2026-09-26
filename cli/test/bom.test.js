@@ -146,6 +146,22 @@ test('a repo with no notes: unknown is null with the fix named, never a zero', (
   assert.doesNotMatch(out, /null/);
 });
 
+test('the .bob/ install is not part of the bill of materials', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'whyline-bom-config-'));
+  sh(dir, 'git', ['init', '-q', '-b', 'main']);
+  humanWrite(dir, 'app.py', 'x = 1\n');
+  humanWrite(dir, '.bob/settings.json', '{\n  "hooks": {}\n}\n');
+  humanWrite(dir, '.bob/skills/a/SKILL.md', 'one\ntwo\n');
+  sh(dir, 'git', ['add', '.']); sh(dir, 'git', ['commit', '-q', '-m', 'app and whyline install']);
+  const head = sh(dir, 'git', ['rev-parse', 'HEAD']);
+  require('../lib/git').notesAdd(dir, head, { v: 1, items: [], sessions: { s: { agent: 'bob', cost: null } }, ranges: [
+    { file: 'app.py', lines: [1, 1], origin: 'ai', session: 's' },
+    { file: '.bob/skills/a/SKILL.md', lines: [1, 2], origin: 'ai', session: 's' }] });
+  const r = bom.run(dir, undefined);
+  assert.equal(r.linesChanged, 1, 'only app.py');
+  assert.equal(r.ai.total, 1, 'AI lines under .bob/ are left out too, so the share stays within 100%');
+});
+
 test('an unknown rev throws with the fix named', () => {
   assert.throws(() => bom.run(fx.dir, 'nope..HEAD'), /nope.*(git log|tag|commit)/i);
 });
