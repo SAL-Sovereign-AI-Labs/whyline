@@ -6,18 +6,24 @@ const git = require('./git');
 const classify = require('./classify');
 const lenses = require('./lenses');
 
-const MARKER = /\b(TODO\s*remove|TODO\s*\(?remove|FIXME|HACK|XXX|temporary|temporarily|workaround|remove (this|me|after|once|when)|until [A-Za-z0-9._-]+ (lands|ships|is merged|is done))\b/i;
-const CODE_EXCLUDES = ['.bob/**', '.claude/**', '*.md', '*.txt', 'docs/**', 'node_modules/**', '*.lock', '*.json'];
+// A marker counts only inside a comment (#, //, /*, *, <!--, --) and only when it is actionable: a TODO/FIXME/HACK/XXX
+// tag, a "remove after/once/when ..." instruction, "until <thing> lands/ships", or "temporary" next to such a word.
+// The bare word "temporary" in code or strings is not a marker (this repository talks about temporary code everywhere).
+const COMMENT = /(^|\s)(#|\/\/|\/\*|\*|<!--|--)\s*(.*)$/;
+const MARKER = /\b(TODO|FIXME|HACK|XXX)\b|\bremove\s+(this|me|after|once|when|before)\b|\buntil\s+[A-Za-z0-9._-]+\s+(lands|ships|is merged|is done|is ready)\b|\btemporar(y|ily)\s+(workaround|hack|fix|shim|until)\b|\bworkaround\s+(until|for now)\b/i;
+const CODE_EXCLUDES = ['.bob/**', '.claude/**', '*.md', '*.txt', 'docs/**', 'node_modules/**', '*.lock', '*.json', 'tests/**', 'test/**', '*.test.*', '*_test.*', 'test_*'];
 
 // byName: also take files whose name or folder looks temporary (mock_, compat_, examples/, fixtures/). Off by default:
 // a product's own demo/ or examples/ folder is not temporary code, so name-only hits are shown as candidates.
 function scan(cwd, { byName = false } = {}) {
   const found = new Map(); // file -> {line, text, byName}
-  const hits = git.tryGit(['grep', '-n', '-I', '-i', '-E', '-e', 'TODO ?\\(?remove|FIXME|HACK|XXX|temporar|workaround|remove (this|me|after|once|when)|until [A-Za-z0-9._-]+ (lands|ships|is merged|is done)', '--', ...CODE_EXCLUDES.map(x => `:!${x}`)], { cwd }) || '';
+  const hits = git.tryGit(['grep', '-n', '-I', '-i', '-E', '-e', 'TODO|FIXME|HACK|XXX|remove (this|me|after|once|when|before)|until [A-Za-z0-9._-]+ (lands|ships|is merged|is done|is ready)|temporar|workaround', '--', ...CODE_EXCLUDES.map(x => `:!${x}`)], { cwd }) || '';
   for (const h of hits.split('\n').filter(Boolean)) {
     const m = h.match(/^([^:]+):(\d+):(.*)$/);
-    if (!m || !MARKER.test(m[3])) continue;
-    if (!found.has(m[1])) found.set(m[1], { line: +m[2], text: m[3].trim().replace(/^[#/*\s-]+/, '').slice(0, 140) });
+    if (!m) continue;
+    const c = m[3].match(COMMENT);
+    if (!c || !MARKER.test(c[3])) continue;
+    if (!found.has(m[1])) found.set(m[1], { line: +m[2], text: c[3].trim().replace(/^[#/*\s-]+/, '').replace(/\*\/\s*$/, '').slice(0, 140) });
   }
   const files = (git.tryGit(['ls-files'], { cwd }) || '').split('\n').filter(Boolean);
   for (const f of files) {
