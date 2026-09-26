@@ -125,3 +125,13 @@ test('collect: a repo with no notes gives an empty list, not an error', () => {
   sh(dir, ['commit', '-q', '--allow-empty', '-m', 'init']);
   assert.deepEqual(report.collect(dir), { files: [], skipped: 0 });
 });
+
+test('empty repo: every view says what to do next instead of an empty table', () => {
+  const html = report.render({ ...BASE_DATA, notes: 0, why: { files: [], skipped: 0 } });
+  for (const hint of ['no AI-written lines at HEAD yet', 'no temporary items yet', 'no AI-written lines recorded yet', 'no sessions yet']) assert.ok(html.includes(hint), hint);
+});
+
+test('expiry filters cover every lifecycle state, kept included', () => {
+  const html = report.render(BASE_DATA);
+  for (const f of ['all', 'due', 'active', 'kept', 'removed']) assert.match(html, new RegExp(`data-f="${f}"`));
+});
