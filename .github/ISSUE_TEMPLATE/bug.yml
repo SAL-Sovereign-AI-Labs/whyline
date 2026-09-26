@@ -1,0 +1,29 @@
+name: Bug report
+description: Something did not work as documented
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What you did, what you expected, what you saw.
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      placeholder: 1. whyline init  2. ...  3. ...
+    validations:
+      required: true
+  - type: textarea
+    id: env
+    attributes:
+      label: Environment
+      value: |
+        OS:
+        Node version (node -v):
+        Bob version (IDE or Shell):
+        whyline version (whyline --version):
+    validations:
+      required: true

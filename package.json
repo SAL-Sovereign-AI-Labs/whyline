@@ -2,6 +2,7 @@
   "name": "whyline",
   "version": "0.1.0",
   "description": "Provenance for AI-written code. Every line keeps the prompt that caused it. Built for IBM Bob.",
+  "type": "commonjs",
   "license": "MIT",
   "bin": {
     "whyline": "cli/index.js"
@@ -18,7 +19,8 @@
   },
   "scripts": {
     "test": "node --test cli/test/*.test.js",
-    "coverage": "node --test --experimental-test-coverage cli/test/*.test.js"
+    "coverage": "node --test --experimental-test-coverage cli/test/*.test.js",
+    "smoke": "node cli/index.js --help >/dev/null && node cli/index.js --version"
   },
   "keywords": [
     "ibm-bob",
@@ -32,5 +34,11 @@
     "type": "git",
     "url": "https://github.com/SAL-Sovereign-AI-Labs/whyline"
   },
-  "homepage": "https://github.com/SAL-Sovereign-AI-Labs/whyline#readme"
+  "homepage": "https://github.com/SAL-Sovereign-AI-Labs/whyline#readme",
+  "bugs": {
+    "url": "https://github.com/SAL-Sovereign-AI-Labs/whyline/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
 }

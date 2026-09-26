@@ -3,7 +3,7 @@
 // whyline: provenance for AI-written code. Commands never throw at the agent: hook commands always exit 0.
 const fs = require('node:fs');
 
-const USAGE = `whyline <command>
+const USAGE = `whyline <command> [--json]
 
   init                      install Bob hooks (.bob/) and git hooks in this repo
   capture                   hook: read a Bob/Claude payload on stdin, record the write
@@ -13,24 +13,45 @@ const USAGE = `whyline <command>
   check [--json]            temporary items that are due (exit 2 when any)
   keep <id> "<reason>"      mark an item permanent
   until <id> <YYYY-MM-DD>   change an item's condition to a date
+  --version, --help
+
+Exit codes: 0 ok, 1 usage or error, 2 check found due items, 3 not a git repository.
+Env: WHYLINE_DEBUG=1 prints stack traces to stderr. WHYLINE_BOB_DB overrides the Bob database path.
 `;
 
 function readStdin() {
   try { return fs.readFileSync(0, 'utf8'); } catch { return ''; }
 }
 
+const DEBUG = !!process.env.WHYLINE_DEBUG;
+function debug(area, msg) { if (DEBUG) process.stderr.write(`[whyline:${area}] ${msg}\n`); }
+
 function main(argv) {
+  try { return dispatch(argv); } catch (e) {
+    process.stderr.write(`whyline: ${e && e.message ? e.message : String(e)}\n`);
+    debug('main', e && e.stack ? e.stack : '');
+    return 1;
+  }
+}
+
+function dispatch(argv) {
   const [cmd, ...rest] = argv;
   const cwd = process.cwd();
   const json = rest.includes('--json');
   const args = rest.filter(a => a !== '--json');
   switch (cmd) {
+    case '--version': case '-v':
+      console.log(require('../package.json').version);
+      return 0;
+    case '--help': case '-h': case 'help':
+      process.stdout.write(USAGE);
+      return 0;
     case 'capture': {
       const session = require('./lib/session');
       try {
         const payload = JSON.parse(readStdin() || '{}');
         require('./lib/capture').handle(payload, { cwd });
-      } catch (e) { session.logError(cwd, `capture: ${e.message}`); }
+      } catch (e) { session.logError(cwd, `capture: ${e.message}`); debug('capture', e.stack || ''); }
       return 0;
     }
     case 'session-start': {
@@ -79,8 +100,9 @@ function main(argv) {
     case 'init':
       return require('./lib/init').run(cwd, { claude: args.includes('--claude') });
     default:
-      process.stdout.write(USAGE);
-      return cmd ? 1 : 0;
+      if (!cmd) { process.stdout.write(USAGE); return 0; }
+      process.stderr.write(`Unknown command: ${cmd}\nRun whyline --help for usage.\n`);
+      return 1;
   }
 }
 

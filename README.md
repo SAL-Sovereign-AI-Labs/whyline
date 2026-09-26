@@ -38,15 +38,39 @@ In Bob: `/whyline-check` lists due items, and the `whyline-remover` mode removes
 
 Costs 0 Bobcoins. Hooks are deterministic; Bob is only used for removals.
 
-## Develop
-
-```sh
-npm test                      # node:test, builds temp git repos
-npm link                      # puts `whyline` on your PATH
-```
-
-Requires Node 20+ and git. Bob Shell 2.x or Bob IDE 2.2+.
-
 ## Status
 
 Hackathon build (IBM Bob 2.0 Hackathon, 25 to 27 Sep 2026). See docs/ for the research, evidence and architecture.
+
+## CLI
+
+| Command | Purpose | Exit code |
+|---|---|---|
+| `whyline init` | install Bob and git hooks in the current repo | 0, 3 if not a git repo |
+| `whyline why <file>:<line> [--json]` | origin, prompt, session, cost, siblings, item | 0 |
+| `whyline check [--json]` | temporary items and their status | 2 when any item is due, else 0 |
+| `whyline keep <id> "<reason>"` | mark an item permanent | 0 |
+| `whyline until <id> <YYYY-MM-DD>` | set a date condition | 0 |
+| `whyline capture`, `whyline session-start`, `whyline commit` | hook entry points, always exit 0 | 0 |
+
+`--json` prints machine-readable output with no ANSI codes. Environment: `WHYLINE_DEBUG=1` prints stack traces to stderr, `WHYLINE_BOB_DB` overrides the Bob database path.
+
+## Requirements
+
+Node 20 or newer, git. Bob IDE 2.2 or Bob Shell 2.x for the hooks. macOS and Linux are tested in CI; Windows needs Git Bash for the shell hook and is untested.
+
+## Private by design
+
+Whyline sends nothing over the network. Prompts are stored as git notes in your own repository.
+
+## Development
+
+```sh
+npm test            # tests on temp git repos
+npm run coverage
+npm run smoke
+```
+
+## License
+
+MIT

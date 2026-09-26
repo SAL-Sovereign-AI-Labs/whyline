@@ -17,4 +17,5 @@ jobs:
           node-version: ${{ matrix.node }}
       - run: git config --global user.name ci && git config --global user.email ci@example.invalid
       - run: npm test
-      - run: node cli/index.js --help >/dev/null
+      - run: npm run smoke
+      - run: node cli/index.js check --json | node -e "JSON.parse(require('fs').readFileSync(0,'utf8'))"
