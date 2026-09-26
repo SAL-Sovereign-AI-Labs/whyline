@@ -74,7 +74,7 @@ Hackathon build (IBM Bob 2.0 Hackathon, 25 to 27 Sep 2026). See docs/ for the re
 
 ## Speed
 
-Measured on this repo's demo, median of 10 runs on a 2023 MacBook Pro: capture hook 166 ms, `check` 129 ms, session-start line 277 ms. Recording costs 0 Bobcoins.
+Measured on this repo's demo, median of 10 runs on a MacBook Pro with an Apple M1 Pro: capture hook 166 ms, `check` 129 ms, session-start line 277 ms. Recording costs 0 Bobcoins.
 
 ## Requirements
 
