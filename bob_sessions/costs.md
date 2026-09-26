@@ -29,6 +29,7 @@ Cost is the task's own figure from its task summary (click New task before each 
 | B task07 | GitHub Pages workflow that builds the demo shop, merges payments-v2 and publishes its report (.github/workflows/pages.yml; ran the steps locally, 54K page; same Bob thread at 180k context, badge 16.89 minus 11.63) | 5.26 | whyline_b_task07_pages.png |
 | B tasks01-07 | the shared thread behind tasks 01 to 07: 180.3k of 270k context tokens, badge 16.89 (the sum of the rows above); context breakdown screenshot | (sum above) | whyline_b_tasks01-07_thread_summary.png |
 | B task08 | Bob code review of bom.js, report.js, report-template.html: 9 findings, 2 real (overview showed "no data" for a real zero) fixed with a test, 7 explained as not bugs; first task in a new thread (72.5k context) | 4.22 | whyline_b_task08_review.png |
+| B task09 | Whyline used from Bob in the demo shop: a plain question loaded the whyline-status skill, which ran whyline unreviewed, bom and report; answers matched the CLI (47 unreviewed lines in 12 files; 59 of 93 lines AI, 2 due at that build); report opened in Bob's browser (new thread, 17.9k context) | 0.132 | whyline_b_task09_status_1_skill_approval.png to _4_answer.png, whyline_b_task09_report_overview.png, _why.png, _expiry.png |
 
 ## Totals
 
