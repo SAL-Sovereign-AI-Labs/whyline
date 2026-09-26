@@ -26,6 +26,6 @@ test('init installs .bob files and git hooks, merges without dropping user hooks
   assert.equal(execFileSync('git', ['config', 'notes.rewriteRef'], { cwd: dir, encoding: 'utf8' }).trim(), 'refs/notes/whyline');
   assert.equal(execFileSync('git', ['config', '--get-all', 'notes.displayRef'], { cwd: dir, encoding: 'utf8' }).trim().split('\n').length, 1, 'displayRef added once');
   const pc = fs.readFileSync(path.join(dir, '.git', 'hooks', 'post-commit'), 'utf8');
-  assert.match(pc, /whyline commit/);
+  assert.match(pc, /whyline commit; whyline report/);
   assert.equal((pc.match(/whyline commit/g) || []).length, 1);
 });
