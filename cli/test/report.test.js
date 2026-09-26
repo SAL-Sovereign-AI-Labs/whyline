@@ -135,3 +135,9 @@ test('expiry filters cover every lifecycle state, kept included', () => {
   const html = report.render(BASE_DATA);
   for (const f of ['all', 'due', 'active', 'kept', 'removed']) assert.match(html, new RegExp(`data-f="${f}"`));
 });
+
+test('overview panels: kinds, folders and last removal come from real data, and say so when empty', () => {
+  const html = report.render(BASE_DATA);
+  for (const id of ['ovKindTable', 'ovFolderTable', 'ovLastRemoval']) assert.ok(html.includes(`id="${id}"`), id);
+  assert.ok(html.includes('nothing removed yet'), 'empty last-removal message');
+});
