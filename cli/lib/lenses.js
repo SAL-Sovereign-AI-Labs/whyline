@@ -32,16 +32,53 @@ function why(cwd, file, line) {
 
 function latestItem(cwd, id) { return index(cwd).items.get(id) || null; }
 
-// Evaluate each active item's condition. Returns {due:[], active:[], other:[]}.
+// Lifecycle: active -> due -> kept | removed. `active` and `due` are computed from the repo every run;
+// `kept` and `removed` are recorded decisions. Returns {due, active, other, counts}. Every item carries `state`.
+const LIFECYCLE = ['active', 'due', 'kept', 'removed'];
+
 function check(cwd, { today = new Date() } = {}) {
   const { items } = index(cwd);
   const due = [], active = [], other = [];
   for (const it of items.values()) {
-    if (it.status !== 'active') { other.push(it); continue; }
+    if (it.status !== 'active') { other.push({ ...it, state: it.status }); continue; }
     const r = evaluate(cwd, it, today);
-    (r.due ? due : active).push({ ...it, evidence: r.evidence });
+    const state = r.due ? 'due' : 'active';
+    (r.due ? due : active).push({ ...it, state, evidence: r.evidence });
   }
-  return { due, active, other };
+  const counts = Object.fromEntries(LIFECYCLE.map(k => [k, 0]));
+  for (const it of [...due, ...active, ...other]) counts[it.state] = (counts[it.state] || 0) + 1;
+  return { due, active, other, counts };
+}
+
+// Record a decision or a condition change for an item as a note on HEAD (folded by readers, latest wins).
+function recordItemChange(cwd, id, change) {
+  const head = git.head(cwd);
+  if (!head) throw new Error('not a git repository with commits');
+  if (!index(cwd).items.has(id)) throw new Error(`unknown item ${id} (run: whyline check)`);
+  const note = git.notesShow(cwd, head) || { v: 1, sessions: {}, ranges: [], items: [] };
+  // if the item was born on HEAD itself, keep its original fields and layer the change on top
+  const existing = (note.items || []).find(i => i.id === id) || {};
+  note.items = [...(note.items || []).filter(i => i.id !== id), { ...existing, id, ...change, by: git.userName(cwd), at: new Date().toISOString() }];
+  git.notesAdd(cwd, head, note);
+  return head;
+}
+
+// AI lines in HEAD that no human has edited since the agent wrote them, per file, with coverage when a report exists.
+function unreviewed(cwd) {
+  const review = require('./review');
+  const coverage = require('./coverage');
+  const idx = index(cwd);
+  const root = git.repoRoot(cwd);
+  const cov = coverage.load(root);
+  const files = review.unreviewedByFile(cwd, idx).map(f => {
+    const c = coverage.forLines(cov, f.file, f.aiLines);
+    return { file: f.file, aiLines: f.aiLines.length, editedRanges: f.editedRanges, sessions: f.sessions,
+      coverage: c && c.measured ? Math.round(100 * c.covered / c.measured) : null };
+  }).sort((a, b) => b.aiLines - a.aiLines);
+  const totals = { aiLines: files.reduce((n, f) => n + f.aiLines, 0), files: files.filter(f => f.aiLines > 0).length, coverageSource: cov ? cov.source : null };
+  const missing = [];
+  if (!cov) missing.push('coverage');
+  return { files, totals, missing };
 }
 
 function evaluate(cwd, it, today) {
@@ -59,4 +96,4 @@ function evaluate(cwd, it, today) {
   return { due: false, evidence: 'unknown condition' };
 }
 
-module.exports = { index, why, check, evaluate };
+module.exports = { index, why, check, evaluate, unreviewed, recordItemChange, LIFECYCLE };

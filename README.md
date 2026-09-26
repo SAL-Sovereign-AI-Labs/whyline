@@ -22,10 +22,19 @@ Then work in Bob as usual. Nothing new to type.
 
 ```sh
 whyline why src/payments/checkout.py:12   # who wrote it, and why
-whyline check                             # temporary code that is due for removal
-whyline keep L-787fa4 "kept: beta flag stays until Q1 review"
+whyline check                             # temporary code and its lifecycle state
+whyline unreviewed                        # AI lines no human has edited since, with coverage if you have a report
+whyline keep L-787fa4 "beta flag stays until Q1 review"
 whyline until L-787fa4 2027-01-01
+whyline watch L-787fa4 --symbol BetaFlag  # fix the symbol the reference check looks for
 ```
+
+Lifecycle of a temporary item:
+
+```
+active --(condition met: date passed, or no references left)--> due --(you decide)--> kept | removed
+```
+`active` and `due` are recomputed from the repo on every `check`, so they never go stale. `kept` and `removed` are recorded decisions. Bob never changes a state on its own.
 
 In Bob: `/whyline-check` lists due items, and the `whyline-remover` mode removes one with evidence and your approval.
 
@@ -48,12 +57,24 @@ Hackathon build (IBM Bob 2.0 Hackathon, 25 to 27 Sep 2026). See docs/ for the re
 |---|---|---|
 | `whyline init` | install Bob and git hooks in the current repo | 0, 3 if not a git repo |
 | `whyline why <file>:<line> [--json]` | origin, prompt, session, cost, siblings, item | 0 |
-| `whyline check [--json]` | temporary items and their status | 2 when any item is due, else 0 |
+| `whyline check [--json]` | temporary items with lifecycle state and evidence | 2 when any item is due, else 0 |
+| `whyline unreviewed [--json]` | AI lines with no human edit since, per file, coverage from coverage.xml or lcov.info | 0 |
+| `whyline watch <id> --symbol Name` | change the symbol the reference check searches for | 0 |
 | `whyline keep <id> "<reason>"` | mark an item permanent | 0 |
 | `whyline until <id> <YYYY-MM-DD>` | set a date condition | 0 |
 | `whyline capture`, `whyline session-start`, `whyline commit` | hook entry points, always exit 0 | 0 |
 
 `--json` prints machine-readable output with no ANSI codes. Environment: `WHYLINE_DEBUG=1` prints stack traces to stderr, `WHYLINE_BOB_DB` overrides the Bob database path.
+
+## Known limitations
+
+- Squash merges drop the notes of the squashed commits. Amend and rebase keep them (init sets `notes.rewriteRef`).
+- The reference check is text search (git grep for the symbol and the module name). Code reached only through strings or reflection can look unreferenced, which is why removal always goes through Bob's evidence step and your approval.
+- "Unreviewed" means no human edit since the agent wrote the line. Review comments and PR approvals are not read yet.
+
+## Speed
+
+Measured on this repo's demo, median of 10 runs on a 2023 MacBook Pro: capture hook 166 ms, `check` 129 ms, session-start line 277 ms. Recording costs 0 Bobcoins.
 
 ## Requirements
 

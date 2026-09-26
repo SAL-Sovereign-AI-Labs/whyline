@@ -10,9 +10,14 @@ const USAGE = `whyline <command> [--json]
   session-start             hook: print a one-line summary for Bob's context
   commit                    git post-commit: attach the provenance note to HEAD
   why <file>:<line>         who wrote this line, and why
-  check [--json]            temporary items that are due (exit 2 when any)
-  keep <id> "<reason>"      mark an item permanent
-  until <id> <YYYY-MM-DD>   change an item's condition to a date
+  check [--json]            temporary items and their lifecycle state (exit 2 when any is due)
+  unreviewed [--json]       AI lines no human has edited since, per file, with coverage if a report exists
+  keep <id> "<reason>"      decision: keep permanently          (due -> kept)
+  until <id> <YYYY-MM-DD>   change the condition to a date       (stays active)
+  watch <id> --symbol Name  fix the symbol the reference check searches for
+
+Lifecycle:  active --(condition met)--> due --(you decide)--> kept | removed
+            active and due are recomputed from the repo on every check; kept and removed are recorded.
   --version, --help
 
 Exit codes: 0 ok, 1 usage or error, 2 check found due items, 3 not a git repository.
@@ -61,9 +66,15 @@ function dispatch(argv) {
       return 0;
     }
     case 'session-start': {
+      // stdout is injected into Bob's context. One line, actionable, only when there is something to act on.
       try {
-        const r = require('./lib/lenses').check(cwd);
-        if (r.due.length) process.stdout.write(`whyline: ${r.due.length} temporary item(s) due for removal (run: whyline check)\n`);
+        const lenses = require('./lib/lenses');
+        const r = lenses.check(cwd);
+        const parts = [];
+        if (r.due.length) parts.push(`${r.due.length} temporary item(s) due for removal: ${r.due.map(i => i.id).join(', ')}. To act, switch to the whyline-remover mode and say "remove ${r.due[0].id}"`);
+        const u = lenses.unreviewed(cwd);
+        if (u.totals.aiLines) parts.push(`${u.totals.aiLines} AI-written line(s) in ${u.totals.files} file(s) have had no human edit since (run: whyline unreviewed)`);
+        if (parts.length) process.stdout.write(`whyline: ${parts.join('. ')}\n`);
       } catch { /* silent by design */ }
       return 0;
     }
@@ -85,22 +96,37 @@ function dispatch(argv) {
     case 'check': {
       const r = require('./lib/lenses').check(cwd);
       if (json) { console.log(JSON.stringify(r, null, 2)); return r.due.length ? 2 : 0; }
+      if (!r.due.length && !r.active.length && !r.other.length) { console.log('no temporary items yet (commit something Bob wrote, then check again)'); return 0; }
       for (const it of r.due) console.log(`due     ${it.id}  ${it.kind.padEnd(7)} ${it.file}:${it.lines.map(x => x.join('-')).join(',')}  ${it.evidence}  "${it.reason}"`);
       for (const it of r.active) console.log(`active  ${it.id}  ${it.kind.padEnd(7)} ${it.file}  ${it.evidence}`);
-      console.log(`${r.active.length} active, ${r.due.length} due, ${r.other.length} kept/removed.${r.due.length ? ' Ask Bob: "remove <id>"' : ''}`);
+      for (const it of r.other) console.log(`${it.state.padEnd(7)} ${it.id}  ${(it.kind || '').padEnd(7)} ${it.file || ''}  ${it.reason ? '"' + it.reason + '"' : ''}`);
+      const c = r.counts;
+      console.log(`lifecycle: ${c.active} active · ${c.due} due · ${c.kept} kept · ${c.removed} removed${r.due.length ? `. Next: tell Bob "remove ${r.due[0].id}" (mode whyline-remover), or whyline keep / until` : ''}`);
       return r.due.length ? 2 : 0;
     }
+    case 'unreviewed': {
+      const r = require('./lib/lenses').unreviewed(cwd);
+      if (json) { console.log(JSON.stringify(r, null, 2)); return 0; }
+      if (!r.files.length) { console.log('no AI-written lines recorded yet (commit something Bob wrote, then run again)'); return 0; }
+      console.log('file'.padEnd(44) + 'ai lines  edited  coverage');
+      for (const f of r.files) console.log(`${f.file.padEnd(44)}${String(f.aiLines).padStart(8)}  ${String(f.editedRanges).padStart(6)}  ${f.coverage == null ? 'no data' : f.coverage + '%'}`);
+      console.log(`${r.totals.aiLines} unreviewed AI lines in ${r.totals.files} file(s)${r.totals.coverageSource ? `, coverage from ${r.totals.coverageSource}` : ', no coverage report found (coverage.xml or lcov.info)'}`);
+      return 0;
+    }
     case 'keep':
-    case 'until': {
-      const id = args[0], value = args[1];
-      if (!id || !value) { process.stderr.write(`usage: whyline ${cmd} <id> ${cmd === 'keep' ? '"<reason>"' : '<YYYY-MM-DD>'}\n`); return 1; }
-      const git = require('./lib/git');
-      const head = git.head(cwd);
-      const note = git.notesShow(cwd, head) || { v: 1, sessions: {}, ranges: [], items: [] };
-      const patchItem = cmd === 'keep' ? { id, status: 'kept', reason: value } : { id, status: 'active', condition: { type: 'date', on: value } };
-      note.items = [...(note.items || []).filter(i => i.id !== id), { ...patchItem, by: git.userName(cwd), at: new Date().toISOString() }];
-      git.notesAdd(cwd, head, note);
-      console.log(`${id}: ${cmd === 'keep' ? 'kept permanently' : 'due on ' + value} (recorded on ${head.slice(0, 7)})`);
+    case 'until':
+    case 'watch': {
+      const id = args[0], value = args[1] === '--symbol' ? args[2] : args[1];
+      const usage = { keep: '"<reason>"', until: '<YYYY-MM-DD>', watch: '--symbol <Name>' }[cmd];
+      if (!id || !value) { process.stderr.write(`usage: whyline ${cmd} <id> ${usage}\n`); return 1; }
+      if (cmd === 'until' && !/^\d{4}-\d{2}-\d{2}$/.test(value)) { process.stderr.write('until: date must be YYYY-MM-DD\n'); return 1; }
+      const lenses = require('./lib/lenses');
+      const change = cmd === 'keep' ? { status: 'kept', reason: value }
+        : cmd === 'until' ? { status: 'active', condition: { type: 'date', on: value } }
+        : { status: 'active', condition: { type: 'no_references', symbol: value } };
+      const head = lenses.recordItemChange(cwd, id, change);
+      const said = { keep: 'kept permanently', until: `due on ${value}`, watch: `now watching symbol ${value}` }[cmd];
+      console.log(`${id}: ${said} (recorded on ${head.slice(0, 7)})`);
       return 0;
     }
     case 'init':
