@@ -9,7 +9,7 @@
 :root{--bg:#f6f5f1;--surface:#fff;--surface2:#f1efe9;--ink:#15171c;--muted:#5d6471;--faint:#676d78;--line:#e5e2da;--line2:#d9d5cb;
 --side:#fbfaf7;--sideink:#3a3f48;--navon:#15171c;--navonink:#fff;
 --ai:#2f6bff;--aibg:rgba(47,107,255,.10);--edit:#8c5f00;--editbg:rgba(201,138,0,.13);--tmp:#7c4dff;--tmpbg:rgba(124,77,255,.11);--human:#a3a9b3;
---due:#d7263d;--duebg:rgba(215,38,61,.08);--ok:#15803d;--okbg:rgba(21,128,61,.10);--kept:#4f6077;--keptbg:rgba(79,96,119,.12);--removed:#8e949f;--removedbg:rgba(142,148,159,.10);
+--due:#d7263d;--duebg:rgba(215,38,61,.08);--ok:#127036;--okbg:rgba(18,112,54,.10);--kept:#4f6077;--keptbg:rgba(79,96,119,.12);--removed:#8e949f;--removedbg:rgba(142,148,159,.10);
 --term:#14161b;--termink:#dfe4ec;--termmuted:#8d96a5;--shadow:0 1px 2px rgba(20,23,28,.04),0 2px 8px rgba(20,23,28,.04)}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#0b0d11;--surface:#12151b;--surface2:#191d25;--ink:#e9ecf1;--muted:#9aa3b1;--faint:#808896;--line:#232833;--line2:#2e3441;
 --side:#090b0e;--sideink:#b8bfca;--navon:#1d2230;--navonink:#fff;
@@ -1585,7 +1585,7 @@ if (unrevFiles > 0) document.getElementById('unrevCnt').className = 'cnt rev';
   // record health
   function stamp(ts) { return ts ? String(ts).slice(0, 10) + ' ' + String(ts).slice(11, 16) + ' UTC' : 'no data'; }
   var tiles = [
-    ['Notes', nd(DATA.notes), 'one per commit with AI lines'],
+    ['Notes', nd(DATA.notes), 'attached to commits in git'],
     ['Ranges', nd(DATA.ranges ? ranges.length : null), 'line ranges with a prompt'],
     ['Sessions', nd(DATA.sessions ? n : null), 'agent sessions'],
     ['HEAD', DATA.head ? '<span class="mono st-head" title="' + esc(DATA.head) + '">' + esc(shortHead) + '</span>' : '<span class="st-nd">no data</span>', 'generated ' + esc(stamp(DATA.generatedAt))]
@@ -1644,13 +1644,13 @@ if (unrevFiles > 0) document.getElementById('unrevCnt').className = 'cnt rev';
         if (!t.clientHeight) return;
         var fits = t.scrollHeight <= t.clientHeight + 1;
         d.classList.toggle('fits', fits);
-        d.querySelector('summary').setAttribute('tabindex', fits ? '-1' : '0');
       });
     }
     dets.forEach(function(d) {
       d.querySelector('summary').addEventListener('click', function(e) { if (d.classList.contains('fits')) e.preventDefault(); });
     });
-    if (typeof ResizeObserver === 'function') new ResizeObserver(fit).observe(box);
+    // measure on the next frame so a layout change caused by fit() never re-enters the observer
+    if (typeof ResizeObserver === 'function') new ResizeObserver(function() { requestAnimationFrame(fit); }).observe(box);
     else window.addEventListener('resize', fit);
     fit();
   }
