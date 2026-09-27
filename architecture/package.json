@@ -1,0 +1,25 @@
+{
+  "name": "whyline-architecture",
+  "private": true,
+  "description": "The interactive Whyline architecture page and the recorder for its README GIFs. Not part of the npm package.",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --open",
+    "build": "vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "gifs": "node scripts/gif.mjs whyline-1-editor whyline-2-team --out ../docs/figures"
+  },
+  "dependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^6.1.1",
+    "playwright": "^1.50.0",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.0"
+  }
+}

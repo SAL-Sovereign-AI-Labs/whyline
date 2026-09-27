@@ -90,23 +90,47 @@ What Whyline does not claim:
 
 ## Under the hood
 
-For the curious: two animated diagrams of the moving parts, with the real file and event names. Each plays its steps in a loop.
+For the curious: the moving parts, with the real file and event names. Each clip plays one step and loops. To click through the steps yourself at 0.5×, 1× or 2× speed, run the interactive version in [architecture/](architecture/).
 
-**1. In your editor.** You ask Bob, the scripts Bob runs automatically save your request and the lines Bob wrote, a commit saves them in your git history, `why` and `check` answer from there, and Bob deletes temporary code only after your yes.
+### 1. In your editor
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/figures/whyline-1-editor-dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="docs/figures/whyline-1-editor-light.svg">
-  <img alt="Whyline in your editor: you and IBM Bob, the scripts Bob runs automatically, the Whyline commands, and your git repository. Your request is saved, attached to the commit, answered by why and check, and a mock that nothing uses any more is deleted by Bob after you say yes." src="docs/figures/whyline-1-editor-light.svg" width="100%">
-</picture>
+**Saving the request.** You ask Bob for a cart helper. The scripts Bob runs automatically save your request and the exact lines Bob wrote. No AI model runs, so it costs no Bob usage credits.
 
-**2. Across the team.** The saved history travels with the code through git, a pull request check fails while temporary code that is ready to delete is still there, and the report page answers each role. The last step shows a proposed paid Team plan, not built yet.
+![You ask Bob for a change, and the scripts Bob runs automatically save the request and the lines Bob wrote to the session log](docs/figures/whyline-1-editor-record.gif)
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/figures/whyline-2-team-dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="docs/figures/whyline-2-team-light.svg">
-  <img alt="Whyline across the team: developers, git, GitHub and the answers. Git carries the saved history, GitHub Actions runs whyline check --gate on each pull request (one passes, one fails), GitHub Pages hosts the report page, and a proposed Team plan turns Whyline on for every developer." src="docs/figures/whyline-2-team-light.svg" width="100%">
-</picture>
+**The commit.** A git hook labels every line (written by AI, written by AI then changed by a person, or yours) and attaches the history to the commit as a git note, extra data on the commit. Your files are not touched.
+
+![On commit, a git hook labels each line and attaches the history to the commit as a git note](docs/figures/whyline-1-editor-commit.gif)
+
+**Asking why.** You ask why a line exists. `whyline why` finds the commit with `git blame`, reads its note and answers with the request that wrote the line.
+
+![whyline why finds the commit with git blame, reads its note and shows the request behind the line](docs/figures/whyline-1-editor-why.gif)
+
+**Expiry.** payments-v2 is merged. Nothing uses the mock gateway any more, so `whyline check` marks it ready to delete. Bob cannot edit the history Whyline keeps.
+
+![After the payments-v2 merge, whyline check finds that nothing uses the mock gateway and marks it ready to delete](docs/figures/whyline-1-editor-lifecycle.gif)
+
+**Deleting it.** You ask Bob to remove the mock. Bob shows the proof it is safe to delete, runs the tests and waits for your yes. The deletion is saved in the history too.
+
+![Bob shows the proof, you say yes, Bob deletes the mock, the tests pass and the deletion is saved](docs/figures/whyline-1-editor-remove.gif)
+
+### 2. Across the team
+
+**Sharing.** The history travels with your code: a git hook pushes it with your branch, and pulling fetches it.
+
+![git hooks push and fetch the saved history together with the code](docs/figures/whyline-2-team-share.gif)
+
+**The pull request check.** GitHub Actions fails the pull request check while temporary code that is ready to delete is still there. On the demo shop, [PR 1](https://github.com/SAL-Sovereign-AI-Labs/whyline-demo-shop/pull/1) passes and [PR 2](https://github.com/SAL-Sovereign-AI-Labs/whyline-demo-shop/pull/2) fails.
+
+![GitHub Actions runs whyline check --gate: PR 1 passes, PR 2 fails because the mock is ready to delete](docs/figures/whyline-2-team-ci-gate.gif)
+
+**The report page.** One page answers each role: why each line exists, what is ready to delete, which AI code no person has changed since, and the AI report for a release.
+
+![The report page and the AI report for a release, rebuilt on GitHub Pages](docs/figures/whyline-2-team-dashboard.gif)
+
+**A Team plan (proposed, not built).** A paid plan would turn Whyline on for every developer through Bob's organisation settings, and keep each release's report.
+
+![Proposed Team plan: an organisation turns Whyline on for every developer and keeps each release report](docs/figures/whyline-2-team-team-tier.gif)
 
 ## Everything the CLI does
 
