@@ -33,7 +33,7 @@ const QA: { q: string; a: ReactNode }[] = [
     a: (
       <>
         No. A guard blocks any Bob command that would rewrite or delete it. A person with write access still can, so it's a record, not a
-        tamper-proof ledger.
+        tamper-proof one.
       </>
     ),
   },
@@ -41,7 +41,7 @@ const QA: { q: string; a: ReactNode }[] = [
     q: 'Is this a real product?',
     a: (
       <>
-        It's real and it works, but it's young. We built it in 48 hours for the IBM Bob 2.0 Hackathon (25 to 27 Sep 2026). It's{' '}
+        It's real and it works, but it's young. We built it during the IBM Bob 2.0 Hackathon (25 to 27 Sep 2026). It's{' '}
         <Ext href={LINKS.npm}>published on npm</Ext> and <Ext href={LINKS.repo}>open source under the MIT license</Ext>. The team plan is
         proposed, not built.
       </>

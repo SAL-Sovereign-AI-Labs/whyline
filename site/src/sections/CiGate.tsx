@@ -61,7 +61,7 @@ export function CiGate() {
       <style>{CSS}</style>
       <div className="wrap">
         <Reveal>
-          <Eyebrow fig="07">The pull request check</Eyebrow>
+          <Eyebrow fig="08">The pull request check</Eyebrow>
         </Reveal>
         <Reveal i={1} as="h2" className="h2 ci-h2">
           Your pull request check knows what should be <span className="em">gone.</span>

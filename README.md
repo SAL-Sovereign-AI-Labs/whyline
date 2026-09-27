@@ -6,7 +6,7 @@
 
 Whyline saves the request behind every line IBM Bob writes, right in your git history, and tells you when its temporary code is safe to delete. It works with [IBM Bob](https://bob.ibm.com), IBM's AI coding assistant.
 
-**Website:** https://sal-sovereign-ai-labs.github.io/whyline/ (the story in one page, with the live diagrams)
+[Website](https://sal-sovereign-ai-labs.github.io/whyline/) · [Live report](https://sal-sovereign-ai-labs.github.io/whyline/report/) · [npm](https://www.npmjs.com/package/@sal-sovereign-ai-labs/whyline) · [Demo repository](https://github.com/SAL-Sovereign-AI-Labs/whyline-demo-shop)
 
 **Before:** `git blame` says who and when.
 
@@ -187,6 +187,18 @@ npm test            # 82 tests on throwaway git repositories
 npm run smoke
 npm run bench
 ```
+
+### What is in this repository
+
+| Folder | What it is | Where people see it |
+|---|---|---|
+| [cli/](cli/) | The `whyline` command, the Bob scripts and skills it installs, and the report page template | [npm](https://www.npmjs.com/package/@sal-sovereign-ai-labs/whyline) |
+| [site/](site/) | The product website | [sal-sovereign-ai-labs.github.io/whyline](https://sal-sovereign-ai-labs.github.io/whyline/) |
+| [cli/lib/report-template.html](cli/lib/report-template.html) | The report page (`whyline report`), built from the demo shop on every push | [.../whyline/report/](https://sal-sovereign-ai-labs.github.io/whyline/report/) |
+| [architecture/](architecture/) | The animated diagrams, used by the README and the website | [Under the hood](#under-the-hood) |
+| [demo/](demo/) | Builds the demo shop from recorded Bob chats | [whyline-demo-shop](https://github.com/SAL-Sovereign-AI-Labs/whyline-demo-shop) |
+| [bob_sessions/](bob_sessions/) | Screenshots and costs of the Bob tasks that built Whyline | this repository |
+| [docs/](docs/) | Design notes, the voice guide, the submission texts | this repository |
 
 How Whyline talks: [docs/VOICE.md](docs/VOICE.md). Architecture and data format: [docs/05-architecture.md](docs/05-architecture.md). Adding another AI assistant: [docs/08-adapters.md](docs/08-adapters.md).
 

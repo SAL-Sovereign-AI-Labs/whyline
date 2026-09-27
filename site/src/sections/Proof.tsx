@@ -7,7 +7,7 @@ const STATS: { num: ReactNode; cap: ReactNode; src: string }[] = [
   { num: <CountUp to={47} />, cap: <>AI lines no person has changed since</>, src: 'whyline unreviewed' },
   { num: <>0</>, cap: <>dependencies. Just Node and git.</>, src: 'package.json' },
   { num: <><CountUp to={0.2} decimals={1} /><small> s</small></>, cap: <>added per file Bob edits <b>(182 ms median)</b></>, src: 'README, Speed' },
-  { num: <><CountUp to={5} ms={900} /><small>/5</small></>, cap: <>checks proven by the built-in self check</>, src: 'whyline selftest' },
+  { num: <><CountUp to={5} ms={900} /><small>/5</small></>, cap: <>checks passed by the built-in self check</>, src: 'whyline selftest' },
 ];
 
 const CSS = `
@@ -51,7 +51,7 @@ export function Proof() {
     <section className="section" id="proof" aria-labelledby="proof-h">
       <style>{CSS}</style>
       <div className="wrap">
-        <Eyebrow fig="08">Proof</Eyebrow>
+        <Eyebrow fig="07">Proof</Eyebrow>
         <div className="proof-head">
           <div>
             <Reveal>

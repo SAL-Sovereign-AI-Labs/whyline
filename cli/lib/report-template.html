@@ -542,7 +542,7 @@ input.search{border:1px solid var(--line2);background:var(--surface);color:var(-
 
   <!-- OVERVIEW -->
   <section class="view on" id="v-overview">
-    <div class="vh"><div class="eyebrow" id="ovEyebrow">Overview</div><h1 id="ovHeadline"></h1><p id="ovSub">This report shows, for every line an AI (IBM Bob, IBM's AI coding assistant) wrote in this repository, the request behind it, and which temporary code is ready to delete. <a href="https://github.com/SAL-Sovereign-AI-Labs/whyline">How Whyline works</a></p></div>
+    <div class="vh"><div class="eyebrow" id="ovEyebrow">Overview</div><h1 id="ovHeadline"></h1><p id="ovSub">This report shows, for every line an AI (IBM Bob, IBM's AI coding assistant) wrote in this repository, the request behind it, and which temporary code is ready to delete. <a href="https://sal-sovereign-ai-labs.github.io/whyline/">How Whyline works</a></p></div>
     <ol class="how" aria-label="How Whyline works">
       <li><span class="hi" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 4 2 8l3.5 4M10.5 4 14 8l-3.5 4"/></svg></span><span><b>Bob writes code</b></span></li>
       <li class="ha" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg></li>
@@ -883,7 +883,7 @@ var revLines = bom && bom.reviewed ? bom.reviewed.lines : null;
   document.addEventListener('click', function(e) { if (!box.contains(e.target)) close(false); });
 })();
 
-document.getElementById('sidefoot').innerHTML = 'v0.1 · ' + esc(DATA.generatedAt ? DATA.generatedAt.replace('T', ' ').slice(0, 16) + ' UTC' : '') + ' · <a href="https://github.com/SAL-Sovereign-AI-Labs/whyline">GitHub</a>';
+document.getElementById('sidefoot').innerHTML = 'v0.1 · ' + esc(DATA.generatedAt ? DATA.generatedAt.replace('T', ' ').slice(0, 16) + ' UTC' : '') + ' · <a href="https://sal-sovereign-ai-labs.github.io/whyline/">Website</a> · <a href="https://github.com/SAL-Sovereign-AI-Labs/whyline">GitHub</a>';
 
 // nav counts
 var due = (check.due || []).length;

@@ -154,7 +154,7 @@ export function Bob() {
             <div className="card">
               <div className="bob-card-top">
                 <h3 className="h3">4 small scripts Bob runs automatically</h3>
-                <span className="tag">hooks</span>
+                <span className="tag">automatic</span>
               </div>
               <ul className="bob-hook-list">
                 {HOOKS.map((h, i) => (
@@ -190,7 +190,7 @@ export function Bob() {
           <Reveal className="bob-flow" i={1}>
             <div className="card">
               <div className="bob-card-top">
-                <h3 className="h3">Bob's own approval prompt</h3>
+                <h3 className="h3">Bob's own approval step</h3>
                 <span className="tag">deleting</span>
               </div>
               <p className="body">Nothing goes without your yes.</p>

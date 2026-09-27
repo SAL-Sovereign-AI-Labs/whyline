@@ -7,7 +7,7 @@ const STEPS = [
   {
     title: 'Save the request.',
     body: 'When Bob edits a file, small scripts Bob runs automatically save your request and the exact lines. No AI call, about 0.2 seconds per file.',
-    chip: 'Bob hooks',
+    chip: "Bob's automatic scripts",
   },
   {
     title: 'Save it in your git history.',

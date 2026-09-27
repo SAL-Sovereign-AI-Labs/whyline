@@ -68,7 +68,7 @@ test('the report is one offline file with no em dashes', () => {
 test('the header explains the page in one sentence and links to the project, still fully offline', () => {
   const html = report.render(BASE_DATA);
   assert.ok(html.includes("This report shows, for every line an AI (IBM Bob, IBM's AI coding assistant) wrote in this repository, the request behind it, and which temporary code is ready to delete."), 'header sentence');
-  assert.match(html, /<a href="https:\/\/github\.com\/SAL-Sovereign-AI-Labs\/whyline">/, 'project link');
+  assert.match(html, /<a href="https:\/\/sal-sovereign-ai-labs\.github\.io\/whyline\/">How Whyline works<\/a>/, 'website link');
   assert.doesNotMatch(html, /<script[^>]+src\s*=/i, 'no external script');
   assert.doesNotMatch(html, /<link[^>]+rel\s*=\s*["']?stylesheet/i, 'no external stylesheet');
   assert.doesNotMatch(html, /@import/i, 'no imported stylesheet');
