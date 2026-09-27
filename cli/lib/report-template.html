@@ -220,15 +220,35 @@ input.search{border:1px solid var(--line2);background:var(--surface);color:var(-
 .exp-row .info .reason{font-size:12px;color:var(--muted);margin-top:3px;word-break:break-word}
 .exp-row .when{font-size:12.5px;color:var(--muted);word-break:break-word}
 .exp-row .when .days{font-size:11.5px;color:var(--faint);margin-top:2px}
+/* ---- unreviewed ---- */
+.unrev-progress{margin-bottom:24px}
+.unrev-prog-bar{height:10px;background:var(--surface2);border-radius:99px;overflow:hidden;display:flex;margin:10px 0 6px}
+.unrev-prog-bar i{display:block;height:100%}
+.unrev-prog-bar i.ok{background:var(--ok)}.unrev-prog-bar i.rest{background:var(--edit)}
+.unrev-prog-line{font-size:13px;color:var(--muted)}
+.unrev-prog-line b{color:var(--ink)}
+.unrev-list{background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);overflow:hidden}
+.unrev-row{display:grid;grid-template-columns:36px minmax(0,1fr) minmax(0,120px) 90px auto;gap:12px;align-items:center;padding:14px 18px;border-top:1px solid var(--line);background:var(--surface)}
+.unrev-list .unrev-row:first-child{border-top:0}
+.unrev-row.top{background:var(--editbg);border-left:3px solid var(--edit)}
+.unrev-rank{width:28px;height:28px;border-radius:8px;background:var(--surface2);color:var(--muted);display:grid;place-items:center;font-size:12px;font-weight:700;flex:none;font-variant-numeric:tabular-nums}
+.unrev-row.top .unrev-rank{background:var(--edit);color:#fff}
+.unrev-info .file{font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13px;font-weight:600;word-break:break-all}
+.unrev-info .folder{display:inline-flex;align-items:center;font-size:11px;font-weight:600;letter-spacing:.03em;background:var(--surface2);color:var(--muted);border-radius:99px;padding:1px 7px;margin-left:6px;vertical-align:middle;white-space:nowrap}
+.unrev-start{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--edit);margin-bottom:3px}
+.unrev-info .excerpt{font-size:12px;color:var(--faint);margin-top:4px;font-style:italic;word-break:break-word}
+.unrev-bar-cell .cnt{font-size:11.5px;color:var(--muted);margin-top:3px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.unrev-show-more{display:flex;justify-content:center;padding:14px;border-top:1px solid var(--line);background:var(--surface)}
 /* ---- responsive ---- */
 @media (max-width:1100px){.q-row{grid-template-columns:100px minmax(0,1fr)}.q-row .act{grid-column:2}}
-@media (max-width:980px){.grid2{grid-template-columns:1fr}.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}.tile:nth-child(3){border-left:0}.tile:nth-child(n+3){border-top:1px solid var(--line)}.exp-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}.exp-tile:nth-child(n+3){border-top:1px solid var(--line)}.exp-tile:nth-child(3){border-left:0}}
+@media (max-width:980px){.grid2{grid-template-columns:1fr}.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}.tile:nth-child(3){border-left:0}.tile:nth-child(n+3){border-top:1px solid var(--line)}.exp-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}.exp-tile:nth-child(n+3){border-top:1px solid var(--line)}.exp-tile:nth-child(3){border-left:0}.unrev-row{grid-template-columns:36px minmax(0,1fr) auto}}
 @media (max-width:900px){.app{grid-template-columns:1fr}aside{position:fixed;left:-270px;width:260px;transition:left .2s;z-index:20;box-shadow:0 0 40px rgba(0,0,0,.25)}aside.open{left:0}
 .mobilebar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:18px}main{padding:18px 16px 60px}.vh h1{font-size:24px}}
 @media (max-width:640px){.q-row{grid-template-columns:1fr;gap:10px;padding:14px 16px}.q-row .act{grid-column:1}.q-row .badge{flex-direction:row;align-items:center}.hrow{grid-template-columns:minmax(0,1fr) auto}.hrow .bar{grid-column:1/-1;grid-row:2}
 #v-why .row2c{grid-template-columns:1fr !important}.card{overflow-x:auto}table.stack thead{display:none}table.stack tr{display:block;padding:10px 0;border-bottom:1px solid var(--line)}table.stack td{display:block;border:0;padding:2px 0;max-width:none !important;min-width:0 !important}table.stack td[data-label]::before{content:attr(data-label) ": ";color:var(--faint);font-size:12px}
 .exp-card{grid-template-columns:1fr}.exp-card .right{border-left:0;padding-left:0;border-top:1px solid var(--line2);padding-top:14px;margin-top:4px}
-.exp-row{grid-template-columns:44px minmax(0,1fr)}.exp-row .when{grid-column:2}.exp-row .pill{grid-column:2;justify-self:start}}
+.exp-row{grid-template-columns:44px minmax(0,1fr)}.exp-row .when{grid-column:2}.exp-row .pill{grid-column:2;justify-self:start}
+.unrev-row{grid-template-columns:36px minmax(0,1fr) auto;align-items:start;row-gap:10px}.unrev-row .unrev-info{grid-column:2/4}.unrev-row .unrev-bar-cell{grid-column:2;align-self:center}.unrev-row .unrev-cov{grid-column:2}.unrev-row .unrev-cov:empty{display:none}.unrev-row .unrev-act{grid-column:3;grid-row:2}}
 @media (max-width:520px){.tile{padding:14px}.tile .v{font-size:26px}.tile .s{font-size:12px}.facts{grid-template-columns:1fr}.facts dt{margin-top:6px}.exp-tile{padding:14px}.exp-tile .v{font-size:26px}}
 </style>
 </head>
@@ -324,12 +344,9 @@ input.search{border:1px solid var(--line2);background:var(--surface);color:var(-
 
   <!-- UNREVIEWED -->
   <section class="view" id="v-unreviewed">
-    <div class="vh"><div class="eyebrow">Unreviewed</div><h1>AI-written lines no human has edited since.</h1><p>Worst first. A human edit on an AI line counts as a review.</p></div>
-    <div class="tiles" id="unrevKpis" style="grid-template-columns:repeat(2,minmax(0,1fr))"></div>
-    <div class="card sec">
-      <table id="unrevTable"><thead><tr><th>File</th><th>AI lines</th><th>Coverage</th></tr></thead><tbody></tbody></table>
-      <div class="hint" id="unrevHowto" style="display:none"></div>
-    </div>
+    <div class="vh"><div class="eyebrow">Unreviewed</div><h1 id="unrevHeadline"></h1><p id="unrevSub"></p></div>
+    <div id="unrevProgress"></div>
+    <div id="unrevList"></div>
   </section>
 
   <!-- BOM -->
@@ -906,21 +923,114 @@ if (unrevFiles > 0) document.getElementById('unrevCnt').className = 'cnt rev';
 // UNREVIEWED
 (function() {
   var utotals = unreviewed.totals || {};
-  document.getElementById('unrevKpis').innerHTML =
-    '<div class="tile"><div class="k">Unreviewed AI lines</div><div class="v">' + nd(utotals.aiLines) + '</div></div>' +
-    '<div class="tile"><div class="k">Files with unreviewed AI lines</div><div class="v">' + nd(utotals.files || null) + '</div></div>';
-  if ((unreviewed.missing || []).indexOf('coverage') >= 0) {
-    var hw = document.getElementById('unrevHowto');
-    hw.style.display = 'block';
-    hw.innerHTML = 'No coverage report found. Add <code>coverage.xml</code> or <code>lcov.info</code> to the repo root to see test coverage per file.';
+  var totalAI = utotals.aiLines || 0;
+  var fileCount = unrevList.length;
+
+  // headline
+  var hl = document.getElementById('unrevHeadline');
+  var sub = document.getElementById('unrevSub');
+  if (totalAI > 0) {
+    hl.innerHTML = '<span class="hl-rev">' + totalAI + ' AI-written ' + plural(totalAI, 'line') + '</span> ' + (totalAI === 1 ? 'has' : 'have') + ' no human edit yet.';
+    sub.textContent = 'Across ' + fileCount + ' ' + plural(fileCount, 'file') + ', most first. A human edit on an AI line counts as a review.';
+  } else if (ranges.length) {
+    hl.textContent = 'Every AI-written line has had a human edit.';
+    sub.textContent = 'A human edit on an AI line counts as a review.';
+  } else {
+    hl.textContent = 'No AI-written lines recorded yet.';
+    sub.textContent = '';
   }
-  var tb = document.querySelector('#unrevTable tbody');
-  unrevList.forEach(function(f) {
-    var tr = document.createElement('tr');
-    tr.innerHTML = '<td class="mono">' + esc(f.file) + '</td><td>' + f.aiLines + '</td><td>' + (f.coverage != null ? f.coverage + '%' : 'no data') + '</td>';
-    tb.appendChild(tr);
-  });
-  if (!tb.children.length) tb.innerHTML = '<tr><td colspan="3" class="empty">' + (ranges.length ? 'every AI line has had a human edit since' : 'no AI-written lines recorded yet (commit something Bob wrote, then run whyline report)') + '</td></tr>';
+
+  // progress card
+  var progEl = document.getElementById('unrevProgress');
+  if (bom && bom.ai && bom.ai.total > 0 && bom.reviewed) {
+    var revLines2 = bom.reviewed.lines || 0;
+    var aiTot = bom.ai.total;
+    var revW = Math.round(revLines2 / aiTot * 100);
+    var restW = 100 - revW;
+    var toGo = aiTot - revLines2;
+    progEl.innerHTML = '<div class="card unrev-progress"><div class="card-h" style="margin-bottom:8px"><h2 style="font-size:14px">Progress toward zero unreviewed</h2></div>' +
+      '<div class="unrev-prog-bar" aria-hidden="true"><i class="ok" style="width:' + revW + '%"></i><i class="rest" style="width:' + restW + '%"></i></div>' +
+      '<div class="unrev-prog-line"><b>' + revLines2 + '</b> of <b>' + aiTot + '</b> AI ' + plural(aiTot, 'line') + ' reviewed &middot; <b>' + toGo + '</b> to go</div>' +
+      '</div>';
+  }
+
+  // ranked list
+  var listEl = document.getElementById('unrevList');
+  if (!unrevList.length) {
+    var msg = ranges.length ? 'every AI line has had a human edit since' : 'no AI-written lines recorded yet (commit something Bob wrote, then run whyline report)';
+    listEl.innerHTML = '<p class="empty">' + esc(msg) + '</p>';
+    return;
+  }
+
+  var maxLines = unrevList.reduce(function(m, f) { return Math.max(m, f.aiLines); }, 1);
+  var SHOW = 6;
+  var hasCovMissing = (unreviewed.missing || []).indexOf('coverage') >= 0;
+
+  function buildRow(f, rank) {
+    var isTop = rank === 1;
+    var parts = (f.file || '').split('/');
+    var folder = parts.length < 2 ? '' : (parts[0] === 'src' && parts.length > 2) ? parts[0] + '/' + parts[1] : parts[0];
+    var barW = Math.round(f.aiLines / maxLines * 100);
+    // first prompt excerpt from the first session
+    var excerpt = '';
+    if (f.sessions && f.sessions.length) {
+      var sess = sessMapAll[f.sessions[0]];
+      if (sess && sess.prompt) {
+        var p = sess.prompt;
+        if (p.length > 90) { p = p.slice(0, 90).replace(/\s+\S*$/, '') + '...'; }
+        excerpt = '\u201c' + esc(p) + '\u201d';
+      }
+    }
+    var covPill = f.coverage != null
+      ? '<span class="pill dim">' + f.coverage + '% covered</span>'
+      : '';
+    var btnClass = isTop ? 'btn' : 'btn';
+    var btnStyle = isTop ? 'background:var(--ink);color:var(--bg);border-color:var(--ink)' : '';
+    return '<div class="unrev-row' + (isTop ? ' top' : '') + '">' +
+      '<div class="unrev-rank">' + rank + '</div>' +
+      '<div class="unrev-info">' +
+        (isTop ? '<div class="unrev-start">Start here</div>' : '') +
+        '<div class="file">' + esc(f.file || '') + (folder ? '<span class="folder">' + esc(folder) + '</span>' : '') + '</div>' +
+        (excerpt ? '<div class="excerpt">' + excerpt + '</div>' : '') +
+      '</div>' +
+      '<div class="unrev-bar-cell">' +
+        '<div class="bar" style="height:5px"><i style="width:' + barW + '%;background:var(--edit)"></i></div>' +
+        '<div class="cnt">' + f.aiLines + ' ' + plural(f.aiLines, 'line') + '</div>' +
+      '</div>' +
+      '<div class="unrev-cov">' + covPill + '</div>' +
+      '<div class="unrev-act"><button class="btn" type="button" data-go="why" data-file="' + esc(f.file) + '" style="' + btnStyle + '">See why &rarr;</button></div>' +
+      '</div>';
+  }
+
+  var visibleRows = unrevList.slice(0, SHOW);
+  var hiddenRows = unrevList.slice(SHOW);
+
+  var html = '<div class="sec"><div class="unrev-list">';
+  visibleRows.forEach(function(f, i) { html += buildRow(f, i + 1); });
+
+  if (hiddenRows.length) {
+    html += '<div class="unrev-show-more" id="unrevShowMore">' +
+      '<button class="btn" type="button" id="unrevExpandBtn">Show ' + hiddenRows.length + ' smaller ' + plural(hiddenRows.length, 'file') + '</button>' +
+      '</div>';
+  }
+  html += '</div>';
+
+  if (hasCovMissing) {
+    html += '<div class="hint" style="margin-top:14px">No coverage report found. Add <code>coverage.xml</code> or <code>lcov.info</code> at the repo root to see which of these lines are tested.</div>';
+  }
+  html += '</div>';
+  listEl.innerHTML = html;
+
+  if (hiddenRows.length) {
+    document.getElementById('unrevExpandBtn').onclick = function() {
+      var list = document.querySelector('#unrevList .unrev-list');
+      var showMore = document.getElementById('unrevShowMore');
+      var extraHtml = '';
+      hiddenRows.forEach(function(f, i) { extraHtml += buildRow(f, SHOW + i + 1); });
+      showMore.insertAdjacentHTML('beforebegin', extraHtml);
+      showMore.remove();
+    };
+  }
 })();
 
 // BOM
