@@ -5,156 +5,261 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Whyline Report</title>
 <style>
-:root{--bg:#f4f6f9;--card:#fff;--ink:#14171c;--muted:#5d6675;--line:#e1e5ea;--accent:#0f62fe;--accent2:#8a3ffc;--ok:#198038;--warn:#b28600;--bad:#da1e28;--term:#111418;--termink:#d6dde6;--ai:#e8f0ff;--human:#e6f4ea;--side:#161616;--sideink:#c6c6c6}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#0f1216;--card:#181d24;--ink:#e6e9ee;--muted:#98a2b3;--line:#2a313b;--accent:#4589ff;--accent2:#be95ff;--ok:#42be65;--warn:#f1c21b;--bad:#fa4d56;--term:#0a0c0f;--ai:#1d2a45;--human:#16301f;--side:#0a0c0f}}
-:root[data-theme="dark"]{--bg:#0f1216;--card:#181d24;--ink:#e6e9ee;--muted:#98a2b3;--line:#2a313b;--accent:#4589ff;--accent2:#be95ff;--ok:#42be65;--warn:#f1c21b;--bad:#fa4d56;--term:#0a0c0f;--ai:#1d2a45;--human:#16301f;--side:#0a0c0f}
+/* ---- design tokens: one palette for origin (ai, edited, temporary, human) and one for state (due, active, kept, removed) ---- */
+:root{--bg:#f6f5f1;--surface:#fff;--surface2:#f1efe9;--ink:#15171c;--muted:#5d6471;--faint:#8b919c;--line:#e5e2da;--line2:#d9d5cb;
+--side:#fbfaf7;--sideink:#3a3f48;--navon:#15171c;--navonink:#fff;
+--ai:#2f6bff;--aibg:rgba(47,107,255,.10);--edit:#b77d00;--editbg:rgba(201,138,0,.13);--tmp:#7c4dff;--tmpbg:rgba(124,77,255,.11);--human:#a3a9b3;
+--due:#d7263d;--duebg:rgba(215,38,61,.08);--ok:#15803d;--okbg:rgba(21,128,61,.10);--kept:#4f6077;--keptbg:rgba(79,96,119,.12);--removed:#7b818c;--removedbg:rgba(123,129,140,.12);
+--term:#14161b;--termink:#dfe4ec;--termmuted:#8d96a5;--shadow:0 1px 2px rgba(20,23,28,.04),0 2px 8px rgba(20,23,28,.04)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#0b0d11;--surface:#12151b;--surface2:#191d25;--ink:#e9ecf1;--muted:#9aa3b1;--faint:#6c7482;--line:#232833;--line2:#2e3441;
+--side:#090b0e;--sideink:#b8bfca;--navon:#1d2230;--navonink:#fff;
+--ai:#5b8cff;--aibg:rgba(91,140,255,.14);--edit:#e3a92b;--editbg:rgba(227,169,43,.14);--tmp:#a78bfa;--tmpbg:rgba(167,139,250,.15);--human:#5c6370;
+--due:#ff5b6b;--duebg:rgba(255,91,107,.09);--ok:#3ecf7a;--okbg:rgba(62,207,122,.11);--kept:#93a4bc;--keptbg:rgba(147,164,188,.13);--removed:#8a919d;--removedbg:rgba(138,145,157,.13);
+--term:#07090c;--termink:#dfe4ec;--termmuted:#7d8695;--shadow:none}}
+:root[data-theme="dark"]{--bg:#0b0d11;--surface:#12151b;--surface2:#191d25;--ink:#e9ecf1;--muted:#9aa3b1;--faint:#6c7482;--line:#232833;--line2:#2e3441;
+--side:#090b0e;--sideink:#b8bfca;--navon:#1d2230;--navonink:#fff;
+--ai:#5b8cff;--aibg:rgba(91,140,255,.14);--edit:#e3a92b;--editbg:rgba(227,169,43,.14);--tmp:#a78bfa;--tmpbg:rgba(167,139,250,.15);--human:#5c6370;
+--due:#ff5b6b;--duebg:rgba(255,91,107,.09);--ok:#3ecf7a;--okbg:rgba(62,207,122,.11);--kept:#93a4bc;--keptbg:rgba(147,164,188,.13);--removed:#8a919d;--removedbg:rgba(138,145,157,.13);
+--term:#07090c;--termink:#dfe4ec;--termmuted:#7d8695;--shadow:none}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
-.app{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
-aside{background:var(--side);color:var(--sideink);padding:18px 14px;position:sticky;top:0;height:100vh}
-.brand{color:#fff;font-weight:700;font-size:15px;margin:0 6px 4px}
-.brand small{display:block;color:#8d8d8d;font-weight:400;font-size:11px}
-.repo{margin:14px 6px;padding:8px 10px;border:1px solid #393939;border-radius:8px;font-size:12px;color:#fff}
-.repo small{display:block;color:#8d8d8d}
-nav button{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:none;border:0;color:var(--sideink);padding:10px 10px;border-radius:8px;font-size:14px;cursor:pointer}
-nav button:hover{background:#262626;color:#fff}
-nav button.on{background:var(--accent);color:#fff}
-nav button .cnt{margin-left:auto;font-size:11px;background:#393939;padding:1px 7px;border-radius:10px;color:#fff}
-nav button.on .cnt{background:rgba(255,255,255,.25)}
-.side-foot{position:absolute;bottom:16px;left:14px;right:14px;font-size:11px;color:#8d8d8d;line-height:1.5}
-.side-foot b{color:#fff;display:block}
-main{padding:22px 26px 60px;min-width:0}
-.top{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:16px}
-h1{font-size:22px;margin:0}
-.top p{margin:2px 0 0;color:var(--muted)}
-.ro{font-size:12px;color:var(--muted);border:1px solid var(--line);border-radius:8px;padding:6px 10px;background:var(--card)}
-.ro b{color:var(--ink)}
-.view{display:none}.view.on{display:block}
-.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
-.kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
-.kpi .v{font-size:30px;font-weight:700;line-height:1.1}
-.kpi .l{color:var(--muted);font-size:12px;margin-top:4px}
-.kpi .d{font-size:12px;margin-top:6px}
-.row2{display:grid;grid-template-columns:1.4fr 1fr;gap:12px;margin-top:12px}
-.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:12px}
-@media (max-width:980px){.row2,.row3{grid-template-columns:1fr}}
-.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}
-.card h3{margin:0 0 10px;font-size:14px}
-.card h3 small{color:var(--muted);font-weight:400;margin-left:6px}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.55 Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased}
+code,.mono{font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.92em}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--ai);outline-offset:2px}
+
+/* ---- shell ---- */
+.app{display:grid;grid-template-columns:252px minmax(0,1fr);min-height:100vh}
+aside{background:var(--side);color:var(--sideink);border-right:1px solid var(--line);padding:20px 14px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:14px;overflow-y:auto}
+.brand{display:flex;align-items:center;gap:10px;padding:0 6px}
+.mark{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,var(--ai),var(--tmp));color:#fff;display:grid;place-items:center;font-weight:700;font-size:14px;flex:none}
+.brand b{color:var(--ink);font-size:15px;letter-spacing:-.01em}
+.brand small{display:block;color:var(--faint);font-size:11.5px;line-height:1.2}
+.repo{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:12px}
+.repo b{display:block;color:var(--ink);font-size:13.5px;word-break:break-all}
+.repo .meta{color:var(--faint);font-size:11.5px;margin-top:2px}
+.authbar{display:flex;height:6px;border-radius:99px;overflow:hidden;background:var(--line);margin-top:10px}
+.authbar i{display:block;height:100%}
+.authleg{display:flex;justify-content:space-between;font-size:11.5px;color:var(--muted);margin-top:6px}
+nav{display:flex;flex-direction:column;gap:2px}
+nav button{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:none;border:0;color:var(--sideink);padding:9px 10px;border-radius:9px;font-size:14px;cursor:pointer}
+nav button svg{width:16px;height:16px;flex:none;opacity:.8}
+nav button:hover{background:var(--surface2);color:var(--ink)}
+nav button.on{background:var(--navon);color:var(--navonink)}
+nav button.on svg{opacity:1}
+nav .cnt{margin-left:auto;font-size:11px;font-weight:600;padding:1px 7px;border-radius:99px;background:var(--surface2);color:var(--muted)}
+nav .cnt.due{background:var(--due);color:#fff}
+nav .cnt.rev{background:var(--editbg);color:var(--edit)}
+nav button.on .cnt:not(.due){background:rgba(255,255,255,.18);color:inherit}
+.side-note{margin-top:auto;border:1px solid var(--line);border-radius:12px;padding:12px;font-size:12px;color:var(--muted);background:var(--surface)}
+.side-note b{display:block;color:var(--ink);font-size:12.5px;margin-bottom:2px}
+.side-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:11.5px;color:var(--faint);padding:0 4px}
+.themebtn{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:4px 9px;font-size:11.5px;color:var(--muted);cursor:pointer;white-space:nowrap}
+.themebtn:hover{color:var(--ink)}
+main{padding:36px 44px 72px;min-width:0}
+.wrap{max-width:1160px;margin:0 auto}
+.mobilebar{display:none}
+.burger{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:9px;padding:6px 12px;font-size:13px;cursor:pointer}
+.view{display:none}.view.on{display:block;animation:fade .18s ease-out}
+@keyframes fade{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.view.on{animation:none}}
+
+/* ---- view header ---- */
+.vh{margin-bottom:26px}
+.eyebrow{font-size:11.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
+.vh h1{font-size:30px;line-height:1.2;letter-spacing:-.022em;font-weight:680;margin:6px 0 8px;max-width:900px}
+.vh p{margin:0;color:var(--muted);font-size:15px;max-width:760px}
+.hl-due{color:var(--due);text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:5px}
+.hl-rev{color:var(--edit)}
+
+/* ---- building blocks ---- */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px;box-shadow:var(--shadow);min-width:0}
+.card-h{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.card-h h2{font-size:15.5px;margin:0;letter-spacing:-.01em}
+.card-h p{margin:2px 0 0;font-size:12.5px;color:var(--muted)}
+.card-h .aside{font-size:12.5px;color:var(--faint)}
+.sec{margin-top:30px}
+.sec-h{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.sec-h h2{font-size:18px;margin:0;letter-spacing:-.015em}
+.sec-h p{margin:2px 0 0;font-size:13px;color:var(--muted)}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.grid2 > .card{height:100%}
+.tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow)}
+.tile{padding:18px 20px;min-width:0}
+.tile + .tile{border-left:1px solid var(--line)}
+.tile .k{font-size:12.5px;color:var(--muted)}
+.tile .v{font-size:32px;font-weight:680;letter-spacing:-.02em;line-height:1.15;margin-top:4px;font-variant-numeric:tabular-nums}
+.tile .v small{font-size:16px;color:var(--faint);font-weight:500;margin-left:1px}
+.tile .v .flag{font-size:13px;font-weight:600;color:var(--due);margin-left:8px;letter-spacing:0}
+.tile .s{font-size:12.5px;color:var(--faint);margin-top:8px}
+.tile .bar{margin-top:12px}
+.bar{height:6px;background:var(--surface2);border-radius:99px;overflow:hidden;display:flex}
+.bar i{display:block;height:100%;background:var(--ai)}
+.bar i.edit{background:var(--edit)}.bar i.tmp{background:var(--tmp)}.bar i.due{background:var(--due)}.bar i.ok{background:var(--ok)}.bar i.kept{background:var(--kept)}.bar i.human{background:var(--human)}
+.segs{display:flex;gap:3px;margin-top:12px}
+.segs i{flex:1;height:6px;border-radius:99px;background:var(--surface2)}
+.segs i.due{background:var(--due)}.segs i.active{background:var(--ok)}.segs i.kept{background:var(--kept)}.segs i.removed{background:var(--removed)}
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:650;letter-spacing:.04em;text-transform:uppercase;padding:3px 8px;border-radius:99px;white-space:nowrap;line-height:1.4}
+.pill.due{background:var(--due);color:#fff}.pill.active{background:var(--okbg);color:var(--ok)}.pill.kept{background:var(--keptbg);color:var(--kept)}.pill.removed{background:var(--removedbg);color:var(--removed)}
+.pill.review{background:var(--editbg);color:var(--edit)}.pill.ai{background:var(--aibg);color:var(--ai)}.pill.tmp{background:var(--tmpbg);color:var(--tmp)}.pill.dim{background:var(--surface2);color:var(--muted)}
+.kind{font-size:12px;color:var(--muted);text-transform:capitalize}
+.dot{display:inline-block;width:8px;height:8px;border-radius:99px;background:var(--ai);flex:none}
+.dot.edit{background:var(--edit)}.dot.tmp{background:var(--tmp)}.dot.human{background:var(--human)}.dot.due{background:var(--due)}
+.muted{color:var(--muted)}.faint{color:var(--faint)}
+.empty{color:var(--muted);font-size:13.5px;padding:6px 0}
+.empty code{background:var(--surface2);padding:1px 6px;border-radius:5px}
+.hint{display:flex;gap:10px;align-items:flex-start;border:1px dashed var(--line2);border-radius:12px;padding:12px 14px;font-size:13px;color:var(--muted);margin-top:14px}
+.hint code{background:var(--surface2);color:var(--ink);padding:1px 6px;border-radius:5px}
+.linkbtn{background:none;border:0;padding:0;color:var(--ai);font-weight:600;font-size:13px;cursor:pointer}
+.linkbtn:hover{text-decoration:underline}
+.btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line2);background:var(--surface);color:var(--ink);border-radius:9px;padding:7px 12px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap}
+.btn:hover{background:var(--surface2)}
+
+/* command chip: the exact command to run in Bob or a terminal, with copy */
+.cmd{display:flex;align-items:center;gap:10px;background:var(--term);color:var(--termink);border-radius:10px;padding:7px 8px 7px 12px;font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12.5px;min-width:0;max-width:100%}
+.cmd .p{color:var(--termmuted);user-select:none}
+.cmd code{font-size:inherit;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0}
+.cmd .cp{flex:none;font:600 11px/1 Inter,ui-sans-serif,-apple-system,sans-serif;background:rgba(255,255,255,.08);color:var(--termink);border:1px solid rgba(255,255,255,.16);border-radius:6px;padding:5px 8px;cursor:pointer}
+.cmd .cp:hover{background:rgba(255,255,255,.16)}
+.cmd-where{font-size:11.5px;color:var(--faint);margin-top:5px;text-align:right}
+
+/* ---- overview: what needs you ---- */
+.queue{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:var(--shadow)}
+.q-row{display:grid;grid-template-columns:118px minmax(0,1fr) minmax(0,340px);gap:18px;align-items:center;padding:16px 20px;border-top:1px solid var(--line);position:relative}
+.q-row:first-child{border-top:0}
+.q-row::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--edit)}
+.q-row.due{background:var(--duebg)}
+.q-row.due::before{background:var(--due)}
+.q-row .badge{display:flex;flex-direction:column;align-items:flex-start;gap:5px;font-size:12px;color:var(--muted)}
+.q-row .file{font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13.5px;font-weight:600;word-break:break-all}
+.q-row .why{font-size:13px;color:var(--muted);margin-top:3px}
+.q-row .act{display:flex;flex-direction:column;align-items:stretch;min-width:0}
+.q-row .act .btn{align-self:flex-end}
+.q-foot{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 20px;border-top:1px solid var(--line);font-size:13px;color:var(--muted);background:var(--surface2)}
+
+/* overview lists */
+.hrow{display:grid;grid-template-columns:minmax(0,150px) minmax(0,1fr) auto;gap:12px;align-items:center;padding:7px 0}
+.hrow .name{font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hrow .num{font-size:12.5px;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+.hrow .num b{color:var(--ink);font-weight:600}
+.krow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+.krow:first-child{border-top:0;padding-top:2px}
+.krow .kn{font-weight:600;text-transform:capitalize}
+.krow .kd{font-size:12.5px;color:var(--faint)}
+.krow .ks{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.note-bad{border:1px solid var(--duebg);background:var(--duebg);color:var(--ink);border-radius:10px;padding:10px 12px;font-size:12.5px;margin-top:12px}
+.facts{display:grid;grid-template-columns:110px minmax(0,1fr);gap:6px 12px;margin:0;font-size:13px}
+.facts dt{color:var(--faint)}.facts dd{margin:0;word-break:break-word}
+
+/* ---- tables (views not yet redesigned keep tables; they stack on phones) ---- */
 table{width:100%;border-collapse:collapse;font-size:13px}
-th,td{text-align:left;padding:8px 8px;border-bottom:1px solid var(--line);vertical-align:middle}
-th{color:var(--muted);font-weight:600;font-size:12px}
-.tag{display:inline-block;font-size:11px;padding:2px 7px;border-radius:5px;font-weight:600;white-space:nowrap}
-.tag.ok{background:rgba(25,128,56,.15);color:var(--ok)}.tag.warn{background:rgba(178,134,0,.15);color:var(--warn)}.tag.bad{background:rgba(218,30,40,.15);color:var(--bad)}.tag.info{background:var(--ai);color:var(--accent)}.tag.pur{background:rgba(138,63,252,.15);color:var(--accent2)}.tag.dim{background:var(--line);color:var(--muted)}
-.bar{height:8px;background:var(--line);border-radius:4px;overflow:hidden;display:flex}
-.bar i{display:block;height:100%;background:var(--accent);width:0}
-.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:8px}
-.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;vertical-align:-1px;margin-right:4px}
-.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;align-items:center}
-.filters button{border:1px solid var(--line);background:var(--card);color:var(--muted);border-radius:16px;padding:4px 11px;font-size:12px;cursor:pointer}
-.filters button.on{background:var(--accent);color:#fff;border-color:var(--accent)}
-.prompt{background:var(--ai);border-radius:8px;padding:8px 10px;margin-top:8px;font-style:italic;font-size:12.5px;word-break:break-word}
-.howto{border-left:3px solid var(--accent);background:var(--ai);border-radius:0 8px 8px 0;padding:8px 12px;font-size:12.5px;margin-top:10px}
-.howto code{background:rgba(0,0,0,.08);padding:1px 5px;border-radius:4px}
-.muted{color:var(--muted)}
-input.search{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;padding:7px 10px;font-size:13px;width:240px;max-width:100%}
-.code{background:var(--term);color:var(--termink);border-radius:10px;font:12.5px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;overflow:auto;max-height:420px}
-.code div{padding:0 12px;white-space:pre;position:relative;cursor:pointer}
-.code .n{display:inline-block;width:34px;color:#8d96a5;user-select:none}
-.code .ai{background:rgba(69,137,255,.30);border-left:3px solid var(--accent)}
-.code .mx{background:rgba(241,194,27,.26);border-left:3px solid var(--warn)}
-.code .hu{border-left:3px solid transparent}
-.code .tmp{background:rgba(138,63,252,.32);border-left:3px solid var(--accent2)}
-.code div.sel{outline:2px solid var(--accent)}
-.code div:focus{outline:2px solid var(--accent);outline-offset:1px}
-.detail{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;font-size:13px}
-.detail h4{margin:0 0 6px;font-size:13px}
-.detail dl{display:grid;grid-template-columns:100px 1fr;gap:4px 8px;margin:0}
-.detail dt{color:var(--muted)}.detail dd{margin:0;word-break:break-word}
-.term{background:var(--term);color:var(--termink);border-radius:10px;padding:12px 14px;font:12.5px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap;margin-top:10px}
-.term .d{color:#8d96a5}.term .p{color:#82cfff}
-.why-file-row{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;cursor:pointer;font-size:12.5px;outline:none}
-.why-file-row:focus{outline:2px solid var(--accent);outline-offset:1px}
-.why-file-row:hover{background:var(--line)}
-.why-file-row.on{background:var(--ai);font-weight:600}
-.why-file-row .fname{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.why-file-row .fbar{width:60px;flex-shrink:0}
-.why-file-row .fcnt{flex-shrink:0;font-size:11px;color:var(--muted);white-space:nowrap}
-.burger{display:none;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;padding:5px 10px;font-size:12px;cursor:pointer;margin-bottom:6px}
-:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-@media (max-width:820px){.app{grid-template-columns:1fr}aside{position:fixed;left:-240px;width:232px;transition:.2s;z-index:15}aside.open{left:0}.burger{display:inline-block}main{padding:16px}.top{align-items:flex-start}}
-@media (max-width:680px){#v-why .row2c{grid-template-columns:1fr !important}.card{overflow-x:auto}table.stack thead{display:none}table.stack tr{display:block;padding:8px 0;border-bottom:1px solid var(--line)}table.stack td{display:block;border:0;padding:2px 0;max-width:none !important;min-width:0 !important}table.stack td[data-label]::before{content:attr(data-label) ": ";color:var(--muted);font-size:12px}}
+th,td{text-align:left;padding:10px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
+th{color:var(--faint);font-weight:600;font-size:11.5px;letter-spacing:.05em;text-transform:uppercase}
+tr:last-child td{border-bottom:0}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
+.filters button{border:1px solid var(--line2);background:var(--surface);color:var(--muted);border-radius:99px;padding:5px 13px;font-size:12.5px;font-weight:600;cursor:pointer}
+.filters button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.prompt{border-left:3px solid var(--ai);padding:4px 0 4px 14px;margin:10px 0;font-size:15px;line-height:1.5;word-break:break-word}
+input.search{border:1px solid var(--line2);background:var(--surface);color:var(--ink);border-radius:9px;padding:8px 11px;font-size:13px;width:100%}
+
+/* ---- why: code viewer ---- */
+.code{background:var(--term);color:var(--termink);border-radius:12px;font:12.5px/1.7 "JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;overflow:auto;max-height:460px;padding:8px 0}
+.code div{padding:0 14px 0 0;white-space:pre;position:relative;cursor:pointer;box-shadow:inset 3px 0 0 transparent}
+.code .n{display:inline-block;width:46px;padding-right:14px;text-align:right;color:var(--termmuted);user-select:none}
+.code .ai{background:rgba(91,140,255,.16);box-shadow:inset 3px 0 0 #5b8cff}
+.code .mx{background:rgba(227,169,43,.16);box-shadow:inset 3px 0 0 #e3a92b}
+.code .tmp{background:rgba(167,139,250,.18);box-shadow:inset 3px 0 0 #a78bfa}
+.code .hu{color:#aab2bf}
+.code div.sel{background:rgba(255,255,255,.10);outline:1px solid rgba(255,255,255,.35);outline-offset:-1px}
+.code div:focus{outline:2px solid #5b8cff;outline-offset:-2px}
+.detail{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px 20px;font-size:13px;box-shadow:var(--shadow)}
+.detail h4{margin:0 0 8px;font-size:13.5px}
+.detail dl{display:grid;grid-template-columns:100px 1fr;gap:5px 10px;margin:0}
+.detail dt{color:var(--faint)}.detail dd{margin:0;word-break:break-word}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.why-file-row{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:9px;cursor:pointer;font-size:12.5px;outline:none}
+.why-file-row:focus{outline:2px solid var(--ai);outline-offset:1px}
+.why-file-row:hover{background:var(--surface2)}
+.why-file-row.on{background:var(--aibg)}
+.why-file-row .fname{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.why-file-row .fbar{width:54px;flex-shrink:0}
+.why-file-row .fcnt{flex-shrink:0;font-size:11px;color:var(--faint);white-space:nowrap;font-variant-numeric:tabular-nums}
+
+/* ---- responsive ---- */
+@media (max-width:1100px){.q-row{grid-template-columns:100px minmax(0,1fr)}.q-row .act{grid-column:2}}
+@media (max-width:980px){.grid2{grid-template-columns:1fr}.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}.tile:nth-child(3){border-left:0}.tile:nth-child(n+3){border-top:1px solid var(--line)}}
+@media (max-width:900px){.app{grid-template-columns:1fr}aside{position:fixed;left:-270px;width:260px;transition:left .2s;z-index:20;box-shadow:0 0 40px rgba(0,0,0,.25)}aside.open{left:0}
+.mobilebar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:18px}main{padding:18px 16px 60px}.vh h1{font-size:24px}}
+@media (max-width:640px){.q-row{grid-template-columns:1fr;gap:10px;padding:14px 16px}.q-row .act{grid-column:1}.q-row .badge{flex-direction:row;align-items:center}.hrow{grid-template-columns:minmax(0,1fr) auto}.hrow .bar{grid-column:1/-1;grid-row:2}
+#v-why .row2c{grid-template-columns:1fr !important}.card{overflow-x:auto}table.stack thead{display:none}table.stack tr{display:block;padding:10px 0;border-bottom:1px solid var(--line)}table.stack td{display:block;border:0;padding:2px 0;max-width:none !important;min-width:0 !important}table.stack td[data-label]::before{content:attr(data-label) ": ";color:var(--faint);font-size:12px}}
+@media (max-width:520px){.tile{padding:14px}.tile .v{font-size:26px}.tile .s{font-size:12px}.facts{grid-template-columns:1fr}.facts dt{margin-top:6px}}
 </style>
 </head>
 <body>
 <div class="app">
 <aside id="side">
-  <div class="brand">Whyline <small>report &middot; read-only &middot; generated by whyline report</small></div>
+  <div class="brand"><span class="mark" aria-hidden="true">W</span><div><b>Whyline</b><small>provenance for AI-written code</small></div></div>
   <div class="repo" id="repoBox"></div>
   <nav id="nav" aria-label="Report sections">
-    <button class="on" data-view="overview" aria-current="page">Overview</button>
-    <button data-view="why">Why (blame)</button>
-    <button data-view="expiry">Expiry <span class="cnt" id="expCnt"></span></button>
-    <button data-view="unreviewed">Unreviewed <span class="cnt" id="unrevCnt"></span></button>
-    <button data-view="bom">AI Bill of Materials</button>
-    <button data-view="status">Status</button>
+    <button class="on" data-view="overview" aria-current="page"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/><rect x="2" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/></svg>Overview</button>
+    <button data-view="why"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 4 1.5 8 5 12M11 4l3.5 4L11 12"/></svg>Why this line</button>
+    <button data-view="expiry"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="8" cy="8" r="6"/><path d="M8 4.5V8l2.5 1.5"/></svg>Expiry <span class="cnt" id="expCnt"></span></button>
+    <button data-view="unreviewed"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M1.5 8S4 3.5 8 3.5 14.5 8 14.5 8 12 12.5 8 12.5 1.5 8 1.5 8Z"/><circle cx="8" cy="8" r="2"/></svg>Unreviewed <span class="cnt" id="unrevCnt"></span></button>
+    <button data-view="bom"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M8 1.5 14 4.5v7L8 14.5 2 11.5v-7L8 1.5Z"/><path d="M2 4.5 8 7.5l6-3M8 7.5v7"/></svg>AI Bill of Materials</button>
+    <button data-view="status"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M1.5 8h3l2-4.5 3 9 2-4.5h3"/></svg>Status</button>
   </nav>
-  <div class="side-foot" id="sidefoot"></div>
+  <div class="side-note"><b>Read-only report</b>Nothing here changes code. Actions happen in Bob or the <code>whyline</code> CLI.</div>
+  <div class="side-foot"><span id="sidefoot"></span><button class="themebtn" id="themeBtn" type="button" aria-label="Color theme">Theme: auto</button></div>
 </aside>
 <main>
-  <div class="top">
-    <div><button class="burger" id="burger" aria-expanded="false" aria-controls="side" onclick="var s=document.getElementById('side');var open=s.classList.toggle('open');this.setAttribute('aria-expanded',open)">Menu</button>
-      <h1 id="title">Overview</h1><p id="subtitle"></p></div>
-    <div class="ro"><b>Read-only.</b> Actions run in Bob or the CLI. This page has no buttons that change anything.</div>
-  </div>
+<div class="wrap">
+  <div class="mobilebar"><div class="brand"><span class="mark" aria-hidden="true">W</span><b>Whyline</b></div>
+    <button class="burger" id="burger" aria-expanded="false" aria-controls="side" onclick="var s=document.getElementById('side');var open=s.classList.toggle('open');this.setAttribute('aria-expanded',open)">Menu</button></div>
 
   <!-- OVERVIEW -->
   <section class="view on" id="v-overview">
-    <div class="kpis" id="ovKpis"></div>
-    <div class="row2">
-      <div class="card"><h3>By agent</h3><table id="agentTable"></table></div>
-      <div class="card"><h3>Needs a human</h3><table id="needsHumanTable"></table>
-        <div class="howto">In Bob IDE (Agent mode) say <code>remove &lt;file name&gt;</code>. In a terminal: <code>whyline check</code>, <code>whyline why &lt;file&gt;:&lt;line&gt;</code>.</div>
-      </div>
+    <div class="vh"><div class="eyebrow" id="ovEyebrow">Overview</div><h1 id="ovHeadline"></h1><p id="ovSub"></p></div>
+    <div class="tiles" id="ovKpis"></div>
+    <div class="sec">
+      <div class="sec-h"><div><h2>What needs you</h2><p>One row per thing to look at, with the exact next step.</p></div><span class="faint" id="ovQueueMeta"></span></div>
+      <div class="queue" id="needsHuman"></div>
     </div>
-    <div class="row3">
-      <div class="card"><h3>Temporary code by kind</h3><table id="ovKindTable"></table></div>
-      <div class="card" id="ovFolderCard"><h3>AI share by folder <small>lines in files Bob touched</small></h3><table id="ovFolderTable"></table></div>
-      <div class="card"><h3>Last removal</h3><div id="ovLastRemoval"></div></div>
+    <div class="sec grid2">
+      <div class="card" id="ovFolderCard"><div class="card-h"><div><h2>AI share by folder</h2><p>Of the lines in files Bob touched, how many are AI-written.</p></div></div><div id="ovFolderTable"></div></div>
+      <div class="card"><div class="card-h"><div><h2>Temporary code, by kind</h2><p>Code written to go away, and where each piece stands.</p></div></div><div id="ovKindTable"></div></div>
+    </div>
+    <div class="sec grid2">
+      <div class="card"><div class="card-h"><div><h2>Who wrote the lines</h2><p>Lines changed in this range, by author.</p></div></div><div id="agentTable"></div></div>
+      <div class="card"><div class="card-h"><div><h2>Last removal</h2><p>The most recent temporary code taken out, with its evidence.</p></div></div><div id="ovLastRemoval"></div></div>
     </div>
   </section>
 
   <!-- WHY -->
   <section class="view" id="v-why">
-    <div id="whyEmpty" style="display:none;padding:20px" class="card muted">
+    <div class="vh"><div class="eyebrow">Why this line</div><h1>Every AI-written line keeps the prompt that caused it.</h1><p>Pick a file, then click a line. The answer is the same one <code>whyline why</code> gives in a terminal.</p></div>
+    <div id="whyEmpty" style="display:none" class="card empty">
       no AI-written lines at HEAD yet (commit something Bob wrote, then run whyline report)
     </div>
     <div id="whyMain" style="display:none">
-      <div class="filters" style="margin-bottom:10px">
-        <input class="search" id="whySearch" placeholder="filter files..." type="text">
-      </div>
-      <div class="row2c" style="display:grid;grid-template-columns:260px 1fr;gap:12px;align-items:start;overflow-x:auto">
-        <div class="card" style="padding:10px;min-width:0">
-          <h3 style="margin-bottom:8px">Files <small id="whyFileCount"></small></h3>
-          <div id="whyFileList" style="max-height:500px;overflow-y:auto"></div>
+      <div class="row2c" style="display:grid;grid-template-columns:280px minmax(0,1fr);gap:16px;align-items:start">
+        <div class="card" style="padding:12px;min-width:0">
+          <input class="search" id="whySearch" placeholder="Filter files" type="text" aria-label="Filter files">
+          <div class="card-h" style="margin:12px 4px 6px"><h2 style="font-size:13px">Files</h2><span class="aside" id="whyFileCount"></span></div>
+          <div id="whyFileList" style="max-height:520px;overflow-y:auto"></div>
         </div>
         <div style="min-width:0">
-          <div class="card" style="padding:12px;min-width:0">
-            <h3 id="whyCodeTitle" style="margin-bottom:6px">select a file</h3>
-            <div class="code" id="whyCode" style="overflow-x:auto"></div>
-            <div class="legend" style="margin-top:8px">
-              <span><i style="background:rgba(69,137,255,.6)"></i>AI</span>
-              <span><i style="background:rgba(241,194,27,.6)"></i>AI, edited by a human</span>
-              <span><i style="background:rgba(138,63,252,.6)"></i>AI, temporary item</span>
-              <span><i style="background:var(--line)"></i>human</span>
-            </div>
+          <div class="card" style="padding:14px;min-width:0">
+            <div class="card-h" style="margin-bottom:10px"><h2 id="whyCodeTitle" class="mono" style="font-size:14px">select a file</h2>
+              <div class="legend"><span><i class="dot"></i>AI</span><span><i class="dot edit"></i>AI, edited by a human</span><span><i class="dot tmp"></i>temporary</span><span><i class="dot human"></i>human</span></div></div>
+            <div class="code" id="whyCode"></div>
           </div>
-          <div class="detail" id="whyDetail" style="margin-top:12px;display:none" aria-live="polite" aria-atomic="true"></div>
+          <div class="detail" id="whyDetail" style="margin-top:16px;display:none" aria-live="polite" aria-atomic="true"></div>
         </div>
       </div>
-      <div id="whyFallback" style="display:none;margin-top:12px">
-        <div class="card"><h3>AI ranges (fallback)</h3>
-          <table id="whyTable"><thead><tr><th>File</th><th>Lines</th><th>Agent</th><th>Prompt</th><th>Session</th><th>Origin</th></tr></thead><tbody></tbody></table>
+      <div id="whyFallback" style="display:none;margin-top:16px">
+        <div class="card"><div class="card-h"><h2>AI ranges</h2></div>
+          <table id="whyTable"><thead><tr><th>File</th><th>Lines</th><th>Agent</th><th>Prompt</th><th>Origin</th></tr></thead><tbody></tbody></table>
         </div>
       </div>
     </div>
@@ -162,6 +267,7 @@ input.search{border:1px solid var(--line);background:var(--card);color:var(--ink
 
   <!-- EXPIRY -->
   <section class="view" id="v-expiry">
+    <div class="vh"><div class="eyebrow">Expiry</div><h1>Temporary code, and whether its time is up.</h1><p>Mocks, demos, flags, shims and fixtures are recorded with a reason and a removal condition when Bob writes them. Whyline checks the condition on every run.</p></div>
     <div class="filters" id="expFilters" role="group" aria-label="Filter by status">
       <button class="on" data-f="all" aria-pressed="true">All</button>
       <button data-f="due" aria-pressed="false">Due</button>
@@ -170,35 +276,36 @@ input.search{border:1px solid var(--line);background:var(--card);color:var(--ink
       <button data-f="removed" aria-pressed="false">Removed</button>
     </div>
     <div class="card">
-      <table id="expTable"><thead><tr><th>Item</th><th>Kind</th><th>Where</th><th>Reason</th><th>Condition</th><th>Status</th></tr></thead><tbody></tbody></table>
-      <div class="howto">To act: in Bob IDE say <code>remove &lt;id&gt;</code>. To override: <code>whyline keep &lt;id&gt; "reason"</code> or <code>whyline until &lt;id&gt; 2027-01-01</code>.</div>
+      <table id="expTable"><thead><tr><th>File</th><th>Kind</th><th>Reason</th><th>Removes when</th><th>Status</th></tr></thead><tbody></tbody></table>
+      <div class="hint">To remove a due item, say <code>remove &lt;file name&gt;</code> to Bob. To keep one: <code>whyline keep &lt;file&gt; "reason"</code>, or set a date: <code>whyline until &lt;file&gt; 2027-01-01</code>.</div>
     </div>
   </section>
 
   <!-- UNREVIEWED -->
   <section class="view" id="v-unreviewed">
-    <div class="kpis" id="unrevKpis"></div>
-    <div class="card" style="margin-top:12px">
-      <h3>Worst first</h3>
+    <div class="vh"><div class="eyebrow">Unreviewed</div><h1>AI-written lines no human has edited since.</h1><p>Worst first. A human edit on an AI line counts as a review.</p></div>
+    <div class="tiles" id="unrevKpis" style="grid-template-columns:repeat(2,minmax(0,1fr))"></div>
+    <div class="card sec">
       <table id="unrevTable"><thead><tr><th>File</th><th>AI lines</th><th>Coverage</th></tr></thead><tbody></tbody></table>
-      <div class="howto" id="unrevHowto"></div>
+      <div class="hint" id="unrevHowto" style="display:none"></div>
     </div>
   </section>
 
   <!-- BOM -->
   <section class="view" id="v-bom">
-    <div class="card" id="bomCard"><h3 id="bomTitle">AI Bill of Materials</h3><table id="bomTable"></table></div>
+    <div class="vh"><div class="eyebrow" id="bomTitle">AI Bill of Materials</div><h1>What the AI wrote in this range, and what was checked.</h1><p>Lines changed, AI share, human review, tests, temporary code and cost.</p></div>
+    <div class="card" id="bomCard"><table id="bomTable"></table></div>
   </section>
 
   <!-- STATUS -->
   <section class="view" id="v-status">
-    <div class="card"><h3>Notes and sessions</h3>
-      <table id="statusTable"></table>
-    </div>
-    <div class="card" style="margin-top:12px"><h3>Recent sessions <small>prompt on record</small></h3>
-      <table id="sessionTable"><thead><tr><th>Session</th><th>Agent</th><th>Author</th><th>When</th><th>Cost</th><th>Prompt</th></tr></thead><tbody></tbody></table>
+    <div class="vh"><div class="eyebrow">Status</div><h1>Everything the hooks have recorded.</h1><p>Notes, sessions and ranges stored in git notes in this repository.</p></div>
+    <div class="card"><table id="statusTable"></table></div>
+    <div class="card sec"><div class="card-h"><div><h2>Sessions</h2><p>The prompt on record for each agent session.</p></div></div>
+      <table id="sessionTable"><thead><tr><th>When</th><th>Agent</th><th>Author</th><th>Cost</th><th>Prompt</th></tr></thead><tbody></tbody></table>
     </div>
   </section>
+</div>
 </main>
 </div>
 
@@ -211,15 +318,41 @@ function esc(s) {
 }
 function nd(v) { return (v == null) ? 'no data' : esc(String(v)); }
 function pct(n, d) { return (d && d > 0 && n != null) ? Math.round(n / d * 100) + '%' : 'no data'; }
+function plural(n, one, many) { return n === 1 ? one : (many || one + 's'); }
+function base(file) { return String(file || '').split('/').pop(); }
+function day(ts) { return ts ? String(ts).slice(0, 10) : null; }
 
-var titles = {
-  overview: ['Overview', 'captured by Bob hooks'],
-  why: ['Why does this line exist?', 'the prompt, the session, the agent behind every AI range'],
-  expiry: ['Expiry', 'temporary code with a reason and a removal condition'],
-  unreviewed: ['Unreviewed AI code', 'AI-written lines with no review signal'],
-  bom: ['AI Bill of Materials', 'lines changed, AI share, reviewed, cost for the range'],
-  status: ['Status', 'notes, sessions and ranges recorded by the hooks']
-};
+// command chip: exact text to run, with a copy button (copying changes nothing in the repo)
+function cmdChip(text, where) {
+  return '<div class="cmd"><span class="p">' + (where === 'bob' ? '&rsaquo;' : '$') + '</span><code>' + esc(text) + '</code>' +
+    '<button class="cp" type="button" data-copy="' + esc(text) + '" aria-label="Copy command">Copy</button></div>' +
+    (where === 'bob' ? '<div class="cmd-where">say it to Bob (Agent mode)</div>' : '');
+}
+document.addEventListener('click', function(e) {
+  var b = e.target.closest ? e.target.closest('[data-copy]') : null;
+  if (!b) return;
+  var text = b.getAttribute('data-copy');
+  function done() { b.textContent = 'Copied'; setTimeout(function() { b.textContent = 'Copy'; }, 1200); }
+  try { navigator.clipboard.writeText(text).then(done, done); }
+  catch (err) { var t = document.createElement('textarea'); t.value = text; document.body.appendChild(t); t.select(); try { document.execCommand('copy'); } catch (x) {} t.remove(); done(); }
+});
+
+// theme: auto follows the system; the choice is remembered in this browser only
+(function() {
+  var modes = ['auto', 'light', 'dark'], btn = document.getElementById('themeBtn'), mode = 'auto';
+  try { mode = localStorage.getItem('whyline-theme') || 'auto'; } catch (e) {}
+  function apply(m) {
+    mode = modes.indexOf(m) >= 0 ? m : 'auto';
+    if (mode === 'auto') document.documentElement.removeAttribute('data-theme');
+    else document.documentElement.setAttribute('data-theme', mode);
+    btn.textContent = 'Theme: ' + mode;
+    try { localStorage.setItem('whyline-theme', mode); } catch (e) {}
+  }
+  btn.onclick = function() { apply(modes[(modes.indexOf(mode) + 1) % modes.length]); };
+  apply(mode);
+})();
+
+var titles = { overview: 1, why: 1, expiry: 1, unreviewed: 1, bom: 1, status: 1 };
 
 function showView(v) {
   document.querySelectorAll('.view').forEach(function(s) { s.classList.toggle('on', s.id === 'v-' + v); });
@@ -229,17 +362,23 @@ function showView(v) {
     if (active) b.setAttribute('aria-current', 'page');
     else b.removeAttribute('aria-current');
   });
-  var t = titles[v] || titles['overview'];
-  document.getElementById('title').textContent = t[0];
-  document.getElementById('subtitle').textContent = t[1];
   var side = document.getElementById('side');
   side.classList.remove('open');
   var burger = document.getElementById('burger');
   if (burger) burger.setAttribute('aria-expanded', 'false');
   try { localStorage.setItem('whyline-report-view', v); } catch(e) {}
+  window.scrollTo(0, 0);
 }
 document.querySelectorAll('nav button').forEach(function(b) {
   b.onclick = function() { showView(b.getAttribute('data-view')); };
+});
+// in-page links: any element with data-go="<view>" (and optional data-file for the Why view)
+document.addEventListener('click', function(e) {
+  var a = e.target.closest ? e.target.closest('[data-go]') : null;
+  if (!a) return;
+  var f = a.getAttribute('data-file');
+  showView(a.getAttribute('data-go'));
+  if (f && window.whyOpenFile) window.whyOpenFile(f);
 });
 
 // ---- populate ----
@@ -248,97 +387,115 @@ var bom = DATA.bom || null;
 var unreviewed = DATA.unreviewed || {};
 var sessions = DATA.sessions || [];
 var ranges = DATA.ranges || [];
-
-// repo box
-document.getElementById('repoBox').innerHTML =
-  '<b>' + esc(DATA.repo) + '</b>' +
-  '<small>' + esc((DATA.head || '').slice(0,7)) + ' &middot; ' + (DATA.notes || 0) + ' note(s) &middot; ' + ranges.length + ' range(s)</small>';
-
-// side foot
-document.getElementById('sidefoot').innerHTML =
-  '<b>Whyline 0.1</b>generated ' + esc(DATA.generatedAt ? DATA.generatedAt.replace('T', ' ').slice(0, 16) : '');
-
-// expiry counts
-var due = (check.due || []).length;
 var counts = check.counts || {};
-document.getElementById('expCnt').textContent = due > 0 ? due + ' due' : '';
-var unrevFiles = (unreviewed.totals && unreviewed.totals.files) || 0;
-document.getElementById('unrevCnt').textContent = unrevFiles > 0 ? unrevFiles : '';
+var allItems = (check.due || []).concat(check.active || []).concat(check.other || []);
+var sessMapAll = {};
+sessions.forEach(function(s) { sessMapAll[s.id] = s; });
+var shortHead = (DATA.head || '').slice(0, 7);
 
-// OVERVIEW kpis
-var aiTotal = bom ? bom.ai.total : null;
+// plain-language removal condition, from the recorded condition
+function waitingFor(it) {
+  var c = it.condition || {};
+  if (c.type === 'date' && c.on) return 'the date reaches ' + c.on;
+  if (c.type === 'no_references') return c.symbol ? 'no code still uses ' + c.symbol : 'nothing references this file';
+  if (c.type) return String(c.type).replace(/_/g, ' ') + (c.symbol ? ' ' + c.symbol : '') + (c.on ? ' ' + c.on : '');
+  return null;
+}
+
+// AI, edited and human shares of the lines changed (from bom)
+var aiTotal = bom && bom.ai ? bom.ai.total : null;
 var linesChanged = bom ? bom.linesChanged : null;
 var aiPct = (aiTotal != null && linesChanged) ? Math.round(aiTotal / linesChanged * 100) : null;
-var revPct = bom ? bom.reviewed.percent : null;
-var kpis = [
-  { v: aiPct != null ? aiPct + '%' : 'no data', l: 'AI-written (% of lines changed)', c: '' },
-  { v: revPct != null ? revPct + '%' : 'no data', l: 'AI lines reviewed', c: 'color:var(--warn)' },
-  { v: nd(counts.active != null ? counts.active + counts.due : null), l: 'temporary items tracked', c: 'color:var(--accent2)' },
-  { v: nd(sessions.length), l: 'sessions on record', c: '' }
-];
-var kpiHtml = '';
-kpis.forEach(function(k) {
-  kpiHtml += '<div class="kpi"><div class="v" style="' + k.c + '">' + k.v + '</div><div class="l">' + k.l + '</div></div>';
-});
-document.getElementById('ovKpis').innerHTML = kpiHtml;
+var revPct = bom && bom.reviewed ? bom.reviewed.percent : null;
+var revLines = bom && bom.reviewed ? bom.reviewed.lines : null;
 
-// by agent table
-var byAgent = (bom && bom.ai && bom.ai.byAgent) ? bom.ai.byAgent : {};
-var agHtml = '';
-Object.keys(byAgent).forEach(function(agent) {
-  var n = byAgent[agent];
-  var w = aiTotal ? Math.round(n / aiTotal * 100) : 0;
-  agHtml += '<tr><td>' + esc(agent) + '</td><td style="width:55%"><div class="bar"><i style="width:' + w + '%"></i></div></td><td>' + nd(n) + '</td></tr>';
-});
-if (!agHtml) agHtml = '<tr><td colspan="3" class="muted">no AI ranges in this range</td></tr>';
-document.getElementById('agentTable').innerHTML = agHtml;
-
-// needs a human
-var nhHtml = '';
-(check.due || []).slice(0, 5).forEach(function(it) {
-  nhHtml += '<tr><td><span class="tag bad">due</span></td><td>' + esc(it.id) + ' ' + esc(it.kind || '') + ' &middot; ' + esc(it.file || '') + '</td></tr>';
-});
-(unreviewed.files || []).filter(function(f) { return f.aiLines > 0; }).slice(0, 3).forEach(function(f) {
-  nhHtml += '<tr><td><span class="tag warn">unreviewed</span></td><td>' + esc(f.file) + ': ' + f.aiLines + ' AI lines</td></tr>';
-});
-if (!nhHtml) nhHtml = '<tr><td colspan="2" class="muted">nothing needs attention right now</td></tr>';
-document.getElementById('needsHumanTable').innerHTML = nhHtml;
-
-// OVERVIEW panel 1: Temporary code by kind
+// repo box with the authorship bar
 (function() {
-  var allItems = (check.due || []).concat(check.active || []).concat(check.other || []);
-  var KINDS = ['mock', 'demo', 'flag', 'shim', 'fixture', 'todo'];
-  var STATES = ['active', 'due', 'kept', 'removed'];
-  var stCls = { active: 'ok', due: 'bad', kept: 'dim', removed: 'dim' };
-  // group items by kind then state
-  var byKind = {};
-  allItems.forEach(function(it) {
-    var k = it.kind || 'other';
-    if (!byKind[k]) byKind[k] = { active: 0, due: 0, kept: 0, removed: 0 };
-    var s = it.state || 'active';
-    byKind[k][s] = (byKind[k][s] || 0) + 1;
-  });
-  // sort: known kinds first (in KINDS order), then any extras alphabetically
-  var knownKinds = KINDS.filter(function(k) { return byKind[k]; });
-  var extraKinds = Object.keys(byKind).filter(function(k) { return KINDS.indexOf(k) === -1; }).sort();
-  var kinds = knownKinds.concat(extraKinds);
-  var html = '';
-  if (!kinds.length) {
-    html = '<tr><td class="muted" colspan="2">no temporary items recorded yet</td></tr>';
-  } else {
-    html += '<tr><th>Kind</th><th>Counts</th></tr>';
-    kinds.forEach(function(k) {
-      var counts = byKind[k];
-      var tags = STATES.filter(function(s) { return counts[s]; }).map(function(s) {
-        return '<span class="tag ' + stCls[s] + '" style="margin-right:3px">' + counts[s] + ' ' + esc(s) + '</span>';
-      }).join('');
-      html += '<tr><td>' + esc(k) + '</td><td>' + tags + '</td></tr>';
-    });
+  var h = '<b>' + esc(DATA.repo) + '</b><div class="meta mono">' + esc(shortHead || 'no HEAD') + ' &middot; ' + (DATA.notes || 0) + ' ' + plural(DATA.notes || 0, 'note') + ' &middot; ' + ranges.length + ' ' + plural(ranges.length, 'range') + '</div>';
+  if (aiPct != null) {
+    var ed = revLines ? Math.round(revLines / linesChanged * 100) : 0;
+    h += '<div class="authbar" aria-hidden="true"><i style="width:' + (aiPct - ed) + '%;background:var(--ai)"></i><i style="width:' + ed + '%;background:var(--edit)"></i><i style="width:' + (100 - aiPct) + '%;background:var(--human)"></i></div>' +
+      '<div class="authleg"><span>' + aiPct + '% AI-written</span><span>' + (100 - aiPct) + '% human</span></div>';
   }
-  document.getElementById('ovKindTable').innerHTML = html;
+  document.getElementById('repoBox').innerHTML = h;
 })();
 
-// OVERVIEW panel 2: AI share by folder
+document.getElementById('sidefoot').textContent = 'v0.1 · ' + (DATA.generatedAt ? DATA.generatedAt.replace('T', ' ').slice(0, 16) + ' UTC' : '');
+
+// nav counts
+var due = (check.due || []).length;
+document.getElementById('expCnt').textContent = due > 0 ? due + ' due' : '';
+if (due > 0) document.getElementById('expCnt').className = 'cnt due';
+var unrevList = (unreviewed.files || []).filter(function(f) { return f.aiLines > 0; });
+var unrevFiles = (unreviewed.totals && unreviewed.totals.files) || 0;
+var unrevLines = unreviewed.totals ? unreviewed.totals.aiLines : null;
+document.getElementById('unrevCnt').textContent = unrevFiles > 0 ? unrevFiles : '';
+if (unrevFiles > 0) document.getElementById('unrevCnt').className = 'cnt rev';
+
+// ---- OVERVIEW ----
+(function() {
+  var notes = DATA.notes || 0;
+  var H = document.getElementById('ovHeadline'), S = document.getElementById('ovSub');
+  document.getElementById('ovEyebrow').textContent = 'Status of ' + (DATA.repo || 'this repository');
+  var dueTxt = due + ' ' + plural(due, 'piece') + ' of temporary code ' + (due === 1 ? 'is' : 'are') + ' due';
+  if (due && unrevFiles) H.innerHTML = '<span class="hl-due">' + dueTxt + '</span> and ' + unrevFiles + ' ' + plural(unrevFiles, 'file has', 'files have') + ' AI-written lines no human has edited.';
+  else if (due) H.innerHTML = '<span class="hl-due">' + dueTxt + '</span>. Everything else is on track.';
+  else if (unrevFiles) H.innerHTML = '<span class="hl-rev">' + unrevLines + ' AI-written ' + plural(unrevLines, 'line') + '</span> in ' + unrevFiles + ' ' + plural(unrevFiles, 'file') + ' have no human edit yet.';
+  else if (notes) H.textContent = 'Nothing needs a human right now.';
+  else H.textContent = 'No AI-written code recorded yet.';
+  S.innerHTML = notes
+    ? 'Recorded by Bob hooks at commit <code>' + esc(shortHead) + '</code>. Every line keeps the prompt that caused it. Nothing on this page changes code: each next step is a command you run in Bob or a terminal.'
+    : 'Run <code>whyline init</code>, work in Bob, commit, then run <code>whyline report</code>. Every line Bob writes will keep the prompt that caused it.';
+
+  // KPI strip
+  var tracked = counts.active != null ? counts.active + counts.due : null;
+  var agents = {};
+  sessions.forEach(function(s) { agents[s.agent || 'unknown'] = 1; });
+  var agentList = Object.keys(agents);
+  var lastTs = sessions.map(function(s) { return s.ts || ''; }).sort().pop();
+  var stateSegs = '';
+  ['due', 'active', 'kept', 'removed'].forEach(function(st) {
+    var n = allItems.filter(function(it) { return it.state === st; }).length;
+    for (var i = 0; i < n; i++) stateSegs += '<i class="' + st + '"></i>';
+  });
+  var kp = [
+    '<div class="tile"><div class="k">AI-written</div><div class="v">' + (aiPct != null ? aiPct + '<small>%</small>' : 'no data') + '</div>' +
+      (aiPct != null ? '<div class="bar"><i style="width:' + aiPct + '%"></i></div><div class="s">' + aiTotal + ' of ' + linesChanged + ' lines changed</div>' : '<div class="s">no notes yet</div>') + '</div>',
+    '<div class="tile"><div class="k">Reviewed by a human</div><div class="v"' + (revPct === 0 ? ' style="color:var(--edit)"' : '') + '>' + (revPct != null ? revPct + '<small>%</small>' : 'no data') + '</div>' +
+      (revPct != null ? '<div class="bar"><i class="edit" style="width:' + revPct + '%"></i></div><div class="s">' + revLines + ' of ' + aiTotal + ' AI lines have a human edit</div>' : '<div class="s">no AI lines yet</div>') + '</div>',
+    '<div class="tile"><div class="k">Temporary code tracked</div><div class="v">' + nd(tracked) + (due ? '<span class="flag">' + due + ' due</span>' : '') + '</div>' +
+      (stateSegs ? '<div class="segs" aria-hidden="true">' + stateSegs + '</div>' : '') + '<div class="s">mocks, demos, flags, shims, fixtures</div></div>',
+    '<div class="tile"><div class="k">Agent sessions</div><div class="v">' + nd(sessions.length) + '</div>' +
+      '<div class="s">' + (agentList.length ? 'by ' + agentList.map(esc).join(', ') + (lastTs ? ' &middot; last ' + esc(day(lastTs)) : '') : 'none on record') + '</div></div>'
+  ];
+  document.getElementById('ovKpis').innerHTML = kp.join('');
+
+  // What needs you: due items first, then the files with the most unreviewed AI lines
+  var q = '';
+  (check.due || []).forEach(function(it) {
+    var why = [it.reason, it.evidence && it.evidence.summary].filter(Boolean).map(esc).join(' &middot; ');
+    q += '<div class="q-row due"><div class="badge"><span class="pill due">Due</span><span class="kind">' + esc(it.kind || 'temporary') + '</span></div>' +
+      '<div><div class="file">' + esc(it.file) + '</div><div class="why">' + (why || 'its removal condition is met') + '</div></div>' +
+      '<div class="act">' + cmdChip('remove ' + base(it.file), 'bob') + '</div></div>';
+  });
+  var topRev = unrevList.slice(0, 3);
+  topRev.forEach(function(f) {
+    var s = f.sessions && f.sessions.length ? sessMapAll[f.sessions[0]] : null;
+    var ctx = s && s.prompt ? '&ldquo;' + esc(s.prompt.length > 96 ? s.prompt.slice(0, 96).replace(/\s+\S*$/, '') + '...' : s.prompt) + '&rdquo;' : 'AI-written, no human edit since';
+    q += '<div class="q-row"><div class="badge"><span class="pill review">Review</span><span>' + f.aiLines + ' AI ' + plural(f.aiLines, 'line') + '</span></div>' +
+      '<div><div class="file">' + esc(f.file) + '</div><div class="why">' + ctx + '</div></div>' +
+      '<div class="act"><button class="btn" type="button" data-go="why" data-file="' + esc(f.file) + '">See why it exists &rarr;</button></div></div>';
+  });
+  var more = unrevList.length - topRev.length;
+  if (!q) q = '<div class="q-row" style="grid-template-columns:1fr"><div class="empty">nothing needs attention right now' + (notes ? '' : ' (no notes yet)') + '</div></div>';
+  else q += '<div class="q-foot"><span>' + (more > 0 ? more + ' more ' + plural(more, 'file') + ' with unreviewed AI lines' : 'Nothing else needs a human right now.') + '</span>' +
+    (more > 0 ? '<button class="linkbtn" type="button" data-go="unreviewed">Open Unreviewed &rarr;</button>' : '') + '</div>';
+  document.getElementById('needsHuman').innerHTML = q;
+  var qn = due + topRev.length;
+  document.getElementById('ovQueueMeta').textContent = qn ? 'due first, then most AI lines' : '';
+})();
+
+// OVERVIEW: AI share by folder
 (function() {
   var why = DATA.why;
   var files = (why && why.files) || [];
@@ -350,90 +507,106 @@ document.getElementById('needsHumanTable').innerHTML = nhHtml;
   var byFolder = {};
   files.forEach(function(f) {
     var parts = f.file.split('/');
-    var folder = (parts.length > 1 && parts[0] === 'src') ? parts[0] + '/' + (parts[1] || '') : parts[0];
+    var folder = parts.length === 1 ? '(root)' : (parts[0] === 'src' && parts.length > 2) ? parts[0] + '/' + parts[1] : parts[0];
     if (!byFolder[folder]) byFolder[folder] = { aiLines: 0, lines: 0 };
     byFolder[folder].aiLines += f.aiLines;
     byFolder[folder].lines += f.lines;
   });
-  // sort by AI lines descending
   var sorted = Object.keys(byFolder).sort(function(a, b) { return byFolder[b].aiLines - byFolder[a].aiLines; });
-  var html = '';
+  var html = '', full = 0;
   sorted.forEach(function(folder) {
     var d = byFolder[folder];
     var p = d.lines ? Math.round(d.aiLines / d.lines * 100) : 0;
-    html += '<tr>' +
-      '<td style="width:100px;white-space:nowrap">' + esc(folder) + '</td>' +
-      '<td style="width:50%"><div class="bar"><i style="width:' + p + '%"></i></div></td>' +
-      '<td style="white-space:nowrap;font-size:12px">' + d.aiLines + ' of ' + d.lines + ' (' + p + '%)</td>' +
-      '</tr>';
+    if (p === 100) full++;
+    html += '<div class="hrow"><span class="name" title="' + esc(folder) + '">' + esc(folder) + '/</span>' +
+      '<div class="bar"><i style="width:' + p + '%"></i></div>' +
+      '<span class="num"><b>' + d.aiLines + '</b> of ' + d.lines + ' &middot; ' + p + '%</span></div>';
   });
+  if (full) html += '<div class="note-bad">' + full + ' ' + plural(full, 'folder is', 'folders are') + ' entirely AI-written. Worth a human read end to end before shipping.</div>';
   document.getElementById('ovFolderTable').innerHTML = html;
 })();
 
-// OVERVIEW panel 3: Last removal
+// OVERVIEW: temporary code by kind
 (function() {
-  var other = check.other || [];
-  var removed = other.filter(function(it) { return it.state === 'removed'; });
-  var el = document.getElementById('ovLastRemoval');
-  if (!removed.length) {
-    el.innerHTML = '<p class="muted" style="margin:0">nothing removed yet (say <code>remove &lt;file name&gt;</code> to Bob when an item is due)</p>';
-    return;
-  }
-  // pick the one with the latest `at` timestamp
-  removed.sort(function(a, b) { return (b.at || '') > (a.at || '') ? 1 : -1; });
-  var it = removed[0];
-  var cond = it.condition ? (it.condition.type + (it.condition.on ? ' ' + it.condition.on : '')) : null;
-  var short = it.removedIn ? it.removedIn.slice(0, 7) : null;
-  var html = '<dl style="display:grid;grid-template-columns:90px 1fr;gap:3px 8px;font-size:13px;margin:0">' +
-    '<dt class="muted">Item</dt><dd>' + esc(it.id) + '</dd>' +
-    '<dt class="muted">Kind</dt><dd><span class="tag ' + esc(kindTagOf(it.kind)) + '">' + esc(it.kind || 'unknown') + '</span></dd>' +
-    '<dt class="muted">File</dt><dd>' + esc(it.file || '') + '</dd>' +
-    '<dt class="muted">Reason</dt><dd>' + nd(it.reason) + '</dd>' +
-    (cond ? '<dt class="muted">Condition</dt><dd>' + esc(cond) + '</dd>' : '') +
-    '<dt class="muted">Removed by</dt><dd>' + nd(it.by) + '</dd>' +
-    '<dt class="muted">Date</dt><dd>' + nd(it.at ? it.at.slice(0, 10) : null) + '</dd>' +
-    (short ? '<dt class="muted">Commit</dt><dd>' + esc(short) + '</dd>' : '') +
-    '</dl>';
-  if (short) {
-    html += '<div class="howto" style="margin-top:8px">evidence: the Bob task that removed it and commit <code>' + esc(short) + '</code></div>';
-  }
-  el.innerHTML = html;
+  var KINDS = ['mock', 'demo', 'flag', 'shim', 'fixture', 'todo'];
+  var DESC = { mock: 'stand-in for a real service', demo: 'demo or sample code', flag: 'feature flag for a rollout', shim: 'compatibility layer or workaround', fixture: 'test data', todo: 'marked for follow-up' };
+  var STATES = ['due', 'active', 'kept', 'removed'];
+  var byKind = {};
+  allItems.forEach(function(it) {
+    var k = it.kind || 'other';
+    if (!byKind[k]) byKind[k] = { active: 0, due: 0, kept: 0, removed: 0, n: 0 };
+    byKind[k][it.state || 'active'] = (byKind[k][it.state || 'active'] || 0) + 1;
+    byKind[k].n++;
+  });
+  var kinds = KINDS.filter(function(k) { return byKind[k]; }).concat(Object.keys(byKind).filter(function(k) { return KINDS.indexOf(k) === -1; }).sort());
+  var html = '';
+  if (!kinds.length) html = '<div class="empty">no temporary items recorded yet (Whyline records one when Bob writes a mock, demo, flag, shim or fixture)</div>';
+  kinds.forEach(function(k) {
+    var c = byKind[k];
+    var pills = STATES.filter(function(s) { return c[s]; }).map(function(s) { return '<span class="pill ' + s + '">' + c[s] + ' ' + s + '</span>'; }).join('');
+    html += '<div class="krow"><div><div class="kn">' + esc(k) + '</div><div class="kd">' + esc(DESC[k] || 'temporary code') + '</div></div><div class="ks">' + pills + '</div></div>';
+  });
+  document.getElementById('ovKindTable').innerHTML = html;
 })();
 
-function kindTagOf(k) {
-  var m = { flag: 'info', mock: 'pur', shim: 'warn', demo: 'dim', todo: 'dim', fixture: 'dim' };
-  return m[k] || 'dim';
-}
+// OVERVIEW: who wrote the lines
+(function() {
+  var byAgent = (bom && bom.ai && bom.ai.byAgent) ? bom.ai.byAgent : {};
+  var html = '';
+  Object.keys(byAgent).sort(function(a, b) { return byAgent[b] - byAgent[a]; }).forEach(function(agent) {
+    var n = byAgent[agent];
+    var w = linesChanged ? Math.round(n / linesChanged * 100) : 0;
+    html += '<div class="hrow"><span class="name">' + esc(agent) + ' (AI)</span><div class="bar"><i style="width:' + w + '%"></i></div><span class="num"><b>' + nd(n) + '</b> ' + plural(n, 'line') + ' &middot; ' + w + '%</span></div>';
+  });
+  if (html && linesChanged != null && aiTotal != null) {
+    var hu = linesChanged - aiTotal, hw = Math.round(hu / linesChanged * 100);
+    html += '<div class="hrow"><span class="name">human</span><div class="bar"><i class="human" style="width:' + hw + '%"></i></div><span class="num"><b>' + hu + '</b> ' + plural(hu, 'line') + ' &middot; ' + hw + '%</span></div>';
+    html += '<p class="faint" style="font-size:12.5px;margin:10px 0 0">' + (bom.range ? 'Range ' + esc(bom.range) : 'All history (no release tag yet)') + '. The <b>AI Bill of Materials</b> has the full breakdown.</p>';
+  }
+  if (!html) html = '<div class="empty">no AI ranges in this range</div>';
+  document.getElementById('agentTable').innerHTML = html;
+})();
+
+// OVERVIEW: last removal
+(function() {
+  var removed = allItems.filter(function(it) { return it.state === 'removed'; });
+  var el = document.getElementById('ovLastRemoval');
+  if (!removed.length) {
+    el.innerHTML = '<div class="empty">nothing removed yet (say <code>remove &lt;file name&gt;</code> to Bob when an item is due)</div>';
+    return;
+  }
+  removed.sort(function(a, b) { return (b.at || '') > (a.at || '') ? 1 : -1; });
+  var it = removed[0];
+  var short = it.removedIn ? it.removedIn.slice(0, 7) : null;
+  el.innerHTML = '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><span class="pill removed">Removed</span><span class="kind">' + esc(it.kind || '') + '</span></div>' +
+    '<div class="q-row" style="padding:0;display:block;border:0"><div class="file">' + esc(it.file || '') + '</div></div>' +
+    '<dl class="facts" style="margin-top:12px">' +
+    '<dt>Reason</dt><dd>' + nd(it.reason) + '</dd>' +
+    (waitingFor(it) ? '<dt>Condition</dt><dd>' + esc(waitingFor(it)) + '</dd>' : '') +
+    '<dt>Removed by</dt><dd>' + nd(it.by) + '</dd>' +
+    '<dt>Date</dt><dd>' + nd(day(it.at)) + '</dd>' +
+    (short ? '<dt>Evidence</dt><dd>commit <code>' + esc(short) + '</code></dd>' : '') +
+    '</dl>';
+})();
 
 // WHY view
 (function() {
   var why = DATA.why;
-  var allItems = (check.due || []).concat(check.active || []).concat(check.other || []);
+  var itemMap = {};
+  allItems.forEach(function(it) { itemMap[it.id] = it; });
 
   // undefined = old data without why; null or empty files = nothing at HEAD
   if (why === undefined) {
-    // fallback: show the old ranges table
     document.getElementById('whyMain').style.display = 'block';
+    document.querySelector('#whyMain .row2c').style.display = 'none';
     document.getElementById('whyFallback').style.display = 'block';
-    var byFile = {};
-    ranges.forEach(function(r) {
-      if (!byFile[r.file]) byFile[r.file] = [];
-      byFile[r.file].push(r);
-    });
     var whyTbody = document.querySelector('#whyTable tbody');
-    Object.keys(byFile).sort().forEach(function(file) {
-      byFile[file].forEach(function(r) {
-        var sess = sessions.find(function(s) { return s.id === r.session; }) || {};
-        var tr = document.createElement('tr');
-        tr.innerHTML =
-          '<td>' + esc(file) + '</td>' +
-          '<td>' + r.lines[0] + '-' + r.lines[1] + '</td>' +
-          '<td>' + esc(sess.agent || '') + '</td>' +
-          '<td style="max-width:280px;word-break:break-word">' + esc(sess.prompt || '') + '</td>' +
-          '<td>' + esc((r.session || '').slice(0, 8)) + '</td>' +
-          '<td>' + esc(r.origin) + '</td>';
-        whyTbody.appendChild(tr);
-      });
+    ranges.slice().sort(function(a, b) { return a.file < b.file ? -1 : 1; }).forEach(function(r) {
+      var sess = sessMapAll[r.session] || {};
+      var tr = document.createElement('tr');
+      tr.innerHTML = '<td class="mono">' + esc(r.file) + '</td><td>' + r.lines[0] + '-' + r.lines[1] + '</td><td>' + esc(sess.agent || '') + '</td>' +
+        '<td style="max-width:320px;word-break:break-word">' + esc(sess.prompt || '') + '</td><td>' + esc(r.origin) + '</td>';
+      whyTbody.appendChild(tr);
     });
     return;
   }
@@ -443,16 +616,7 @@ function kindTagOf(k) {
     document.getElementById('whyEmpty').style.display = 'block';
     return;
   }
-
   document.getElementById('whyMain').style.display = 'block';
-  document.getElementById('whyFileCount').textContent = files.length + ' file(s)';
-
-  var sessMap = {};
-  sessions.forEach(function(s) { sessMap[s.id] = s; });
-  var itemMap = {};
-  allItems.forEach(function(it) { itemMap[it.id] = it; });
-
-  var currentFile = null;
 
   function lineClass(line) {
     if (!line.origin) return 'hu';
@@ -462,8 +626,7 @@ function kindTagOf(k) {
   }
 
   function renderCode(f) {
-    currentFile = f;
-    document.getElementById('whyCodeTitle').textContent = f.file + (f.truncated ? ' (showing first 400 lines)' : '');
+    document.getElementById('whyCodeTitle').textContent = f.file + (f.truncated ? ' (first 400 lines)' : '');
     var cv = document.getElementById('whyCode');
     cv.innerHTML = '';
     var detail = document.getElementById('whyDetail');
@@ -472,15 +635,14 @@ function kindTagOf(k) {
     f.code.forEach(function(line) {
       var d = document.createElement('div');
       d.className = lineClass(line);
-      var originLabel = line.origin ? line.origin : 'human';
       d.setAttribute('tabindex', '0');
       d.setAttribute('role', 'button');
-      d.setAttribute('aria-label', 'line ' + line.n + ', ' + originLabel);
+      d.setAttribute('aria-label', 'line ' + line.n + ', ' + (line.origin ? line.origin : 'human'));
       d.innerHTML = '<span class="n">' + line.n + '</span>' + esc(line.text);
       function activate() {
         cv.querySelectorAll('div').forEach(function(x) { x.classList.remove('sel'); });
         d.classList.add('sel');
-        showLineDetail(f.file, line);
+        showLineDetail(f, line);
       }
       d.onclick = activate;
       d.onkeydown = function(e) {
@@ -490,43 +652,38 @@ function kindTagOf(k) {
       };
       cv.appendChild(d);
     });
-    // select first AI line by default
     var first = f.code.find(function(l) { return l.origin; });
     if (first) {
-      var el = cv.children[first.n - 1] || cv.children[0];
-      if (el) { el.classList.add('sel'); showLineDetail(f.file, first); }
+      var el = cv.children[f.code.indexOf(first)];
+      if (el) { el.classList.add('sel'); showLineDetail(f, first); }
     }
-    // update file list selection
     document.querySelectorAll('.why-file-row').forEach(function(r) {
       r.classList.toggle('on', r.getAttribute('data-file') === f.file);
       r.setAttribute('aria-pressed', r.getAttribute('data-file') === f.file ? 'true' : 'false');
     });
   }
 
-  function showLineDetail(file, line) {
+  function showLineDetail(f, line) {
+    var file = f.file;
     var detail = document.getElementById('whyDetail');
     detail.style.display = 'block';
-    var sess = line.session ? (sessMap[line.session] || {}) : {};
+    var sess = line.session ? (sessMapAll[line.session] || {}) : {};
     var item = line.item ? (itemMap[line.item] || null) : null;
     if (!line.origin) {
       detail.innerHTML = '<h4>Line ' + line.n + ' &middot; human</h4>' +
-        '<p class="muted" style="margin:4px 0 0">Human-written: no prompt on record.</p>' +
-        '<div class="term"><span class="p">$</span> whyline why ' + esc(file) + ':' + line.n + '</div>';
+        '<p class="muted" style="margin:4px 0 12px">Human-written: no prompt on record.</p>' + cmdChip('whyline why ' + file + ':' + line.n);
       return;
     }
-    var who = line.origin === 'ai-edited' ? 'AI (edited by a human)' : 'AI (' + esc(sess.agent || 'unknown') + ')';
-    var h = '<h4>Line ' + line.n + ' &middot; ' + who + '</h4><dl>';
-    if (sess.id) h += '<dt>Session</dt><dd>' + esc(sess.id.slice(0, 8)) + (sess.cost != null ? ' &middot; ' + esc(String(sess.cost)) + ' Bobcoin' : ' &middot; cost: no data') + '</dd>';
-    if (sess.author) h += '<dt>Author</dt><dd>' + esc(sess.author) + '</dd>';
-    if (sess.ts) h += '<dt>When</dt><dd>' + esc(sess.ts.slice(0, 10)) + '</dd>';
-    h += '<dt>Origin</dt><dd>' + esc(line.origin) + '</dd>';
-    if (item) {
-      var cond = item.condition ? (item.condition.type + (item.condition.on ? ' ' + item.condition.on : '')) : '';
-      h += '<dt>Item</dt><dd>' + esc(item.id) + ' ' + esc(item.kind || '') + ' &middot; ' + esc(item.state || '') + (cond ? ' &middot; ' + esc(cond) : '') + '</dd>';
-    }
-    h += '</dl>';
+    var who = line.origin === 'ai-edited' ? 'AI, edited by a human since' : 'AI (' + esc(sess.agent || 'unknown') + ')';
+    var h = '<h4>Line ' + line.n + ' &middot; ' + who + '</h4>';
     if (sess.prompt) h += '<div class="prompt">&ldquo;' + esc(sess.prompt) + '&rdquo;</div>';
-    h += '<div class="term"><span class="p">$</span> whyline why ' + esc(file) + ':' + line.n + '</div>';
+    h += '<dl>';
+    if (sess.author) h += '<dt>Asked by</dt><dd>' + esc(sess.author) + '</dd>';
+    if (sess.ts) h += '<dt>When</dt><dd>' + esc(day(sess.ts)) + '</dd>';
+    if (sess.id) h += '<dt>Session</dt><dd class="mono">' + esc(sess.id.slice(0, 8)) + '</dd>';
+    h += '<dt>Cost</dt><dd>' + (sess.cost != null ? esc(String(sess.cost)) : 'no data') + '</dd>';
+    if (item) h += '<dt>Temporary</dt><dd><span class="pill ' + esc(item.state || 'active') + '">' + esc(item.state || '') + '</span> <span class="kind">' + esc(item.kind || '') + '</span>' + (waitingFor(item) ? ' &middot; removes when ' + esc(waitingFor(item)) : '') + '</dd>';
+    h += '</dl><div style="margin-top:14px">' + cmdChip('whyline why ' + file + ':' + line.n) + '</div>';
     detail.innerHTML = h;
   }
 
@@ -534,24 +691,21 @@ function kindTagOf(k) {
     var list = document.getElementById('whyFileList');
     list.innerHTML = '';
     var visible = files.filter(function(f) { return !filter || f.file.toLowerCase().indexOf(filter.toLowerCase()) !== -1; });
-    document.getElementById('whyFileCount').textContent = visible.length + ' / ' + files.length + ' file(s)';
+    document.getElementById('whyFileCount').textContent = visible.length + ' of ' + files.length;
     visible.forEach(function(f) {
-      var pct = f.lines ? Math.round(f.aiLines / f.lines * 100) : 0;
+      var p = f.lines ? Math.round(f.aiLines / f.lines * 100) : 0;
       var row = document.createElement('div');
       row.className = 'why-file-row';
       row.setAttribute('data-file', f.file);
       row.setAttribute('tabindex', '0');
       row.setAttribute('role', 'button');
-      row.setAttribute('aria-label', esc(f.file) + ', ' + f.aiLines + ' AI lines of ' + f.lines);
+      row.setAttribute('aria-label', f.file + ', ' + f.aiLines + ' AI lines of ' + f.lines);
       row.setAttribute('aria-pressed', 'false');
-      row.innerHTML =
-        '<span class="fname" title="' + esc(f.file) + '">' + esc(f.file) + '</span>' +
-        '<span class="fbar"><div class="bar" style="height:6px"><i style="width:' + pct + '%"></i></div></span>' +
-        '<span class="fcnt">' + f.aiLines + ' / ' + f.lines + '</span>';
-      function activate() { renderCode(f); }
-      row.onclick = activate;
+      row.innerHTML = '<span class="fname" title="' + esc(f.file) + '">' + esc(f.file) + '</span>' +
+        '<span class="fbar"><span class="bar"><i style="width:' + p + '%"></i></span></span><span class="fcnt">' + f.aiLines + '/' + f.lines + '</span>';
+      row.onclick = function() { renderCode(f); };
       row.onkeydown = function(e) {
-        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activate(); }
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); renderCode(f); }
         else if (e.key === 'ArrowDown') { e.preventDefault(); var nx = row.nextElementSibling; if (nx) nx.focus(); }
         else if (e.key === 'ArrowUp') { e.preventDefault(); var pv = row.previousElementSibling; if (pv) pv.focus(); }
       };
@@ -561,117 +715,99 @@ function kindTagOf(k) {
 
   buildFileList('');
   renderCode(files[0]);
-
-  document.getElementById('whySearch').oninput = function() {
-    buildFileList(this.value);
-  };
+  window.whyOpenFile = function(name) { var f = files.find(function(x) { return x.file === name; }); if (f) renderCode(f); };
+  document.getElementById('whySearch').oninput = function() { buildFileList(this.value); };
 })();
 
 // EXPIRY
-var allItems = (check.due || []).concat(check.active || []).concat(check.other || []);
-var stTag = { due: 'bad', active: 'ok', kept: 'dim', removed: 'dim' };
 function renderExpiry(f) {
   var tb = document.querySelector('#expTable tbody');
   tb.innerHTML = '';
   allItems.filter(function(x) { return f === 'all' || x.state === f; }).forEach(function(x) {
-    var cond = x.condition ? (x.condition.type + (x.condition.on ? ' ' + x.condition.on : '') + (x.condition.symbol ? ' ' + x.condition.symbol : '')) : '';
     var tr = document.createElement('tr');
     tr.innerHTML =
-      '<td>' + esc(x.id) + '</td>' +
-      '<td><span class="tag ' + esc(kindTag(x.kind)) + '">' + esc(x.kind || '') + '</span></td>' +
-      '<td>' + esc(x.file || '') + '</td>' +
-      '<td class="wrap" style="min-width:180px">' + esc(x.reason || '') + '</td>' +
-      '<td>' + esc(cond) + '</td>' +
-      '<td><span class="tag ' + esc(stTag[x.state] || 'dim') + '">' + esc(x.state) + '</span></td>';
+      '<td class="mono">' + esc(x.file || '') + '</td>' +
+      '<td><span class="kind">' + esc(x.kind || '') + '</span></td>' +
+      '<td style="min-width:180px">' + nd(x.reason) + '</td>' +
+      '<td>' + nd(waitingFor(x)) + '</td>' +
+      '<td><span class="pill ' + esc(x.state || 'dim') + '">' + esc(x.state) + '</span></td>';
     tb.appendChild(tr);
   });
-  if (!tb.children.length) tb.innerHTML = '<tr><td colspan="6" class="muted">' + (allItems.length ? 'no ' + esc(f) + ' items' : 'no temporary items yet (Whyline records one when Bob writes a mock, demo, flag, shim or fixture)') + '</td></tr>';
+  if (!tb.children.length) tb.innerHTML = '<tr><td colspan="5" class="empty">' + (allItems.length ? 'no ' + esc(f) + ' items' : 'no temporary items yet (Whyline records one when Bob writes a mock, demo, flag, shim or fixture)') + '</td></tr>';
   document.querySelectorAll('#expFilters button').forEach(function(b) {
     var active = b.getAttribute('data-f') === f;
     b.classList.toggle('on', active);
     b.setAttribute('aria-pressed', active ? 'true' : 'false');
   });
 }
-function kindTag(k) {
-  var m = { flag: 'info', mock: 'pur', shim: 'warn', demo: 'dim', todo: 'dim', fixture: 'dim' };
-  return m[k] || 'dim';
-}
 renderExpiry('all');
 document.querySelectorAll('#expFilters button').forEach(function(b) {
   b.onclick = function() { renderExpiry(b.getAttribute('data-f')); };
 });
 
-// UNREVIEWED kpis
-var utotals = unreviewed.totals || {};
-var uKpis = [
-  { v: nd(utotals.aiLines), l: 'AI-written lines' },
-  { v: nd(utotals.files || null), l: 'files with unreviewed AI lines', c: 'color:var(--warn)' }
-];
-var uKpiHtml = '';
-uKpis.forEach(function(k) {
-  uKpiHtml += '<div class="kpi"><div class="v" style="' + (k.c || '') + '">' + k.v + '</div><div class="l">' + k.l + '</div></div>';
-});
-document.getElementById('unrevKpis').innerHTML = uKpiHtml;
-if ((unreviewed.missing || []).includes('coverage')) {
-  document.getElementById('unrevHowto').textContent = 'No coverage report found. Add coverage.xml or lcov.info to the repo root to see test coverage per line.';
-}
-var unrevTbody = document.querySelector('#unrevTable tbody');
-(unreviewed.files || []).filter(function(f) { return f.aiLines > 0; }).forEach(function(f) {
-  var tr = document.createElement('tr');
-  tr.innerHTML = '<td>' + esc(f.file) + '</td><td>' + f.aiLines + '</td><td>' + (f.coverage != null ? f.coverage + '%' : 'no data') + '</td>';
-  unrevTbody.appendChild(tr);
-});
-if (!unrevTbody.children.length) unrevTbody.innerHTML = '<tr><td colspan="3" class="muted">' + (ranges.length ? 'every AI line has had a human edit since' : 'no AI-written lines recorded yet (commit something Bob wrote, then run whyline report)') + '</td></tr>';
+// UNREVIEWED
+(function() {
+  var utotals = unreviewed.totals || {};
+  document.getElementById('unrevKpis').innerHTML =
+    '<div class="tile"><div class="k">Unreviewed AI lines</div><div class="v">' + nd(utotals.aiLines) + '</div></div>' +
+    '<div class="tile"><div class="k">Files with unreviewed AI lines</div><div class="v">' + nd(utotals.files || null) + '</div></div>';
+  if ((unreviewed.missing || []).indexOf('coverage') >= 0) {
+    var hw = document.getElementById('unrevHowto');
+    hw.style.display = 'flex';
+    hw.innerHTML = 'No coverage report found. Add <code>coverage.xml</code> or <code>lcov.info</code> to the repo root to see test coverage per file.';
+  }
+  var tb = document.querySelector('#unrevTable tbody');
+  unrevList.forEach(function(f) {
+    var tr = document.createElement('tr');
+    tr.innerHTML = '<td class="mono">' + esc(f.file) + '</td><td>' + f.aiLines + '</td><td>' + (f.coverage != null ? f.coverage + '%' : 'no data') + '</td>';
+    tb.appendChild(tr);
+  });
+  if (!tb.children.length) tb.innerHTML = '<tr><td colspan="3" class="empty">' + (ranges.length ? 'every AI line has had a human edit since' : 'no AI-written lines recorded yet (commit something Bob wrote, then run whyline report)') + '</td></tr>';
+})();
 
 // BOM
 if (bom) {
-  document.getElementById('bomTitle').textContent = 'AI Bill of Materials: ' + (bom.range || 'all history');
+  document.getElementById('bomTitle').textContent = 'AI Bill of Materials · ' + (bom.range || 'all history');
   var bomRows = [
     ['Lines changed', nd(bom.linesChanged)],
     ['AI-written', nd(bom.ai.total) + (aiPct != null ? ' (' + aiPct + '%)' : '')],
-    ['By agent', Object.keys(bom.ai.byAgent).map(function(a) { return esc(a) + ' ' + bom.ai.byAgent[a]; }).join(' &middot; ') || 'no data'],
+    ['By agent', Object.keys(bom.ai.byAgent || {}).map(function(a) { return esc(a) + ' ' + bom.ai.byAgent[a]; }).join(' &middot; ') || 'no data'],
     ['AI lines reviewed', bom.reviewed.lines == null ? 'no data' : bom.reviewed.lines + (bom.reviewed.percent != null ? ' (' + bom.reviewed.percent + '%)' : ' (no data)')],
     ['AI lines covered by tests', bom.tested.lines != null ? String(bom.tested.lines) : 'no data'],
-    ['Temporary items (active)', nd(bom.items.active)],
-    ['Temporary items (due)', nd(bom.items.due)],
-    ['Temporary items (removed)', nd(bom.items.removed)],
-    ['Cost', bom.cost.sum != null ? bom.cost.sum + ' Bobcoin (' + bom.cost.sessionsWithCost + ' of ' + bom.cost.sessions + ' sessions)' : 'no data (' + bom.cost.sessionsWithCost + ' of ' + bom.cost.sessions + ' sessions)']
+    ['Temporary items (active)', nd(bom.items && bom.items.active)],
+    ['Temporary items (due)', nd(bom.items && bom.items.due)],
+    ['Temporary items (removed)', nd(bom.items && bom.items.removed)],
+    ['Cost', bom.cost.sum != null ? bom.cost.sum + ' (' + bom.cost.sessionsWithCost + ' of ' + bom.cost.sessions + ' sessions)' : 'no data (' + bom.cost.sessionsWithCost + ' of ' + bom.cost.sessions + ' sessions)']
   ];
   var bomHtml = '';
   bomRows.forEach(function(r) { bomHtml += '<tr><td>' + esc(r[0]) + '</td><td>' + r[1] + '</td></tr>'; });
   document.getElementById('bomTable').innerHTML = bomHtml;
   if (bom.missing && bom.missing.length) {
-    document.getElementById('bomCard').innerHTML += '<div class="howto">Missing data: ' + bom.missing.map(esc).join(', ') + '</div>';
+    document.getElementById('bomCard').innerHTML += '<div class="hint">Missing data: ' + bom.missing.map(esc).join(', ') + '</div>';
   }
 } else {
-  document.getElementById('bomCard').innerHTML = '<p class="muted">BOM data not available (run: whyline bom).</p>';
+  document.getElementById('bomCard').innerHTML = '<p class="empty">BOM data not available (run: whyline bom).</p>';
 }
 
 // STATUS
-var statRows = [
-  ['Notes recorded', nd(DATA.notes)],
-  ['Ranges recorded', nd(ranges.length)],
-  ['Sessions recorded', nd(sessions.length)],
-  ['HEAD', DATA.head ? '<span title="' + esc(DATA.head) + '">' + esc(DATA.head.slice(0, 7)) + '</span>' : 'no data'],
-  ['Generated at', esc(DATA.generatedAt || 'no data')]
-];
-var statHtml = '';
-statRows.forEach(function(r) { statHtml += '<tr><td>' + r[0] + '</td><td>' + r[1] + '</td></tr>'; });
-document.getElementById('statusTable').innerHTML = statHtml;
-
-var sessTbody = document.querySelector('#sessionTable tbody');
-sessions.slice(0, 50).forEach(function(s) {
-  var tr = document.createElement('tr');
-  tr.innerHTML =
-    '<td>' + esc((s.id || '').slice(0, 8)) + '</td>' +
-    '<td>' + esc(s.agent || '') + '</td>' +
-    '<td>' + esc(s.author || '') + '</td>' +
-    '<td>' + esc((s.ts || '').slice(0, 10)) + '</td>' +
-    '<td>' + (s.cost != null ? nd(s.cost) : 'no data') + '</td>' +
-    '<td class="wrap" style="min-width:220px;max-width:300px;word-break:break-word">' + esc(s.prompt || '') + '</td>';
-  sessTbody.appendChild(tr);
-});
-if (!sessions.length) sessTbody.innerHTML = '<tr><td colspan="6" class="muted">no sessions yet (work in Bob, commit, then run whyline report)</td></tr>';
+(function() {
+  var statRows = [
+    ['Notes recorded', nd(DATA.notes)],
+    ['Ranges recorded', nd(ranges.length)],
+    ['Sessions recorded', nd(sessions.length)],
+    ['HEAD', DATA.head ? '<span class="mono" title="' + esc(DATA.head) + '">' + esc(shortHead) + '</span>' : 'no data'],
+    ['Generated at', esc(DATA.generatedAt || 'no data')]
+  ];
+  document.getElementById('statusTable').innerHTML = statRows.map(function(r) { return '<tr><td class="muted">' + r[0] + '</td><td>' + r[1] + '</td></tr>'; }).join('');
+  var tb = document.querySelector('#sessionTable tbody');
+  sessions.slice(0, 50).forEach(function(s) {
+    var tr = document.createElement('tr');
+    tr.innerHTML = '<td>' + nd(day(s.ts)) + '</td><td>' + esc(s.agent || '') + '</td><td>' + esc(s.author || '') + '</td><td>' + (s.cost != null ? nd(s.cost) : 'no data') + '</td>' +
+      '<td style="min-width:220px;max-width:420px;word-break:break-word">' + esc(s.prompt || '') + '</td>';
+    tb.appendChild(tr);
+  });
+  if (!sessions.length) tb.innerHTML = '<tr><td colspan="5" class="empty">no sessions yet (work in Bob, commit, then run whyline report)</td></tr>';
+})();
 
 // phones: tables with a header stack into one block per row, each cell labelled by its column
 function labelCells() {
