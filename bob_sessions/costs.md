@@ -32,7 +32,8 @@ Cost is the task's own figure from its task summary (click New task before each 
 | B task09 | Whyline used from Bob in the demo shop: a plain question loaded the whyline-status skill, which ran whyline unreviewed, bom and report; answers matched the CLI (47 unreviewed lines in 12 files; 59 of 93 lines AI, 2 due at that build); report opened in Bob's browser (new thread, 17.9k context) | 0.132 | whyline_b_task09_status_1_skill_approval.png to _4_answer.png, whyline_b_task09_report_overview.png, _why.png, _expiry.png |
 | B task10 | report Expiry view as a triage page: state tiles that filter, a card per due item with remove, keep and until commands, tracked list with the removal condition in plain words (cli/lib/report-template.html; 71/71 tests green; new task, 76.3k context) | 2.59 | whyline_b_task10_expiry_view.png |
 | B task11 | report Unreviewed view as a ranked review queue: progress toward zero, rows ranked by AI lines with the prompt that wrote each file, start-here row, smaller files behind a toggle (cli/lib/report-template.html; 71/71 tests green; same thread as task10, badge 5.76 minus 2.59) | 3.17 | whyline_b_task11_unreviewed_view.png |
+| B task12 | report AI Bill of Materials view, answer first: one-sentence verdict, attention banner, provenance rows (written by AI, reviewed, tested), who wrote it donut, temporary code and cost cards (cli/lib/report-template.html; 71/71 tests green; same thread as task10 and task11, badge 12.18 minus 5.76; Bob Settings shows 33.41 of 40 used) | 6.42 | whyline_b_task12_bom_view.png |
 
 ## Totals
 
-Faisal: 8.04 · Atiq: 27.00 · team: 35.04 of 80 (the "B tasks01-07" row is a thread summary, not added twice).
+Faisal: 8.04 · Atiq: 33.42 · team: 41.46 of 80 (the "B tasks01-07" row is a thread summary, not added twice).
