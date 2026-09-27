@@ -182,6 +182,30 @@ main{padding:36px 44px 72px;min-width:0}
 .ov-col > .card:last-child{flex:1 1 auto}
 @media (max-width:980px){.ov-cols{grid-template-columns:1fr}}
 @media (max-width:640px){#ovQueueMeta{display:none}.start ol{grid-template-columns:1fr}}
+/* overview: how it works, one light row of three steps */
+.how{list-style:none;margin:-6px 0 22px;padding:0;display:flex;align-items:center;gap:6px 10px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.how li{display:flex;align-items:center;gap:8px;min-width:0}
+.how .hi{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;flex:none;background:var(--aibg);color:var(--ai)}
+.how li:nth-child(3) .hi{background:var(--tmpbg);color:var(--tmp)}
+.how li:nth-child(5) .hi{background:var(--okbg);color:var(--ok)}
+.how .hi svg{width:15px;height:15px}
+.how b{color:var(--ink);font-weight:600}
+.how .ha{color:var(--faint);flex:none}
+.how .ha svg{width:14px;height:14px;display:block}
+@media (max-width:640px){.how{flex-direction:column;align-items:flex-start;gap:4px}.how .ha{margin-left:6px}.how .ha svg{transform:rotate(90deg)}}
+/* overview: big numbers, short captions */
+.card-h .cap,.sec-h .cap{margin:2px 0 0;font-size:12.5px;color:var(--faint)}
+.empty::first-letter,.wy-empty-t::first-letter{text-transform:uppercase}
+.ov-more{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px;font-size:12.5px;color:var(--faint)}
+
+/* term hints: a small "?" that opens a one or two sentence tooltip on hover, focus or tap */
+.tipw{display:inline-flex;vertical-align:middle;margin-left:5px;position:relative;text-transform:none;letter-spacing:0}
+button.info{position:relative;width:16px;height:16px;padding:0;border-radius:99px;border:1px solid var(--line2);background:var(--surface);color:var(--muted);font-size:10.5px;font-weight:700;line-height:1;display:grid;place-items:center;cursor:help}
+button.info::before{content:"";position:absolute;inset:-7px}
+button.info:hover,.tipw.open button.info{color:var(--ink);border-color:var(--muted)}
+.tip{display:none;position:fixed;z-index:40;width:max-content;max-width:min(260px,calc(100vw - 32px));background:var(--ink);color:var(--bg);font-size:12.5px;font-weight:450;line-height:1.45;padding:8px 11px;border-radius:9px;box-shadow:0 6px 20px rgba(0,0,0,.18);text-align:left;white-space:normal;word-break:normal;overflow-wrap:anywhere}
+.tipw:hover .tip,.tipw:focus-within .tip,.tipw.open .tip{display:block}
+.tipw.shut .tip{display:none}
 
 /* ---- tables (views not yet redesigned keep tables; they stack on phones) ---- */
 table{width:100%;border-collapse:collapse;font-size:13px}
@@ -520,30 +544,37 @@ input.search{border:1px solid var(--line2);background:var(--surface);color:var(-
 
   <!-- OVERVIEW -->
   <section class="view on" id="v-overview">
-    <div class="vh"><div class="eyebrow" id="ovEyebrow">Overview</div><h1 id="ovHeadline"></h1><p id="ovSub"></p></div>
+    <div class="vh"><div class="eyebrow" id="ovEyebrow">Overview</div><h1 id="ovHeadline"></h1><p id="ovSub">What AI wrote here, what to remove, and what to review.</p></div>
+    <ol class="how" aria-label="How Whyline works">
+      <li><span class="hi" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 4 2 8l3.5 4M10.5 4 14 8l-3.5 4"/></svg></span><span><b>Bob writes code</b></span></li>
+      <li class="ha" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg></li>
+      <li><span class="hi" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 3.5h11v7h-6l-3 2.5v-2.5h-2z"/></svg></span><span><b>Whyline keeps the prompt</b> on every line</span></li>
+      <li class="ha" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg></li>
+      <li><span class="hi" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 8S4 3.5 8 3.5 14.5 8 14.5 8 12 12.5 8 12.5 1.5 8 1.5 8Z"/><circle cx="8" cy="8" r="2"/></svg></span><span><b>You see</b> why, what to remove, what to review</span></li>
+    </ol>
     <div class="tiles" id="ovKpis"></div>
     <div class="sec">
-      <div class="sec-h"><div><h2>What needs you</h2><p>One row per thing to look at, with the exact next step.</p></div><span class="faint" id="ovQueueMeta"></span></div>
+      <div class="sec-h"><div><h2>Needs you now <span id="ovDueHint"></span></h2></div><span class="faint" id="ovQueueMeta"></span></div>
       <div class="queue" id="needsHuman"></div>
     </div>
     <div class="sec ov-cols">
       <div class="ov-col">
-        <div class="card"><div class="card-h"><div><h2>Temporary code, by kind</h2><p>Code written to go away, and where each piece stands.</p></div></div><div id="ovKindTable"></div></div>
-        <div class="card"><div class="card-h"><div><h2>Who wrote the lines</h2><p>Lines changed in this range, by author.</p></div></div><div id="agentTable"></div></div>
+        <div class="card"><div class="card-h"><div><h2>Temporary code <span data-hint="tmp"></span></h2><p class="cap">By kind and state</p></div></div><div id="ovKindTable"></div></div>
+        <div class="card"><div class="card-h"><div><h2>Who wrote the lines</h2><p class="cap">Lines changed, by author</p></div></div><div id="agentTable"></div></div>
       </div>
       <div class="ov-col">
-        <div class="card" id="ovFolderCard"><div class="card-h"><div><h2>AI share by folder</h2><p>Of the lines in files Bob touched, how many are AI-written.</p></div></div><div id="ovFolderTable"></div></div>
-        <div class="card"><div class="card-h"><div><h2>Last removal</h2><p>The most recent temporary code taken out, with its evidence.</p></div></div><div id="ovLastRemoval"></div></div>
+        <div class="card" id="ovFolderCard"><div class="card-h"><div><h2>Where AI wrote code</h2><p class="cap">AI lines per folder</p></div></div><div id="ovFolderTable"></div></div>
+        <div class="card"><div class="card-h"><div><h2>Last cleanup</h2><p class="cap">Most recent temporary code removed</p></div></div><div id="ovLastRemoval"></div></div>
       </div>
     </div>
   </section>
 
   <!-- WHY -->
   <section class="view" id="v-why">
-    <div class="vh"><div class="eyebrow">Why this line</div><h1>Every AI-written line keeps the prompt that caused it.</h1><p>Pick a file, then click a line. The answer is the same one <code>whyline why</code> gives in a terminal.</p></div>
+    <div class="vh"><div class="eyebrow">Why this line</div><h1 id="whyHeadline">Every AI-written line keeps its prompt.</h1><p>Pick a file, click a line, read the prompt behind it.</p></div>
     <div id="whyEmpty" style="display:none" class="card wy-empty">
-      <div class="wy-empty-t">no AI-written lines at HEAD yet (commit something Bob wrote, then run whyline report)</div>
-      <p>Whyline records the prompt behind every line Bob writes. Once a commit has AI-written lines, pick a file here and click a line to see why it exists.</p>
+      <div class="wy-empty-t">no AI-written lines at HEAD yet</div>
+      <p>Next: commit code Bob wrote, then run <code>whyline report</code>.</p>
     </div>
     <div id="whyMain" style="display:none">
       <div class="wy-grid" id="whyGrid">
@@ -554,16 +585,16 @@ input.search{border:1px solid var(--line2);background:var(--surface);color:var(-
         </div>
         <div class="wy-right" style="min-width:0">
           <div class="card wy-code-card">
-            <div class="wy-code-h"><h2 id="whyCodeTitle" class="wy-path">select a file</h2><span id="whyCodeStat"></span></div>
+            <div class="wy-code-h"><h2 id="whyCodeTitle" class="wy-path">Pick a file</h2><span id="whyCodeStat"></span></div>
             <div class="code wy-code" id="whyCode"></div>
-            <div class="legend wy-legend"><span><i class="dot"></i>AI</span><span><i class="dot edit"></i>AI edited by a human</span><span><i class="dot tmp"></i>temporary</span><span><i class="dot human"></i>human</span></div>
+            <div class="legend wy-legend"><span><i class="dot"></i>AI</span><span><i class="dot edit"></i>AI, then edited by a person</span><span><i class="dot tmp"></i>Temporary</span><span><i class="dot human"></i>Person</span></div>
           </div>
           <div class="wy-detail" id="whyDetail" style="display:none" aria-live="polite" aria-atomic="true"></div>
         </div>
       </div>
       <div id="whyFallback" style="display:none">
-        <div class="card"><div class="card-h"><h2>AI ranges</h2></div>
-          <table id="whyTable"><thead><tr><th>File</th><th>Lines</th><th>Agent</th><th>Prompt</th><th>Origin</th></tr></thead><tbody></tbody></table>
+        <div class="card"><div class="card-h"><h2>AI-written lines</h2></div>
+          <table id="whyTable"><thead><tr><th>File</th><th>Lines</th><th>Agent</th><th>Prompt</th><th>Written by</th></tr></thead><tbody></tbody></table>
         </div>
       </div>
     </div>
@@ -571,12 +602,12 @@ input.search{border:1px solid var(--line2);background:var(--surface);color:var(-
 
   <!-- EXPIRY -->
   <section class="view" id="v-expiry">
-    <div class="vh"><div class="eyebrow">Expiry</div><h1 id="expHeadline"></h1><p>Mocks, demos, flags, shims and fixtures are recorded with a reason and a removal condition when Bob writes them. Whyline checks the condition on every run.</p></div>
-    <div class="exp-tiles" id="expTiles" role="group" aria-label="Filter by state">
-      <button class="exp-tile" data-st="due" data-f2="due" aria-pressed="false" type="button"><div class="k">Due</div><div class="v" id="expCntDue">0</div><div class="s">condition met, ready to remove</div></button>
-      <button class="exp-tile" data-st="active" data-f2="active" aria-pressed="false" type="button"><div class="k">Active</div><div class="v" id="expCntActive">0</div><div class="s">waiting on a condition</div></button>
-      <button class="exp-tile" data-st="kept" data-f2="kept" aria-pressed="false" type="button"><div class="k">Kept</div><div class="v" id="expCntKept">0</div><div class="s">held on purpose</div></button>
-      <button class="exp-tile" data-st="removed" data-f2="removed" aria-pressed="false" type="button"><div class="k">Removed</div><div class="v" id="expCntRemoved">0</div><div class="s">already cleaned up</div></button>
+    <div class="vh"><div class="eyebrow">Expiry</div><h1 id="expHeadline"></h1><p>Temporary code Bob wrote, and when to <span style="white-space:nowrap">remove it.<span data-hint="tmp"></span></span></p></div>
+    <div class="exp-tiles" id="expTiles" role="group" aria-label="Show only one state">
+      <button class="exp-tile" data-st="due" data-f2="due" aria-pressed="false" type="button"><div class="k">Due</div><div class="v" id="expCntDue">0</div><div class="s">Safe to remove now</div></button>
+      <button class="exp-tile" data-st="active" data-f2="active" aria-pressed="false" type="button"><div class="k">Active</div><div class="v" id="expCntActive">0</div><div class="s">Waiting</div></button>
+      <button class="exp-tile" data-st="kept" data-f2="kept" aria-pressed="false" type="button"><div class="k">Kept</div><div class="v" id="expCntKept">0</div><div class="s">Kept on purpose</div></button>
+      <button class="exp-tile" data-st="removed" data-f2="removed" aria-pressed="false" type="button"><div class="k">Removed</div><div class="v" id="expCntRemoved">0</div><div class="s">Already gone</div></button>
     </div>
     <div class="filters" id="expFilters" role="group" aria-label="Filter by status" style="display:none">
       <button class="on" data-f="all" aria-pressed="true">All</button>
@@ -587,7 +618,7 @@ input.search{border:1px solid var(--line2);background:var(--surface);color:var(-
     </div>
     <div id="expAttention"></div>
     <div id="expTracked"></div>
-    <div class="hint" id="expHint" style="margin-top:16px">To remove a due item, say <code>remove &lt;file name&gt;</code> to Bob. To keep one, run <code>whyline keep &lt;file&gt; "reason"</code> in a terminal. To set a deadline, run <code>whyline until &lt;file&gt; 2027-01-01</code>. Nothing on this page changes code.</div>
+    <div class="hint" id="expHint" style="margin-top:16px"><b>Remove:</b> say <code>remove &lt;file&gt;</code> to Bob &middot; <b>Keep:</b> <code>whyline keep &lt;file&gt; "reason"</code> &middot; <b>Deadline:</b> <code>whyline until &lt;file&gt; 2027-01-01</code></div>
   </section>
 
   <!-- UNREVIEWED -->
@@ -599,21 +630,21 @@ input.search{border:1px solid var(--line2);background:var(--surface);color:var(-
 
   <!-- BOM -->
   <section class="view" id="v-bom">
-    <div class="vh"><div class="eyebrow" id="bomEyebrow">AI Bill of Materials</div><h1 id="bomHeadline"></h1><p id="bomSub"></p></div>
+    <div class="vh"><div class="eyebrow"><span id="bomEyebrow">AI Bill of Materials</span><span data-hint="bom"></span></div><h1 id="bomHeadline"></h1><p id="bomSub"></p></div>
     <div id="bomBody"></div>
   </section>
 
   <!-- STATUS -->
   <section class="view" id="v-status">
-    <div class="vh"><div class="eyebrow">Status</div><h1 id="stHeadline"></h1><p>Bob hooks capture every write; a git hook stores it as a note on the commit (<code>refs/notes/whyline</code>).</p></div>
-    <div class="sec-h"><div><h2>Record health</h2><p>What the ledger holds right now.</p></div></div>
+    <div class="vh"><div class="eyebrow">Status</div><h1 id="stHeadline"></h1><p>Is recording working, and what did Bob do lately?</p></div>
+    <div class="sec-h"><div><h2>What is recorded</h2></div></div>
     <div class="tiles" id="stTiles"></div>
     <div class="sec">
-      <div class="sec-h"><div><h2>Activity</h2><p>One entry per agent session, newest first, with the prompt that started it.</p></div>
-        <div class="st-legend" id="stLegend" aria-label="Legend"><span><i class="dot"></i>session</span><span><i class="dot tmp"></i>wrote temporary code</span><span><i class="dot due"></i>that code is due</span></div></div>
+      <div class="sec-h"><div><h2>Recent Bob tasks</h2><p class="cap">Newest first, with the prompt</p></div>
+        <div class="st-legend" id="stLegend" aria-label="Legend"><span><i class="dot"></i>Bob task</span><span><i class="dot tmp"></i>Wrote temporary code</span><span><i class="dot due"></i>That code is due</span></div></div>
       <div class="card st-card" id="stActivity"></div>
     </div>
-    <div class="hint st-foot"><span>Every entry above is stored in git notes and travels with the code.</span><span id="stCmd"></span></div>
+    <div class="hint st-foot"><span>Saved in git, so it travels with the code. See the raw record:</span><span id="stCmd"></span></div>
   </section>
 </div>
 </main>
@@ -659,6 +690,55 @@ document.addEventListener('click', function(e) {
   try { navigator.clipboard.writeText(text).then(done, done); }
   catch (err) { var t = document.createElement('textarea'); t.value = text; document.body.appendChild(t); t.select(); try { document.execCommand('copy'); } catch (x) {} t.remove(); done(); }
 });
+
+// term hints: a "?" button with a short tooltip; opens on hover, keyboard focus or tap, Escape closes
+var HINTS = {
+  bom: ['AI Bill of Materials', 'A parts list for this release: how much AI wrote, how much a person reviewed, what is temporary and what it cost.'],
+  tmp: ['temporary code', 'Code meant to go away later: mocks, demos, feature flags, shims and test fixtures. Bob records why it exists and when to remove it.'],
+  rev: ['reviewed by a person', 'An AI-written line counts as reviewed once a person has edited it. Whyline sees that edit in git.'],
+  due: ['due', 'Its removal rule is met, so it is safe to remove now. Say remove <file> to Bob.']
+};
+var tipN = 0;
+function hint(key) {
+  var h = HINTS[key]; if (!h) return '';
+  var id = 'tip' + (++tipN);
+  return '<span class="tipw"><button class="info" type="button" aria-label="What is ' + esc(h[0]) + '?" aria-describedby="' + id + '">?</button>' +
+    '<span class="tip" role="tooltip" id="' + id + '">' + esc(h[1]) + '</span></span>';
+}
+document.querySelectorAll('[data-hint]').forEach(function(el) { el.outerHTML = hint(el.getAttribute('data-hint')); });
+(function() {
+  // the tip is position:fixed so cards that clip or scroll never cut it off; place it inside the viewport
+  function place(w) {
+    var t = w.querySelector('.tip'), b = w.querySelector('.info');
+    if (!t || !b || !t.offsetWidth) return;
+    var r = b.getBoundingClientRect(), vw = document.documentElement.clientWidth, vh = window.innerHeight;
+    var left = Math.max(8, Math.min(r.left + r.width / 2 - t.offsetWidth / 2, vw - t.offsetWidth - 8));
+    var top = r.bottom + 8;
+    if (top + t.offsetHeight > vh - 8 && r.top - t.offsetHeight - 8 > 8) top = r.top - t.offsetHeight - 8;
+    t.style.left = left + 'px'; t.style.top = top + 'px';
+  }
+  function wrapOf(e) { return e.target && e.target.closest ? e.target.closest('.tipw') : null; }
+  document.addEventListener('mouseover', function(e) { var w = wrapOf(e); if (w) place(w); });
+  document.addEventListener('focusin', function(e) { var w = wrapOf(e); if (w) place(w); });
+  document.addEventListener('mouseout', function(e) { var w = wrapOf(e); if (w && !w.contains(e.relatedTarget)) w.classList.remove('shut'); });
+  document.addEventListener('focusout', function(e) { var w = wrapOf(e); if (w && !w.contains(e.relatedTarget)) w.classList.remove('shut', 'open'); });
+  document.addEventListener('click', function(e) {
+    var w = e.target.closest ? e.target.closest('.tipw') : null;
+    document.querySelectorAll('.tipw.open').forEach(function(o) { if (o !== w) o.classList.remove('open'); });
+    if (!w || !e.target.closest('.info')) return;
+    var shown = w.classList.contains('open');
+    w.classList.toggle('open', !shown);
+    w.classList.toggle('shut', shown);
+    if (!shown) place(w);
+  });
+  document.addEventListener('keydown', function(e) {
+    if (e.key !== 'Escape') return;
+    document.querySelectorAll('.tipw').forEach(function(w) { if (w.classList.contains('open') || w.contains(document.activeElement) || w.matches(':hover')) { w.classList.remove('open'); w.classList.add('shut'); } });
+  });
+  function replace() { document.querySelectorAll('.tipw.open, .tipw:hover, .tipw:focus-within').forEach(place); }
+  window.addEventListener('scroll', replace, { passive: true });
+  window.addEventListener('resize', replace);
+})();
 
 // theme: auto follows the system; the choice is remembered in this browser only
 (function() {
@@ -819,13 +899,12 @@ if (unrevFiles > 0) document.getElementById('unrevCnt').className = 'cnt rev';
   var H = document.getElementById('ovHeadline'), S = document.getElementById('ovSub');
   document.getElementById('ovEyebrow').textContent = 'Whyline · ' + (DATA.repo || 'this repository');
   var dueTxt = due + ' ' + plural(due, 'piece') + ' of temporary code ' + (due === 1 ? 'is' : 'are') + ' due';
-  if (due && unrevFiles) H.innerHTML = '<span class="hl-due">' + dueTxt + '</span> and ' + unrevFiles + ' ' + plural(unrevFiles, 'file has', 'files have') + ' AI-written lines no human has edited.';
-  else if (due) H.innerHTML = '<span class="hl-due">' + dueTxt + '</span>. Everything else is on track.';
-  else if (unrevFiles) H.innerHTML = '<span class="hl-rev">' + unrevLines + ' AI-written ' + plural(unrevLines, 'line') + '</span> in ' + unrevFiles + ' ' + plural(unrevFiles, 'file') + ' have no human edit yet.';
-  else if (notes) H.textContent = 'Nothing needs a human right now.';
+  if (due && unrevFiles) H.innerHTML = '<span class="hl-due">' + dueTxt + '</span> and ' + unrevFiles + ' ' + plural(unrevFiles, 'file needs', 'files need') + ' a review.';
+  else if (due) H.innerHTML = '<span class="hl-due">' + dueTxt + '</span>. The rest is on track.';
+  else if (unrevFiles) H.innerHTML = '<span class="hl-rev">' + unrevLines + ' AI-written ' + plural(unrevLines, 'line') + '</span> in ' + unrevFiles + ' ' + plural(unrevFiles, 'file') + ' need a review.';
+  else if (notes) H.textContent = 'Nothing needs you right now.';
   else H.textContent = 'No AI-written code recorded yet.';
-  S.innerHTML = 'Whyline keeps the prompt behind every line IBM Bob writes, stored as git notes in this repo, and tells you what to remove, what to review and what shipped. ' +
-    (shortHead ? 'Snapshot of commit <code>' + esc(shortHead) + '</code>.' : 'No commit yet.');
+  if (due) document.getElementById('ovDueHint').outerHTML = hint('due');
 
   // KPI strip
   // total temporary items in every state; null only when check reported no counts at all
@@ -834,8 +913,8 @@ if (unrevFiles > 0) document.getElementById('unrevCnt').className = 'cnt rev';
   allItems.forEach(function(it) { var st = it.state || 'active'; if (byState[st] != null) byState[st]++; });
   var tmpSub = allItems.length
     ? [[byState.active, 'waiting'], [byState.kept, 'kept'], [byState.removed, 'removed']].filter(function(p) { return p[0]; }).map(function(p) { return p[0] + ' ' + p[1]; }).join(' &middot; ')
-    : 'None recorded yet.';
-  if (!tmpSub) tmpSub = 'All of it is due.';
+    : 'None yet';
+  if (!tmpSub) tmpSub = 'All of it is due';
   function kv(v, inner) { return '<div class="v' + (v == null ? ' nd' : '') + '">' + (v == null ? 'no data' : inner) + '</div>'; }
   var agents = {};
   sessions.forEach(function(s) { agents[s.agent || 'unknown'] = 1; });
@@ -847,14 +926,14 @@ if (unrevFiles > 0) document.getElementById('unrevCnt').className = 'cnt rev';
     for (var i = 0; i < n; i++) stateSegs += '<i class="' + st + '"></i>';
   });
   var kp = [
-    '<div class="tile"><div class="k">AI-written</div>' + kv(aiPct, aiPct + '<small>%</small>') +
-      (aiPct != null ? '<div class="bar"><i style="width:' + aiPct + '%"></i></div><div class="s">' + aiTotal + ' of ' + linesChanged + ' lines changed</div>' : '<div class="s">No notes yet.</div>') + '</div>',
-    '<div class="tile"><div class="k">Reviewed by a human</div>' + kv(revPct, revPct + '<small>%</small>') +
-      (revPct != null ? '<div class="bar"><i class="ok" style="width:' + revPct + '%"></i></div><div class="s">' + revLines + ' of ' + aiTotal + ' AI lines have a human edit</div>' : '<div class="s">No AI lines yet.</div>') + '</div>',
-    '<div class="tile"><div class="k">Temporary code</div>' + kv(tracked, tracked + (due ? '<span class="flag">' + due + ' due</span>' : '')) +
+    '<div class="tile"><div class="k">Written by AI</div>' + kv(aiPct, aiPct + '<small>%</small>') +
+      (aiPct != null ? '<div class="bar"><i style="width:' + aiPct + '%"></i></div><div class="s">' + aiTotal + ' of ' + linesChanged + ' lines changed</div>' : '<div class="s">Nothing recorded yet</div>') + '</div>',
+    '<div class="tile"><div class="k">Reviewed by a person' + hint('rev') + '</div>' + kv(revPct, revPct + '<small>%</small>') +
+      (revPct != null ? '<div class="bar"><i class="ok" style="width:' + revPct + '%"></i></div><div class="s">' + revLines + ' of ' + aiTotal + ' AI lines</div>' : '<div class="s">No AI lines yet</div>') + '</div>',
+    '<div class="tile"><div class="k">Temporary code' + hint('tmp') + '</div>' + kv(tracked, tracked + (due ? '<span class="flag">' + due + ' due</span>' : '')) +
       (stateSegs ? '<div class="segs" aria-hidden="true">' + stateSegs + '</div>' : '') + '<div class="s">' + tmpSub + '</div></div>',
-    '<div class="tile"><div class="k">Agent sessions</div>' + kv(sessions.length, sessions.length) +
-      '<div class="s">' + (agentList.length ? 'by ' + agentList.map(esc).join(', ') + (lastTs ? ' &middot; last ' + esc(day(lastTs)) : '') : 'None on record.') + '</div></div>'
+    '<div class="tile"><div class="k">Bob tasks</div>' + kv(sessions.length, sessions.length) +
+      '<div class="s">' + (agentList.length ? (lastTs ? 'Last on ' + esc(day(lastTs)) : 'By ' + agentList.map(esc).join(', ')) : 'None yet') + '</div></div>'
   ];
   document.getElementById('ovKpis').innerHTML = kp.join('');
 
@@ -863,28 +942,28 @@ if (unrevFiles > 0) document.getElementById('unrevCnt').className = 'cnt rev';
   (check.due || []).forEach(function(it) {
     var why = [it.reason, it.evidence && it.evidence.summary].filter(Boolean).map(esc).join(' &middot; ');
     q += '<div class="q-row due"><div class="badge"><span class="pill due">Due</span><span class="kind">' + esc(it.kind || 'temporary') + '</span></div>' +
-      '<div><div class="file">' + esc(it.file) + '</div><div class="why">' + (why || 'its removal condition is met') + '</div></div>' +
+      '<div><div class="file">' + esc(it.file) + '</div><div class="why">' + (why || 'safe to remove') + '</div></div>' +
       '<div class="act">' + cmdChip('remove ' + base(it.file), 'bob') + '</div></div>';
   });
   var topRev = unrevList.slice(0, 3);
   topRev.forEach(function(f) {
     var s = f.sessions && f.sessions.length ? sessMapAll[f.sessions[0]] : null;
-    var ctx = s && s.prompt ? '&ldquo;' + esc(s.prompt.length > 96 ? s.prompt.slice(0, 96).replace(/\s+\S*$/, '') + '...' : s.prompt) + '&rdquo;' : 'AI-written, no human edit since';
+    var ctx = s && s.prompt ? '&ldquo;' + esc(s.prompt.length > 96 ? s.prompt.slice(0, 96).replace(/\s+\S*$/, '') + '...' : s.prompt) + '&rdquo;' : 'AI-written, not reviewed yet';
     q += '<div class="q-row"><div class="badge"><span class="pill review">Review</span><span>' + f.aiLines + ' AI ' + plural(f.aiLines, 'line') + '</span></div>' +
       '<div><div class="file">' + esc(f.file) + '</div><div class="why">' + ctx + '</div></div>' +
-      '<div class="act"><button class="btn" type="button" data-go="why" data-file="' + esc(f.file) + '">See why it exists &rarr;</button></div></div>';
+      '<div class="act"><button class="btn" type="button" data-go="why" data-file="' + esc(f.file) + '">See why &rarr;</button></div></div>';
   });
   var more = unrevList.length - topRev.length;
-  if (!q && !notes) q = '<div class="start"><h3>Start recording in three steps</h3><p>Nothing is recorded in this repo yet. Once Bob writes code here, this list fills in by itself.</p><ol>' +
+  if (!q && !notes) q = '<div class="start"><h3>Get started</h3><p>Nothing recorded here yet.</p><ol>' +
     '<li><span class="step"><span class="n">1</span>Install the hooks</span>' + cmdChip('whyline init') + '</li>' +
-    '<li><span class="step"><span class="n">2</span>Work in Bob and commit</span><span class="plain">Every line Bob writes keeps its prompt</span></li>' +
+    '<li><span class="step"><span class="n">2</span>Work in Bob and commit</span><span class="plain">Each line keeps its prompt</span></li>' +
     '<li><span class="step"><span class="n">3</span>Open this report again</span>' + cmdChip('whyline report') + '</li></ol></div>';
   else if (!q) q = '<div class="q-row empty-row"><div class="empty">nothing needs attention right now</div></div>';
-  else q += '<div class="q-foot"><span>' + (more > 0 ? more + ' more ' + plural(more, 'file') + ' with unreviewed AI lines' : 'Nothing else needs a human right now.') + '</span>' +
-    (more > 0 ? '<button class="linkbtn" type="button" data-go="unreviewed">Open Unreviewed &rarr;</button>' : '') + '</div>';
+  else q += '<div class="q-foot"><span>' + (more > 0 ? more + ' more ' + plural(more, 'file needs', 'files need') + ' a review' : 'Nothing else needs you.') + '</span>' +
+    (more > 0 ? '<button class="linkbtn" type="button" data-go="unreviewed">Open list &rarr;</button>' : '') + '</div>';
   document.getElementById('needsHuman').innerHTML = q;
   var qn = due + topRev.length;
-  document.getElementById('ovQueueMeta').textContent = qn ? 'due first, then most AI lines' : '';
+  document.getElementById('ovQueueMeta').textContent = qn ? 'Due first, then biggest files' : '';
 })();
 
 // OVERVIEW: AI share by folder
@@ -892,7 +971,7 @@ if (unrevFiles > 0) document.getElementById('unrevCnt').className = 'cnt rev';
   var why = DATA.why;
   var files = (why && why.files) || [];
   if (!files.length) {
-    document.getElementById('ovFolderTable').innerHTML = '<div class="empty">No AI-written files at HEAD yet.</div>';
+    document.getElementById('ovFolderTable').innerHTML = '<div class="empty">No AI-written files yet. Commit code Bob wrote.</div>';
     return;
   }
   // group by folder: use first two segments when first is "src", else first segment
@@ -914,14 +993,14 @@ if (unrevFiles > 0) document.getElementById('unrevCnt').className = 'cnt rev';
       '<div class="bar"><i style="width:' + p + '%"></i></div>' +
       '<span class="num"><b>' + d.aiLines + '</b> of ' + d.lines + ' &middot; ' + p + '%</span></div>';
   });
-  if (full) html += '<div class="note-adv">' + full + ' ' + plural(full, 'folder is', 'folders are') + ' entirely AI-written. Worth a human read end to end before shipping.</div>';
+  if (full) html += '<div class="note-adv">' + full + ' ' + plural(full, 'folder is', 'folders are') + ' 100% AI. Read ' + (full === 1 ? 'it' : 'them') + ' before you ship.</div>';
   document.getElementById('ovFolderTable').innerHTML = html;
 })();
 
 // OVERVIEW: temporary code by kind
 (function() {
   var KINDS = ['mock', 'demo', 'flag', 'shim', 'fixture', 'todo'];
-  var DESC = { mock: 'stand-in for a real service', demo: 'demo or sample code', flag: 'feature flag for a rollout', shim: 'compatibility layer or workaround', fixture: 'test data', todo: 'marked for follow-up' };
+  var DESC = { mock: 'Stand-in for a real service', demo: 'Demo or sample code', flag: 'Feature flag for a rollout', shim: 'Workaround or compatibility layer', fixture: 'Test data', todo: 'Marked for follow-up' };
   var STATES = ['due', 'active', 'kept', 'removed'];
   var byKind = {};
   allItems.forEach(function(it) {
@@ -932,7 +1011,7 @@ if (unrevFiles > 0) document.getElementById('unrevCnt').className = 'cnt rev';
   });
   var kinds = KINDS.filter(function(k) { return byKind[k]; }).concat(Object.keys(byKind).filter(function(k) { return KINDS.indexOf(k) === -1; }).sort());
   var html = '';
-  if (!kinds.length) html = '<div class="empty">no temporary items recorded yet (Whyline records one when Bob writes a mock, demo, flag, shim or fixture)</div>';
+  if (!kinds.length) html = '<div class="empty">no temporary items recorded yet. Ask Bob for a mock and it shows up here.</div>';
   kinds.forEach(function(k) {
     var c = byKind[k];
     var pills = STATES.filter(function(s) { return c[s]; }).map(function(s) { return '<span class="pill ' + s + '">' + c[s] + ' ' + s + '</span>'; }).join('');
@@ -952,10 +1031,10 @@ if (unrevFiles > 0) document.getElementById('unrevCnt').className = 'cnt rev';
   });
   if (html && linesChanged != null && aiTotal != null) {
     var hu = linesChanged - aiTotal, hw = Math.round(hu / linesChanged * 100);
-    html += '<div class="hrow"><span class="name">human</span><div class="bar"><i class="human" style="width:' + hw + '%"></i></div><span class="num"><b>' + hu + '</b> ' + plural(hu, 'line') + ' &middot; ' + hw + '%</span></div>';
-    html += '<p class="faint" style="font-size:12.5px;margin:10px 0 0">' + (bom.range ? 'Range ' + esc(bom.range) : 'All history (no release tag yet)') + '. The <b>AI Bill of Materials</b> has the full breakdown.</p>';
+    html += '<div class="hrow"><span class="name">people</span><div class="bar"><i class="human" style="width:' + hw + '%"></i></div><span class="num"><b>' + hu + '</b> ' + plural(hu, 'line') + ' &middot; ' + hw + '%</span></div>';
+    html += '<div class="ov-more"><span>' + (bom.range ? esc(bom.range) : 'All history') + '</span><button class="linkbtn" type="button" data-go="bom">Open bill of materials &rarr;</button></div>';
   }
-  if (!html) html = '<div class="empty">No AI-written lines in this range.</div>';
+  if (!html) html = '<div class="empty">No AI-written lines yet.</div>';
   document.getElementById('agentTable').innerHTML = html;
 })();
 
@@ -964,7 +1043,7 @@ if (unrevFiles > 0) document.getElementById('unrevCnt').className = 'cnt rev';
   var removed = allItems.filter(function(it) { return it.state === 'removed'; });
   var el = document.getElementById('ovLastRemoval');
   if (!removed.length) {
-    el.innerHTML = '<div class="empty">nothing removed yet (say <code>remove &lt;file name&gt;</code> to Bob when an item is due)</div>';
+    el.innerHTML = '<div class="empty">nothing removed yet. When something is due, say <code>remove &lt;file&gt;</code> to Bob.</div>';
     return;
   }
   removed.sort(function(a, b) { return (b.at || '') > (a.at || '') ? 1 : -1; });
@@ -974,10 +1053,10 @@ if (unrevFiles > 0) document.getElementById('unrevCnt').className = 'cnt rev';
     '<div class="mono" style="font-weight:600;word-break:break-all">' + esc(it.file || '') + '</div>' +
     '<dl class="facts" style="margin-top:12px">' +
     '<dt>Reason</dt><dd>' + nd(it.reason) + '</dd>' +
-    (waitingFor(it) ? '<dt>Condition</dt><dd>' + esc(waitingFor(it)) + '</dd>' : '') +
+    (waitingFor(it) ? '<dt>Remove when</dt><dd>' + esc(waitingFor(it)) + '</dd>' : '') +
     '<dt>Removed by</dt><dd>' + nd(it.by) + '</dd>' +
     '<dt>Date</dt><dd>' + nd(day(it.at)) + '</dd>' +
-    (short ? '<dt>Evidence</dt><dd>commit <code>' + esc(short) + '</code></dd>' : '') +
+    (short ? '<dt>Commit</dt><dd><code>' + esc(short) + '</code></dd>' : '') +
     '</dl>';
 })();
 
@@ -997,7 +1076,7 @@ if (unrevFiles > 0) document.getElementById('unrevCnt').className = 'cnt rev';
       var sess = sessMapAll[r.session] || {};
       var tr = document.createElement('tr');
       tr.innerHTML = '<td class="mono">' + esc(r.file) + '</td><td>' + r.lines[0] + '-' + r.lines[1] + '</td><td>' + esc(sess.agent || '') + '</td>' +
-        '<td style="max-width:320px;word-break:break-word">' + esc(sess.prompt || '') + '</td><td>' + esc(r.origin) + '</td>';
+        '<td style="max-width:320px;word-break:break-word">' + esc(sess.prompt || '') + '</td><td>' + esc(r.origin === 'ai-edited' ? 'AI, then edited by a person' : r.origin === 'ai' ? 'AI' : r.origin) + '</td>';
       whyTbody.appendChild(tr);
     });
     return;
@@ -1005,10 +1084,13 @@ if (unrevFiles > 0) document.getElementById('unrevCnt').className = 'cnt rev';
 
   var files = ((why && why.files) || []).slice().sort(function(a, b) { return b.aiLines - a.aiLines || (a.file < b.file ? -1 : 1); });
   if (!files.length) {
+    document.getElementById('whyHeadline').textContent = 'Nothing to explain yet.';
     document.getElementById('whyEmpty').style.display = 'block';
     return;
   }
   document.getElementById('whyMain').style.display = 'block';
+  var whyAi = files.reduce(function(n, f) { return n + (f.aiLines || 0); }, 0);
+  document.getElementById('whyHeadline').textContent = whyAi + ' AI-written ' + plural(whyAi, 'line') + ' in ' + files.length + ' ' + plural(files.length, 'file') + ', each with its prompt.';
 
   var cv = document.getElementById('whyCode');
   var list = document.getElementById('whyFileList');
@@ -1017,10 +1099,10 @@ if (unrevFiles > 0) document.getElementById('unrevCnt').className = 'cnt rev';
 
   // origin of a line: temporary wins over edited, as in the gutter
   var ORIGIN = {
-    ai: { pill: 'ai', label: 'AI', long: 'AI-written' },
-    ed: { pill: 'review', label: 'AI edited', long: 'AI-written, edited by a human since' },
-    tmp: { pill: 'tmp', label: 'Temporary', long: 'AI-written temporary code' },
-    hu: { pill: 'dim', label: 'Human', long: 'human' }
+    ai: { pill: 'ai', label: 'AI', long: 'AI' },
+    ed: { pill: 'review', label: 'AI, then edited', long: 'AI, then edited by a person' },
+    tmp: { pill: 'tmp', label: 'Temporary', long: 'AI (temporary code)' },
+    hu: { pill: 'dim', label: 'Person', long: 'a person' }
   };
   function kindOf(line) {
     if (!line.origin) return 'hu';
@@ -1080,7 +1162,7 @@ if (unrevFiles > 0) document.getElementById('unrevCnt').className = 'cnt rev';
     var h = '';
     f.code.forEach(function(line, i) {
       var k = kindOf(line);
-      h += '<div class="wl ' + k + '" tabindex="0" role="button" aria-pressed="false" data-i="' + i + '" aria-label="line ' + line.n + ', ' + esc(ORIGIN[k].long) + '">' +
+      h += '<div class="wl ' + k + '" tabindex="0" role="button" aria-pressed="false" data-i="' + i + '" aria-label="line ' + line.n + ', written by ' + esc(ORIGIN[k].long) + '">' +
         '<span class="n">' + line.n + '</span><span class="t">' + esc(line.text) + '</span></div>';
     });
     cv.innerHTML = h;
@@ -1104,8 +1186,8 @@ if (unrevFiles > 0) document.getElementById('unrevCnt').className = 'cnt rev';
     var cmd = '<div class="wy-cmd">' + cmdChip('whyline why ' + f.file + ':' + line.n) + '</div>';
     var h;
     if (k === 'hu') {
-      h = '<div class="wy-top"><span class="pill dim">Human</span><span class="wy-who">line ' + line.n + '</span></div>' +
-        '<p class="wy-say">Line ' + line.n + ' was written by a human. <span>No prompt on record.</span></p>' +
+      h = '<div class="wy-top"><span class="pill dim">Person</span><span class="wy-who">line ' + line.n + '</span></div>' +
+        '<p class="wy-say">A person wrote line ' + line.n + '. <span>No prompt on record.</span></p>' +
         (line.commit ? '<div class="wy-meta"><span><em>Commit</em><code>' + esc(String(line.commit).slice(0, 7)) + '</code></span></div>' : '') + cmd;
       detail.innerHTML = h;
       detail.style.display = 'block';
@@ -1114,16 +1196,15 @@ if (unrevFiles > 0) document.getElementById('unrevCnt').className = 'cnt rev';
     var sess = (line.session && sessMapAll[line.session]) || {};
     var agent = sess.agent || 'an agent', author = sess.author || 'Someone';
     h = '<div class="wy-top"><span class="pill ' + o.pill + '">' + o.label + '</span>' +
-      '<span class="wy-who"><b>' + esc(agent) + '</b> wrote line ' + line.n + '</span>' +
-      (line.session ? '<span class="wy-sess" title="agent session">session ' + esc(String(line.session).slice(0, 8)) + '</span>' : '') + '</div>';
+      '<span class="wy-who"><b>' + esc(agent) + '</b> wrote line ' + line.n + '</span></div>';
     if (sess.prompt) {
       h += '<p class="wy-ask"><b>' + esc(author) + '</b> asked <b>' + esc(agent) + '</b>:</p>' +
         '<blockquote class="wy-quote ' + k + '">&ldquo;' + esc(sess.prompt) + '&rdquo;</blockquote>';
     } else {
-      h += '<p class="wy-say">No prompt on record for this session.</p>';
+      h += '<p class="wy-say">No prompt on record for this Bob task.</p>';
     }
     h += '<div class="wy-meta"><span><em>When</em>' + nd(day(sess.ts)) + '</span>' +
-      '<span><em>Origin</em>' + esc(o.long) + '</span>' +
+      '<span><em>Written by</em>' + esc(o.long) + '</span>' +
       '<span><em>Cost</em>' + (sess.cost != null ? esc(String(sess.cost)) + ' Bobcoin' : 'no data') + '</span>' +
       (line.commit ? '<span><em>Commit</em><code>' + esc(String(line.commit).slice(0, 7)) + '</code></span>' : '') + '</div>';
 
@@ -1134,11 +1215,11 @@ if (unrevFiles > 0) document.getElementById('unrevCnt').className = 'cnt rev';
         var st = it.state || 'active', wf = waitingFor(it);
         h += '<div class="wy-tmp' + (st === 'due' ? ' due' : '') + '"><div class="wy-tmp-h">' +
           '<span class="pill ' + esc(st) + '">' + esc(st) + '</span><span class="wy-tmp-l kind">' + esc(it.kind || 'temporary') + '</span>' +
-          (wf ? '<span class="wy-tmp-w">removes when ' + esc(wf) + '</span>' : '') + '</div>' +
+          (st === 'due' ? '<span class="wy-tmp-w">safe to remove now</span>' : wf && st === 'active' ? '<span class="wy-tmp-w">remove when ' + esc(wf) + '</span>' : '') + '</div>' +
           (it.reason ? '<div class="wy-tmp-r"><span class="faint">Reason</span> ' + esc(it.reason) + '</div>' : '') +
           (st === 'due' ? cmdChip('remove ' + base(it.file || f.file), 'bob') : '') + '</div>';
       } else {
-        h += '<div class="wy-tmp"><div class="wy-tmp-h"><span class="wy-tmp-l">Temporary code</span><span class="wy-tmp-w">recorded when this line was written</span></div></div>';
+        h += '<div class="wy-tmp"><div class="wy-tmp-h"><span class="wy-tmp-l">Temporary code</span></div></div>';
       }
     }
 
@@ -1251,9 +1332,9 @@ if (unrevFiles > 0) document.getElementById('unrevCnt').className = 'cnt rev';
   if (!allItems.length) {
     hl.textContent = 'No temporary code recorded yet.';
   } else if (dueN) {
-    hl.innerHTML = '<span class="hl-due">' + dueN + ' ' + plural(dueN, 'piece') + ' of temporary code ' + (dueN === 1 ? 'is' : 'are') + ' ready to remove.</span> ' + activeN + ' more ' + (activeN === 1 ? 'is' : 'are') + ' waiting on a condition.';
+    hl.innerHTML = '<span class="hl-due">' + dueN + ' ' + plural(dueN, 'piece') + ' of temporary code ' + (dueN === 1 ? 'is' : 'are') + ' due.</span>' + (activeN ? ' ' + activeN + ' more ' + (activeN === 1 ? 'is' : 'are') + ' waiting.' : '');
   } else {
-    hl.innerHTML = 'No temporary code is due. ' + activeN + ' ' + plural(activeN, 'piece') + ' ' + (activeN === 1 ? 'is' : 'are') + ' waiting on a condition.';
+    hl.textContent = 'Nothing is due. ' + (activeN ? activeN + ' ' + plural(activeN, 'piece') + ' ' + (activeN === 1 ? 'is' : 'are') + ' still waiting.' : 'Nothing is waiting either.');
   }
 
   // icon letter for kind
@@ -1276,27 +1357,28 @@ if (unrevFiles > 0) document.getElementById('unrevCnt').className = 'cnt rev';
     if (it.state === 'kept') return 'kept on purpose';
     if (it.state === 'due') {
       var was = waitingFor(it);
-      return '<div class="met">condition met</div>' + (was ? '<div class="was">was: ' + esc(was) + '</div>' : '');
+      return '<div class="met">safe to remove</div>' + (was ? '<div class="was">rule: ' + esc(was) + '</div>' : '');
     }
     if (it.state === 'removed') return 'removed on ' + esc(day(it.at) || 'no data') + (it.by ? ' by ' + esc(it.by) : '');
     var wf = waitingFor(it);
-    if (!wf) return 'no condition recorded';
+    if (!wf) return 'no removal rule recorded';
     var c = it.condition || {};
     var extra = '';
     if (c.type === 'date' && c.on) {
       var d = daysUntil(c.on);
       if (d != null) extra = '<div class="days">' + (d > 0 ? 'in ' + d + ' ' + plural(d, 'day') : d === 0 ? 'today' : Math.abs(d) + ' ' + plural(Math.abs(d), 'day') + ' ago') + '</div>';
     }
-    return esc(wf) + extra;
+    if (c.type === 'date' && c.on) return 'remove on <span style="white-space:nowrap">' + esc(c.on) + '</span>' + extra;
+    return 'remove when ' + esc(wf) + extra;
   }
 
   // attention section (due items only)
   var attnEl = document.getElementById('expAttention');
   var dueItems = allItems.filter(function(it) { return it.state === 'due'; });
   if (dueItems.length) {
-    var secH = '<div class="sec"><div class="sec-h"><div><h2>Needs attention</h2><p>These items are due. Their removal condition is met.</p></div></div>';
+    var secH = '<div class="sec"><div class="sec-h"><div><h2>Due now' + hint('due') + '</h2></div></div>';
     var cards = dueItems.map(function(it) {
-      var evSummary = (it.evidence && it.evidence.summary) ? esc(it.evidence.summary) : esc(waitingFor(it) || 'condition met');
+      var evSummary = (it.evidence && it.evidence.summary) ? esc(it.evidence.summary) : esc(waitingFor(it) || 'its removal rule is met');
       return '<div class="exp-card">' +
         '<div class="left">' +
         '<div style="display:flex;align-items:center;gap:8px">' +
@@ -1304,10 +1386,10 @@ if (unrevFiles > 0) document.getElementById('unrevCnt').className = 'cnt rev';
         '</div>' +
         '<div class="file mono">' + esc(it.file || '') + '</div>' +
         '<div class="field"><div class="lbl">Reason</div><div class="val">' + nd(it.reason) + '</div></div>' +
-        '<div class="field"><div class="lbl">Why it is due now</div><div class="val">' + evSummary + '</div></div>' +
+        '<div class="field"><div class="lbl">Why it is safe to remove</div><div class="val">' + evSummary + '</div></div>' +
         '</div>' +
         '<div class="right">' +
-        '<h3>To act</h3>' +
+        '<h3>Pick one</h3>' +
         '<div class="act-row"><div class="act-lbl">Remove it</div>' + cmdChip('remove ' + base(it.file), 'bob') + '</div>' +
         '<div class="act-row"><div class="act-lbl">Keep it, with a reason</div>' + cmdChip('whyline keep ' + base(it.file) + ' "reason"') + '</div>' +
         '<div class="act-row"><div class="act-lbl">Give it a deadline</div>' + cmdChip('whyline until ' + base(it.file) + ' 2027-01-01') + '</div>' +
@@ -1342,15 +1424,15 @@ if (unrevFiles > 0) document.getElementById('unrevCnt').className = 'cnt rev';
 
     var trackedEl = document.getElementById('expTracked');
     if (!allItems.length) {
-      trackedEl.innerHTML = '<div class="sec"><p class="empty">no temporary items yet (Whyline records one when Bob writes a mock, demo, flag, shim or fixture)</p></div>';
+      trackedEl.innerHTML = '<div class="sec"><p class="empty">no temporary items yet. Ask Bob for a mock or a feature flag and it shows up here.</p></div>';
       return;
     }
     if (!visible.length) {
-      trackedEl.innerHTML = '<div class="sec"><p class="empty">no ' + esc(f) + ' items <button class="linkbtn" type="button" id="expShowAll">Show all ' + allItems.length + ' items</button></p></div>';
+      trackedEl.innerHTML = '<div class="sec"><p class="empty">nothing ' + esc(f) + ' right now. <button class="linkbtn" type="button" id="expShowAll">Show all ' + allItems.length + '</button></p></div>';
       return;
     }
 
-    var label = f === 'all' ? 'Being tracked' : f.charAt(0).toUpperCase() + f.slice(1) + ' items';
+    var label = f === 'all' ? 'All temporary code' : f.charAt(0).toUpperCase() + f.slice(1);
     var rows = visible.map(function(it) {
       return '<div class="exp-row">' +
         kindIcon(it.kind) +
@@ -1362,7 +1444,7 @@ if (unrevFiles > 0) document.getElementById('unrevCnt').className = 'cnt rev';
     }).join('');
 
     trackedEl.innerHTML = '<div class="sec"><div class="sec-h"><div><h2>' + esc(label) + '</h2></div>' +
-      (f !== 'all' ? '<button class="linkbtn" type="button" id="expShowAll">Show all ' + allItems.length + ' items</button>' : '') + '</div>' +
+      (f !== 'all' ? '<button class="linkbtn" type="button" id="expShowAll">Show all ' + allItems.length + '</button>' : '') + '</div>' +
       '<div class="exp-listbox">' + rows + '</div></div>';
   }
 
@@ -1394,14 +1476,14 @@ if (unrevFiles > 0) document.getElementById('unrevCnt').className = 'cnt rev';
   var hl = document.getElementById('unrevHeadline');
   var sub = document.getElementById('unrevSub');
   if (totalAI > 0) {
-    hl.innerHTML = '<span class="hl-rev">' + totalAI + ' AI-written ' + plural(totalAI, 'line') + '</span> ' + (totalAI === 1 ? 'has' : 'have') + ' no human edit yet.';
-    sub.textContent = 'Across ' + fileCount + ' ' + plural(fileCount, 'file') + ', most first. A human edit on an AI line counts as a review.';
+    hl.innerHTML = '<span class="hl-rev">' + totalAI + ' AI-written ' + plural(totalAI, 'line') + '</span> in ' + fileCount + ' ' + plural(fileCount, 'file') + ' need a review.';
+    sub.textContent = 'AI code no person has touched yet, biggest file first.';
   } else if (ranges.length) {
-    hl.textContent = 'Every AI-written line has had a human edit.';
-    sub.textContent = 'A human edit on an AI line counts as a review.';
+    hl.textContent = 'Every AI-written line has been reviewed.';
+    sub.textContent = 'AI code no person has touched yet shows up here.';
   } else {
-    hl.textContent = 'No AI-written lines recorded yet.';
-    sub.textContent = '';
+    hl.textContent = 'Nothing to review yet.';
+    sub.textContent = 'AI code no person has touched yet shows up here.';
   }
 
   // progress card
@@ -1412,16 +1494,16 @@ if (unrevFiles > 0) document.getElementById('unrevCnt').className = 'cnt rev';
     var revW = Math.round(revLines2 / aiTot * 100);
     var restW = 100 - revW;
     var toGo = aiTot - revLines2;
-    progEl.innerHTML = '<div class="card unrev-progress"><div class="card-h" style="margin-bottom:8px"><h2 style="font-size:14px">Progress toward zero unreviewed</h2></div>' +
+    progEl.innerHTML = '<div class="card unrev-progress"><div class="card-h" style="margin-bottom:8px"><h2 style="font-size:14px">Reviewed by a person' + hint('rev') + '</h2></div>' +
       '<div class="unrev-prog-bar" aria-hidden="true"><i class="ok" style="width:' + revW + '%"></i><i class="rest" style="width:' + restW + '%"></i></div>' +
-      '<div class="unrev-prog-line"><b>' + revLines2 + '</b> of <b>' + aiTot + '</b> AI ' + plural(aiTot, 'line') + ' reviewed &middot; <b>' + toGo + '</b> to go</div>' +
+      '<div class="unrev-prog-line"><b>' + revLines2 + '</b> of <b>' + aiTot + '</b> AI ' + plural(aiTot, 'line') + ' &middot; <b>' + toGo + '</b> to go</div>' +
       '</div>';
   }
 
   // ranked list
   var listEl = document.getElementById('unrevList');
   if (!unrevList.length) {
-    var msg = ranges.length ? 'every AI line has had a human edit since' : 'no AI-written lines recorded yet (commit something Bob wrote, then run whyline report)';
+    var msg = ranges.length ? 'nothing to review. New AI code will show up here.' : 'no AI-written lines recorded yet. Next: commit code Bob wrote, then run whyline report.';
     listEl.innerHTML = '<p class="empty">' + esc(msg) + '</p>';
     return;
   }
@@ -1461,7 +1543,7 @@ if (unrevFiles > 0) document.getElementById('unrevCnt').className = 'cnt rev';
       '</div>' +
       '<div class="unrev-bar-cell">' +
         '<div class="bar" style="height:5px"><i style="width:' + barW + '%;background:var(--edit)"></i></div>' +
-        '<div class="cnt">' + f.aiLines + ' ' + plural(f.aiLines, 'line') + '</div>' +
+        '<div class="cnt">' + f.aiLines + ' AI ' + plural(f.aiLines, 'line') + '</div>' +
       '</div>' +
       '<div class="unrev-cov">' + covPill + '</div>' +
       '<div class="unrev-act"><button class="btn" type="button" data-go="why" data-file="' + esc(f.file) + '" style="' + btnStyle + '">See why &rarr;</button></div>' +
@@ -1482,7 +1564,7 @@ if (unrevFiles > 0) document.getElementById('unrevCnt').className = 'cnt rev';
   html += '</div>';
 
   if (hasCovMissing) {
-    html += '<div class="hint" style="margin-top:14px">No coverage report found. Add <code>coverage.xml</code> or <code>lcov.info</code> at the repo root to see which of these lines are tested.</div>';
+    html += '<div class="hint" style="margin-top:14px">To see which lines are tested, add <code>coverage.xml</code> or <code>lcov.info</code> at the repo root.</div>';
   }
   html += '</div>';
   listEl.innerHTML = html;
@@ -1530,24 +1612,20 @@ if (unrevFiles > 0) document.getElementById('unrevCnt').className = 'cnt rev';
 
   // headline
   var aiPctStr = aiPct + '%';
-  var revPctStr;
   if (aiPct == null) {
     bomHeadline.textContent = 'No AI-written lines recorded yet.';
   } else if (bRevPct === 0) {
-    revPctStr = 'none of them has had a human edit yet';
-    bomHeadline.innerHTML = aiPctStr + ' of the lines changed were written by AI, and ' + revPctStr + '.';
+    bomHeadline.textContent = aiPctStr + ' of changed lines are AI-written. None reviewed yet.';
   } else if (bRevPct != null) {
-    revPctStr = bRevPct + '% of those have had a human edit';
-    bomHeadline.innerHTML = aiPctStr + ' of the lines changed were written by AI, and ' + revPctStr + '.';
+    bomHeadline.textContent = aiPctStr + ' of changed lines are AI-written. ' + bRevPct + '% of those are reviewed.';
   } else {
-    bomHeadline.textContent = aiPctStr + ' of the lines changed were written by AI.';
+    bomHeadline.textContent = aiPctStr + ' of changed lines are AI-written.';
   }
 
   if (aiPct == null) {
-    bomSub.innerHTML = 'Run <code>whyline init</code>, work in Bob, commit, then run <code>whyline report</code>.';
+    bomSub.innerHTML = 'Next: run <code>whyline init</code>, work in Bob, commit.';
   } else {
-    bomSub.textContent = 'What went into this code: who wrote it, how much a human checked, what is temporary and what it cost. ' +
-      (bLc != null ? bLc : 'no data') + ' ' + plural(bLc, 'line') + ' changed across ' + (bSessions != null ? bSessions : 'no data') + ' agent ' + plural(bSessions, 'session') + '.';
+    bomSub.textContent = 'What went into this release, and how much was checked.';
   }
 
   var html = '';
@@ -1555,9 +1633,9 @@ if (unrevFiles > 0) document.getElementById('unrevCnt').className = 'cnt rev';
   // attention banner when revPct below 50
   var unrevAI = unreviewed.totals ? (unreviewed.totals.aiLines || 0) : 0;
   if (bRevPct != null && bRevPct < 50 && unrevAI > 0) {
-    html += '<div class="bom-attn"><div class="bom-attn-txt"><h3>Needs attention</h3>' +
-      '<p>' + unrevAI + ' AI ' + plural(unrevAI, 'line') + ' ' + (unrevAI === 1 ? 'has' : 'have') + ' no human edit.</p></div>' +
-      '<button class="btn" type="button" data-go="unreviewed">Open Unreviewed &rarr;</button></div>';
+    html += '<div class="bom-attn"><div class="bom-attn-txt"><h3>Needs a review</h3>' +
+      '<p>' + unrevAI + ' AI ' + plural(unrevAI, 'line') + ' not reviewed yet.</p></div>' +
+      '<button class="btn" type="button" data-go="unreviewed">Open list &rarr;</button></div>';
   }
 
   // provenance card
@@ -1570,7 +1648,7 @@ if (unrevFiles > 0) document.getElementById('unrevCnt').className = 'cnt rev';
   var testW = bTestPct != null ? bTestPct : 0;
   var testNoData = bTestPct == null;
 
-  html += '<div class="bom-prov"><div class="card-h" style="margin-bottom:4px"><h2 style="font-size:14px">Provenance</h2></div>';
+  html += '<div class="bom-prov"><div class="card-h" style="margin-bottom:4px"><h2 style="font-size:14px">Written, reviewed, tested</h2></div>';
   // row 1: written by AI
   html += '<div class="bom-prov-row">' +
     '<div><div class="bom-prov-lbl">Written by AI</div>' +
@@ -1581,7 +1659,7 @@ if (unrevFiles > 0) document.getElementById('unrevCnt').className = 'cnt rev';
     '</div>';
   // row 2: reviewed by a human
   html += '<div class="bom-prov-row">' +
-    '<div><div class="bom-prov-lbl">Reviewed by a human</div>' +
+    '<div><div class="bom-prov-lbl">Reviewed by a person' + hint('rev') + '</div>' +
     (bRevLines != null && bAiTotal != null ? '<div class="bom-prov-sub">' + bRevLines + ' of ' + bAiTotal + ' AI lines</div>' : '') +
     '</div>' +
     '<div><div class="bar"><i class="ok" style="width:' + revW2 + '%"></i></div></div>' +
@@ -1590,7 +1668,7 @@ if (unrevFiles > 0) document.getElementById('unrevCnt').className = 'cnt rev';
   // row 3: covered by tests
   html += '<div class="bom-prov-row">' +
     '<div><div class="bom-prov-lbl">Covered by tests</div>' +
-    (testNoData ? '<div class="bom-prov-sub">no data: add coverage.xml or lcov.info</div>' : '') +
+    (testNoData ? '<div class="bom-prov-sub">Add coverage.xml or lcov.info</div>' : '') +
     '</div>' +
     '<div>' + provBar(testW, 'ok', testNoData) + '</div>' +
     '<div class="bom-prov-pct' + (testNoData ? ' nd' : '') + '">' + (testNoData ? 'no data' : bTestPct + '%') + '</div>' +
@@ -1620,7 +1698,7 @@ if (unrevFiles > 0) document.getElementById('unrevCnt').className = 'cnt rev';
     if (humanLines != null && humanLines > 0) {
       stops.push(HUMAN_COLOR + ' ' + curDeg + 'deg 360deg');
       legendRows += '<div class="bom-legend-row"><div class="bom-legend-dot" style="background:' + HUMAN_COLOR + '"></div>' +
-        '<span>human</span><span class="bom-legend-val">' + humanLines + ' lines</span></div>';
+        '<span>people</span><span class="bom-legend-val">' + humanLines + ' lines</span></div>';
     }
     if (stops.length) {
       donutStyle = 'background:conic-gradient(' + stops.join(',') + ');mask:radial-gradient(transparent 40%,#000 41%)';
@@ -1636,7 +1714,7 @@ if (unrevFiles > 0) document.getElementById('unrevCnt').className = 'cnt rev';
   // bom counts items in its range; kept is not in older bom output, so it falls back to check counts
   var itKept = bItems.kept != null ? bItems.kept : (bItems.active != null && counts.kept != null ? counts.kept : null);
   var states = [['due', 'Due', bItems.due], ['active', 'Active', bItems.active], ['kept', 'Kept', itKept], ['removed', 'Removed', bItems.removed]];
-  var card2 = '<div class="card"><div class="card-h"><h2 style="font-size:14px">Temporary code</h2>' +
+  var card2 = '<div class="card"><div class="card-h"><h2 style="font-size:14px">Temporary code' + hint('tmp') + '</h2>' +
     '<button class="linkbtn" type="button" data-go="expiry">Open Expiry &rarr;</button></div>' +
     '<div class="bom-states">' + states.map(function(st) {
       var v = st[2] != null ? st[2] : null;
@@ -1650,22 +1728,23 @@ if (unrevFiles > 0) document.getElementById('unrevCnt').className = 'cnt rev';
   var scWCost = bCost.sessionsWithCost != null ? bCost.sessionsWithCost : null;
   var scTotal = bCost.sessions != null ? bCost.sessions : null;
   var card3 = '<div class="card"><div class="card-h"><h2 style="font-size:14px">Cost</h2></div>' +
-    '<div class="bom-cost-main' + (costSum == null ? ' nd bom-nd' : '') + '">' + nd(costSum) + '</div>' +
+    '<div class="bom-cost-main' + (costSum == null ? ' nd bom-nd' : '') + '">' + nd(costSum) + (costSum != null ? ' <small class="faint" style="font-size:13px;font-weight:500;letter-spacing:0">Bobcoin</small>' : '') + '</div>' +
     '<div class="bom-cost-sub">' +
-    (scTotal === 0 ? 'no agent sessions recorded' : scWCost != null && scTotal != null ? scWCost + ' of ' + scTotal + ' ' + plural(scTotal, 'session') + ' reported a cost' : 'no sessions with cost data') +
+    (scTotal === 0 ? 'No Bob tasks recorded' : scWCost != null && scTotal != null ? scWCost + ' of ' + scTotal + ' Bob ' + plural(scTotal, 'task') + ' reported a cost' : 'No Bob task reported a cost') +
     '</div></div>';
 
   html += '<div class="bom-grid3">' + card1 + card2 + card3 + '</div>';
 
   // footer strip
-  var footMeta = (bom.range ? 'Range: ' + esc(bom.range) : 'All history') +
-    (scTotal != null ? ' &middot; ' + scTotal + ' ' + plural(scTotal, 'session') : '') +
+  var footMeta = (bom.range ? esc(bom.range) : 'All history') +
+    (bLc != null ? ' &middot; ' + bLc + ' ' + plural(bLc, 'line') + ' changed' : '') +
+    (bSessions != null ? ' &middot; ' + bSessions + ' Bob ' + plural(bSessions, 'task') : '') +
     (shortHead ? ' &middot; commit ' + esc(shortHead) : '');
-  html += '<div class="bom-foot"><div class="bom-foot-l"><b>Export for audit or CI</b><span>' + footMeta + '</span></div>' + cmdChip('whyline bom --json') + '</div>';
+  html += '<div class="bom-foot"><div class="bom-foot-l"><b>Export this list</b><span>' + footMeta + '</span></div>' + cmdChip('whyline bom --json') + '</div>';
 
   // missing hint
   if (bom.missing && bom.missing.length) {
-    html += '<div class="hint" style="margin-top:14px">Missing data: ' + bom.missing.map(esc).join(', ') + '. These show as "no data", never as zero.</div>';
+    html += '<div class="hint" style="margin-top:14px">Not measured: ' + bom.missing.map(esc).join(', ') + '. Shown as "no data", never as zero.</div>';
   }
 
   bomBody.innerHTML = html;
@@ -1683,16 +1762,16 @@ if (unrevFiles > 0) document.getElementById('unrevCnt').className = 'cnt rev';
   // header
   var n = sessions.length;
   document.getElementById('stHeadline').textContent = n
-    ? n + ' agent ' + plural(n, 'session') + ' recorded' + (latest ? ', the latest on ' + latest + '.' : '.')
-    : 'No sessions recorded yet.';
+    ? n + ' Bob ' + plural(n, 'task') + ' recorded' + (latest ? ', the latest on ' + latest + '.' : '.')
+    : 'No Bob tasks recorded yet.';
 
   // record health
   function stamp(ts) { return ts ? String(ts).slice(0, 10) + ' ' + String(ts).slice(11, 16) + ' UTC' : 'no data'; }
   var tiles = [
-    ['Notes', nd(DATA.notes), 'attached to commits in git'],
-    ['Ranges', nd(DATA.ranges ? ranges.length : null), 'line ranges with a prompt'],
-    ['Sessions', nd(DATA.sessions ? n : null), 'agent sessions'],
-    ['HEAD', DATA.head ? '<span class="mono st-head" title="' + esc(DATA.head) + '">' + esc(shortHead) + '</span>' : '<span class="st-nd">no data</span>', 'generated ' + esc(stamp(DATA.generatedAt))]
+    ['Records', nd(DATA.notes), 'Saved on commits in git'],
+    ['Line ranges', nd(DATA.ranges ? ranges.length : null), 'Written by AI'],
+    ['Bob tasks', nd(DATA.sessions ? n : null), 'Each with its prompt'],
+    ['Latest commit', DATA.head ? '<span class="mono st-head" title="' + esc(DATA.head) + '">' + esc(shortHead) + '</span>' : '<span class="st-nd">no data</span>', 'Report made ' + esc(stamp(DATA.generatedAt))]
   ];
   document.getElementById('stTiles').innerHTML = tiles.map(function(t) {
     var v = t[1] === 'no data' ? '<span class="st-nd">no data</span>' : t[1];
@@ -1703,7 +1782,7 @@ if (unrevFiles > 0) document.getElementById('unrevCnt').className = 'cnt rev';
   var box = document.getElementById('stActivity');
   if (!list.length) {
     document.getElementById('stLegend').style.display = 'none';
-    box.innerHTML = '<div class="empty">no sessions yet (work in Bob, commit, then run whyline report)</div>';
+    box.innerHTML = '<div class="empty">no sessions yet. Next: work in Bob, commit, then run <code>whyline report</code>.</div>';
   } else {
     var itemsBy = {};
     allItems.forEach(function(it) { if (it.session) (itemsBy[it.session] = itemsBy[it.session] || []).push(it); });
@@ -1714,7 +1793,7 @@ if (unrevFiles > 0) document.getElementById('unrevCnt').className = 'cnt rev';
       cur.s.push(s);
     });
     box.innerHTML = groups.map(function(g) {
-      return '<div class="st-day"><div class="st-dayh"><span class="mono">' + esc(g.d) + '</span> &middot; ' + g.s.length + ' ' + plural(g.s.length, 'session') + '</div>' +
+      return '<div class="st-day"><div class="st-dayh"><span class="mono">' + esc(g.d) + '</span> &middot; ' + g.s.length + ' Bob ' + plural(g.s.length, 'task') + '</div>' +
         '<ol class="st-tl">' + g.s.map(function(s) {
           var its = itemsBy[s.id] || [];
           var node = its.some(function(it) { return it.state === 'due'; }) ? 'due' : (its.length ? 'tmp' : '');
