@@ -278,7 +278,57 @@ input.search{border:1px solid var(--line2);background:var(--surface);color:var(-
 /* ---- spacer between view blocks ---- */
 
 /* ---- status ---- */
-/* Status view styles go here, phone rules in their own @media inside this block */
+#v-status .tiles{margin-bottom:0}
+#v-status .tile .v .st-head{font-size:26px;font-weight:600;letter-spacing:-.01em;cursor:help}
+#v-status .tile .v .st-nd{font-size:18px;font-weight:500;color:var(--faint);letter-spacing:0}
+.st-legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted)}
+.st-legend span{display:inline-flex;align-items:center;gap:6px}
+.st-card{padding:22px 24px 8px}
+.st-card > .empty{padding:0 0 14px}
+.st-day + .st-day{margin-top:8px;padding-top:18px;border-top:1px solid var(--line)}
+.st-dayh{font-size:12px;font-weight:600;color:var(--faint);letter-spacing:.02em;margin-bottom:14px}
+.st-dayh .mono{color:var(--muted);font-size:12px}
+.st-tl{list-style:none;margin:0;padding:0}
+.st-ev{position:relative;padding:0 0 22px 30px;min-width:0}
+.st-ev:not(:last-child)::before{content:"";position:absolute;left:4px;top:16px;bottom:-4px;width:2px;border-radius:2px;background:var(--line)}
+.st-node{position:absolute;left:0;top:9px;width:10px;height:10px;border-radius:99px;background:var(--ai);box-shadow:0 0 0 3px var(--surface),0 0 0 4px var(--aibg)}
+.st-node.tmp{background:var(--tmp);box-shadow:0 0 0 3px var(--surface),0 0 0 4px var(--tmpbg)}
+.st-node.due{background:var(--due);box-shadow:0 0 0 3px var(--surface),0 0 0 5px var(--duebg)}
+.st-body{min-width:0}
+.st-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;min-height:28px}
+.st-av{width:24px;height:24px;border-radius:7px;display:grid;place-items:center;flex:none;background:var(--aibg);color:var(--ai);font-size:12px;font-weight:700}
+.st-who{min-width:0;word-break:break-word;font-size:13.5px}
+.st-who b{font-weight:650}
+.st-when{margin-left:auto;display:inline-flex;align-items:center;gap:10px;font-size:12px;color:var(--faint);white-space:nowrap}
+.st-commit{background:var(--surface2);color:var(--muted);border:1px solid var(--line);border-radius:6px;padding:1px 7px;font-size:11.5px}
+.st-prompt{margin:8px 0 0 34px;border-left:2px solid var(--line2);padding-left:12px}
+.st-prompt summary{list-style:none;cursor:pointer;border-radius:6px;display:block}
+.st-prompt summary::-webkit-details-marker{display:none}
+.st-prompt summary:focus-visible{outline:2px solid var(--ai);outline-offset:3px}
+.st-text{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;font-size:13.5px;line-height:1.55;color:var(--ink);word-break:break-word}
+.st-prompt[open] .st-text{display:block;-webkit-line-clamp:unset;white-space:pre-wrap}
+.st-toggle{display:inline-block;margin-top:4px;font-size:12px;font-weight:600;color:var(--ai)}
+.st-prompt summary:hover .st-toggle{text-decoration:underline}
+.st-toggle .c,.st-prompt[open] .st-toggle .o{display:none}
+.st-prompt[open] .st-toggle .c{display:inline}
+.st-prompt.fits summary{cursor:text}
+.st-prompt.fits .st-toggle{display:none}
+.st-noprompt{margin:8px 0 0 34px;font-size:13px;color:var(--faint);font-style:italic}
+.st-item{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:10px 0 0 34px;min-width:0}
+.st-lbl{font-size:11.5px;color:var(--faint)}
+.st-file{font-size:12.5px;color:var(--ink);word-break:break-all;min-width:0}
+.st-foot{display:flex;align-items:center;justify-content:space-between;gap:12px 16px;flex-wrap:wrap;margin-top:24px}
+.st-foot > span:first-child{flex:1 1 260px}
+.st-foot #stCmd{flex:0 1 auto;min-width:0;max-width:100%}
+.st-foot .cmd code{background:none;color:inherit;padding:0;border-radius:0}
+@media (max-width:640px){
+  .st-card{padding:18px 16px 4px}
+  .st-ev{padding-left:24px}
+  .st-when{margin-left:34px;flex:1 1 calc(100% - 34px)}
+  .st-meta{row-gap:4px}
+  .st-prompt,.st-item,.st-noprompt{margin-left:0}
+  .st-foot #stCmd{flex:1 1 100%}
+}
 /* ---- end status ---- */
 
 /* ---- responsive ---- */
@@ -400,11 +450,15 @@ input.search{border:1px solid var(--line2);background:var(--surface);color:var(-
 
   <!-- STATUS -->
   <section class="view" id="v-status">
-    <div class="vh"><div class="eyebrow">Status</div><h1>Everything the hooks have recorded.</h1><p>Notes, sessions and ranges stored in git notes in this repository.</p></div>
-    <div class="card"><table id="statusTable"></table></div>
-    <div class="card sec"><div class="card-h"><div><h2>Sessions</h2><p>The prompt on record for each agent session.</p></div></div>
-      <table id="sessionTable"><thead><tr><th>When</th><th>Agent</th><th>Author</th><th>Cost</th><th>Prompt</th></tr></thead><tbody></tbody></table>
+    <div class="vh"><div class="eyebrow">Status</div><h1 id="stHeadline"></h1><p>Bob hooks capture every write; a git hook stores it as a note on the commit (<code>refs/notes/whyline</code>).</p></div>
+    <div class="sec-h"><div><h2>Record health</h2><p>What the ledger holds right now.</p></div></div>
+    <div class="tiles" id="stTiles"></div>
+    <div class="sec">
+      <div class="sec-h"><div><h2>Activity</h2><p>One entry per agent session, newest first, with the prompt that started it.</p></div>
+        <div class="st-legend" id="stLegend" aria-label="Legend"><span><i class="dot"></i>session</span><span><i class="dot tmp"></i>wrote temporary code</span><span><i class="dot due"></i>that code is due</span></div></div>
+      <div class="card st-card" id="stActivity"></div>
     </div>
+    <div class="hint st-foot"><span>Every entry above is stored in git notes and travels with the code.</span><span id="stCmd"></span></div>
   </section>
 </div>
 </main>
@@ -1243,22 +1297,93 @@ if (unrevFiles > 0) document.getElementById('unrevCnt').className = 'cnt rev';
 
 // STATUS
 (function() {
-  var statRows = [
-    ['Notes recorded', nd(DATA.notes)],
-    ['Ranges recorded', nd(ranges.length)],
-    ['Sessions recorded', nd(sessions.length)],
-    ['HEAD', DATA.head ? '<span class="mono" title="' + esc(DATA.head) + '">' + esc(shortHead) + '</span>' : 'no data'],
-    ['Generated at', esc(DATA.generatedAt || 'no data')]
-  ];
-  document.getElementById('statusTable').innerHTML = statRows.map(function(r) { return '<tr><td class="muted">' + r[0] + '</td><td>' + r[1] + '</td></tr>'; }).join('');
-  var tb = document.querySelector('#sessionTable tbody');
-  sessions.slice(0, 50).forEach(function(s) {
-    var tr = document.createElement('tr');
-    tr.innerHTML = '<td>' + nd(day(s.ts)) + '</td><td>' + esc(s.agent || '') + '</td><td>' + esc(s.author || '') + '</td><td>' + (s.cost != null ? nd(s.cost) : 'no data') + '</td>' +
-      '<td style="min-width:220px;max-width:420px;word-break:break-word">' + esc(s.prompt || '') + '</td>';
-    tb.appendChild(tr);
+  // newest first; sessions without a timestamp go last
+  var list = sessions.slice().sort(function(a, b) {
+    var x = a.ts || '', y = b.ts || '';
+    return x === y ? 0 : (x < y ? 1 : -1);
   });
-  if (!sessions.length) tb.innerHTML = '<tr><td colspan="5" class="empty">no sessions yet (work in Bob, commit, then run whyline report)</td></tr>';
+  var latest = list.length ? day(list[0].ts) : null;
+
+  // header
+  var n = sessions.length;
+  document.getElementById('stHeadline').textContent = n
+    ? n + ' agent ' + plural(n, 'session') + ' recorded' + (latest ? ', the latest on ' + latest + '.' : '.')
+    : 'No sessions recorded yet.';
+
+  // record health
+  function stamp(ts) { return ts ? String(ts).slice(0, 10) + ' ' + String(ts).slice(11, 16) + ' UTC' : 'no data'; }
+  var tiles = [
+    ['Notes', nd(DATA.notes), 'one per commit with AI lines'],
+    ['Ranges', nd(DATA.ranges ? ranges.length : null), 'line ranges with a prompt'],
+    ['Sessions', nd(DATA.sessions ? n : null), 'agent sessions'],
+    ['HEAD', DATA.head ? '<span class="mono st-head" title="' + esc(DATA.head) + '">' + esc(shortHead) + '</span>' : '<span class="st-nd">no data</span>', 'generated ' + esc(stamp(DATA.generatedAt))]
+  ];
+  document.getElementById('stTiles').innerHTML = tiles.map(function(t) {
+    var v = t[1] === 'no data' ? '<span class="st-nd">no data</span>' : t[1];
+    return '<div class="tile"><div class="k">' + t[0] + '</div><div class="v">' + v + '</div><div class="s">' + t[2] + '</div></div>';
+  }).join('');
+
+  // activity timeline
+  var box = document.getElementById('stActivity');
+  if (!list.length) {
+    document.getElementById('stLegend').style.display = 'none';
+    box.innerHTML = '<div class="empty">no sessions yet (work in Bob, commit, then run whyline report)</div>';
+  } else {
+    var itemsBy = {};
+    allItems.forEach(function(it) { if (it.session) (itemsBy[it.session] = itemsBy[it.session] || []).push(it); });
+    var groups = [], cur = null;
+    list.forEach(function(s) {
+      var d = day(s.ts) || 'undated';
+      if (!cur || cur.d !== d) { cur = { d: d, s: [] }; groups.push(cur); }
+      cur.s.push(s);
+    });
+    box.innerHTML = groups.map(function(g) {
+      return '<div class="st-day"><div class="st-dayh"><span class="mono">' + esc(g.d) + '</span> &middot; ' + g.s.length + ' ' + plural(g.s.length, 'session') + '</div>' +
+        '<ol class="st-tl">' + g.s.map(function(s) {
+          var its = itemsBy[s.id] || [];
+          var node = its.some(function(it) { return it.state === 'due'; }) ? 'due' : (its.length ? 'tmp' : '');
+          var agent = s.agent || 'unknown agent';
+          var time = s.ts && String(s.ts).length >= 16 ? String(s.ts).slice(11, 16) : null;
+          var h = '<li class="st-ev"><span class="st-node ' + node + '" aria-hidden="true"></span><div class="st-body">' +
+            '<div class="st-meta"><span class="st-av" aria-hidden="true">' + esc(agent.charAt(0).toUpperCase()) + '</span>' +
+            '<span class="st-who"><b>' + esc(agent) + '</b>' + (s.author ? ' <span class="faint">as ' + esc(s.author) + '</span>' : '') + '</span>' +
+            '<span class="st-when">' + (s.commit ? '<span class="mono st-commit" title="' + esc(s.commit) + '">' + esc(String(s.commit).slice(0, 7)) + '</span>' : '') +
+            (time ? '<span class="mono">' + esc(time) + ' UTC</span>' : '') + '</span></div>';
+          if (s.prompt) {
+            h += '<details class="st-prompt"><summary><span class="st-text">' + esc(s.prompt) + '</span>' +
+              '<span class="st-toggle"><span class="o">Show full prompt</span><span class="c">Hide full prompt</span></span></summary></details>';
+          } else {
+            h += '<div class="st-noprompt">no prompt on record</div>';
+          }
+          its.forEach(function(it) {
+            h += '<div class="st-item"><span class="st-lbl">Temporary code</span><span class="pill ' + esc(it.state || 'dim') + '">' + esc(it.state || 'unknown') + '</span>' +
+              '<span class="kind">' + esc(it.kind || 'other') + '</span><span class="mono st-file" title="' + esc(it.file || '') + '">' + esc(base(it.file) || 'no file') + '</span></div>';
+          });
+          return h + '</div></li>';
+        }).join('') + '</ol></div>';
+    }).join('');
+
+    // the toggle only shows when the prompt is longer than two lines at the current width
+    var dets = [].slice.call(box.querySelectorAll('.st-prompt'));
+    function fit() {
+      dets.forEach(function(d) {
+        if (d.open) return;
+        var t = d.querySelector('.st-text');
+        if (!t.clientHeight) return;
+        var fits = t.scrollHeight <= t.clientHeight + 1;
+        d.classList.toggle('fits', fits);
+        d.querySelector('summary').setAttribute('tabindex', fits ? '-1' : '0');
+      });
+    }
+    dets.forEach(function(d) {
+      d.querySelector('summary').addEventListener('click', function(e) { if (d.classList.contains('fits')) e.preventDefault(); });
+    });
+    if (typeof ResizeObserver === 'function') new ResizeObserver(fit).observe(box);
+    else window.addEventListener('resize', fit);
+    fit();
+  }
+
+  document.getElementById('stCmd').innerHTML = cmdChip('git log --show-notes=whyline -1');
 })();
 
 // phones: tables with a header stack into one block per row, each cell labelled by its column
