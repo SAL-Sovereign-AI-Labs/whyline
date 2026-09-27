@@ -53,6 +53,15 @@ test('check exits 0 by default and 2 only with --gate; keep and until accept a f
   assert.equal(run(dir, ['keep']).status, 1, 'usage error');
 });
 
+test('check --gate prints a GitHub annotation per due item only inside GitHub Actions', () => {
+  const dir = repoWithItem();
+  assert.doesNotMatch(run(dir, ['check', '--gate']).stdout, /::error/, 'no annotations outside Actions');
+  const r = spawnSync(process.execPath, [CLI, 'check', '--gate'], { cwd: dir, encoding: 'utf8', env: { ...env, GITHUB_ACTIONS: 'true' } });
+  assert.equal(r.status, 2);
+  assert.match(r.stdout, /^::error file=demo_seed\.py,line=1,title=whyline%3A temporary demo is due::/m);
+  assert.doesNotMatch(spawnSync(process.execPath, [CLI, 'check'], { cwd: dir, encoding: 'utf8', env: { ...env, GITHUB_ACTIONS: 'true' } }).stdout, /::error/, 'plain check never annotates');
+});
+
 test('session-start prints one line only when something is due, and always exits 0', () => {
   const dir = repoWithItem();
   const r = run(dir, ['session-start']);

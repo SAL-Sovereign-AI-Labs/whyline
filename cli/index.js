@@ -113,6 +113,7 @@ function dispatch(argv) {
       if (json) { console.log(JSON.stringify(r, null, 2)); return exit; }
       if (!r.due.length && !r.active.length && !r.other.length) { console.log('no temporary items yet (commit something Bob wrote, then check again)'); return 0; }
       printCheck(r);
+      if (gate && process.env.GITHUB_ACTIONS === 'true') annotate(r.due);
       return exit;
     }
     case 'unreviewed': {
@@ -242,6 +243,17 @@ function printWhy(file, line, r) {
   if (r.siblings.length) console.log(`siblings ${r.siblings.join(' · ')}`);
   if (r.item) console.log(`item     ${r.item.id} ${r.item.kind} · ${r.item.status} · ${JSON.stringify(r.item.condition)} · "${r.item.reason}"`);
   console.log(`commit   ${r.commit.slice(0, 7)}`);
+}
+
+// GitHub Actions annotations for due items (check --gate inside Actions only): the error shows on the file in the pull request.
+function annotate(due) {
+  const esc = (v, prop) => String(v).replace(/%/g, '%25').replace(/\r/g, '%0D').replace(/\n/g, '%0A').replace(prop ? /[:,]/g : /$^/, c => (c === ':' ? '%3A' : '%2C'));
+  for (const it of due) {
+    const line = (it.lines && it.lines[0] && it.lines[0][0]) || 1;
+    const why = it.reason ? `recorded as temporary: "${it.reason}". ` : '';
+    const msg = `${why}${it.evidence && it.evidence.summary ? it.evidence.summary + '. ' : ''}Remove it in Bob ("remove ${it.file}"), or whyline keep ${it.file} "<reason>".`;
+    console.log(`::error file=${esc(it.file, true)},line=${line},title=${esc(`whyline: temporary ${it.kind} is due`, true)}::${esc(msg)}`);
+  }
 }
 
 if (require.main === module) process.exit(main(process.argv.slice(2)));
