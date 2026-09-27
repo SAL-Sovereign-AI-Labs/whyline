@@ -108,7 +108,7 @@ main{padding:36px 44px 72px;min-width:0}
 .muted{color:var(--muted)}.faint{color:var(--faint)}
 .empty{color:var(--muted);font-size:13.5px;padding:6px 0}
 .empty code{background:var(--surface2);padding:1px 6px;border-radius:5px}
-.hint{display:flex;gap:10px;align-items:flex-start;border:1px dashed var(--line2);border-radius:12px;padding:12px 14px;font-size:13px;color:var(--muted);margin-top:14px}
+.hint{display:block;border:1px dashed var(--line2);border-radius:12px;padding:12px 14px;font-size:13px;color:var(--muted);margin-top:14px}
 .hint code{background:var(--surface2);color:var(--ink);padding:1px 6px;border-radius:5px}
 .linkbtn{background:none;border:0;padding:0;color:var(--ai);font-weight:600;font-size:13px;cursor:pointer}
 .linkbtn:hover{text-decoration:underline}
@@ -186,14 +186,50 @@ input.search{border:1px solid var(--line2);background:var(--surface);color:var(-
 .why-file-row .fbar{width:54px;flex-shrink:0}
 .why-file-row .fcnt{flex-shrink:0;font-size:11px;color:var(--faint);white-space:nowrap;font-variant-numeric:tabular-nums}
 
+/* ---- expiry ---- */
+.exp-tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);margin-bottom:24px}
+.exp-tile{padding:18px 20px;min-width:0;background:none;border:0;text-align:left;cursor:pointer;border-radius:0;position:relative}
+.exp-tile:first-child{border-radius:14px 0 0 14px}.exp-tile:last-child{border-radius:0 14px 14px 0}
+.exp-tile + .exp-tile{border-left:1px solid var(--line)}
+.exp-tile::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;border-radius:14px 14px 0 0;background:transparent}
+.exp-tile[data-st="due"]::before{background:var(--due)}.exp-tile[data-st="active"]::before{background:var(--ok)}.exp-tile[data-st="kept"]::before{background:var(--kept)}.exp-tile[data-st="removed"]::before{background:var(--removed)}
+.exp-tile[aria-pressed="true"]{background:var(--surface2)}
+.exp-tile[aria-pressed="true"][data-st="due"]{background:var(--duebg)}.exp-tile[aria-pressed="true"][data-st="active"]{background:var(--okbg)}.exp-tile[aria-pressed="true"][data-st="kept"]{background:var(--keptbg)}.exp-tile[aria-pressed="true"][data-st="removed"]{background:var(--removedbg)}
+.exp-tile .k{font-size:12.5px;color:var(--muted)}
+.exp-tile .v{font-size:32px;font-weight:680;letter-spacing:-.02em;line-height:1.15;margin-top:4px;font-variant-numeric:tabular-nums}
+.exp-tile[data-st="due"] .v{color:var(--due)}.exp-tile[data-st="active"] .v{color:var(--ok)}.exp-tile[data-st="kept"] .v{color:var(--kept)}.exp-tile[data-st="removed"] .v{color:var(--removed)}
+.exp-tile .s{font-size:12px;color:var(--faint);margin-top:6px;line-height:1.4}
+.exp-card{background:var(--duebg);border:1px solid var(--due);border-left:4px solid var(--due);border-radius:14px;padding:20px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,380px);gap:24px;align-items:start;min-width:0}
+.exp-card + .exp-card{margin-top:12px}
+.exp-card .left .file{font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:15px;font-weight:600;word-break:break-all;margin:8px 0 10px}
+.exp-card .left .lbl{font-size:11.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);margin-bottom:2px}
+.exp-card .left .val{font-size:13.5px;color:var(--ink);word-break:break-word}
+.exp-card .left .field{margin-bottom:10px}
+.exp-card .right{border-left:1px solid var(--line2);padding-left:20px}
+.exp-card .right h3{font-size:12.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--faint);margin:0 0 12px}
+.exp-card .right .act-row{margin-bottom:10px}
+.exp-card .cmd code{white-space:normal;word-break:break-all;overflow:visible}
+.exp-card .right .act-row .act-lbl{font-size:11.5px;color:var(--muted);margin-bottom:4px}
+.exp-listbox{background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);overflow:hidden}
+.exp-row{display:grid;grid-template-columns:44px minmax(0,1fr) minmax(0,220px) auto;gap:12px;align-items:center;padding:12px 16px;border-top:1px solid var(--line);background:var(--surface)}
+.exp-listbox .exp-row:first-child{border-top:0}
+.exp-icon{width:32px;height:32px;border-radius:8px;display:grid;place-items:center;font-size:14px;font-weight:700;text-transform:uppercase;flex:none}
+.exp-icon.mock{background:rgba(124,77,255,.15);color:var(--tmp)}.exp-icon.demo{background:rgba(215,38,61,.12);color:var(--due)}.exp-icon.flag{background:rgba(47,107,255,.12);color:var(--ai)}.exp-icon.shim{background:rgba(201,138,0,.14);color:var(--edit)}.exp-icon.fixture{background:rgba(139,145,156,.15);color:var(--faint)}
+.exp-icon.other{background:var(--surface2);color:var(--muted)}
+.exp-row .info .file{font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13px;font-weight:600;word-break:break-all}
+.exp-row .info .reason{font-size:12px;color:var(--muted);margin-top:3px;word-break:break-word}
+.exp-row .when{font-size:12.5px;color:var(--muted);word-break:break-word}
+.exp-row .when .days{font-size:11.5px;color:var(--faint);margin-top:2px}
 /* ---- responsive ---- */
 @media (max-width:1100px){.q-row{grid-template-columns:100px minmax(0,1fr)}.q-row .act{grid-column:2}}
-@media (max-width:980px){.grid2{grid-template-columns:1fr}.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}.tile:nth-child(3){border-left:0}.tile:nth-child(n+3){border-top:1px solid var(--line)}}
+@media (max-width:980px){.grid2{grid-template-columns:1fr}.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}.tile:nth-child(3){border-left:0}.tile:nth-child(n+3){border-top:1px solid var(--line)}.exp-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}.exp-tile:nth-child(n+3){border-top:1px solid var(--line)}.exp-tile:nth-child(3){border-left:0}}
 @media (max-width:900px){.app{grid-template-columns:1fr}aside{position:fixed;left:-270px;width:260px;transition:left .2s;z-index:20;box-shadow:0 0 40px rgba(0,0,0,.25)}aside.open{left:0}
 .mobilebar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:18px}main{padding:18px 16px 60px}.vh h1{font-size:24px}}
 @media (max-width:640px){.q-row{grid-template-columns:1fr;gap:10px;padding:14px 16px}.q-row .act{grid-column:1}.q-row .badge{flex-direction:row;align-items:center}.hrow{grid-template-columns:minmax(0,1fr) auto}.hrow .bar{grid-column:1/-1;grid-row:2}
-#v-why .row2c{grid-template-columns:1fr !important}.card{overflow-x:auto}table.stack thead{display:none}table.stack tr{display:block;padding:10px 0;border-bottom:1px solid var(--line)}table.stack td{display:block;border:0;padding:2px 0;max-width:none !important;min-width:0 !important}table.stack td[data-label]::before{content:attr(data-label) ": ";color:var(--faint);font-size:12px}}
-@media (max-width:520px){.tile{padding:14px}.tile .v{font-size:26px}.tile .s{font-size:12px}.facts{grid-template-columns:1fr}.facts dt{margin-top:6px}}
+#v-why .row2c{grid-template-columns:1fr !important}.card{overflow-x:auto}table.stack thead{display:none}table.stack tr{display:block;padding:10px 0;border-bottom:1px solid var(--line)}table.stack td{display:block;border:0;padding:2px 0;max-width:none !important;min-width:0 !important}table.stack td[data-label]::before{content:attr(data-label) ": ";color:var(--faint);font-size:12px}
+.exp-card{grid-template-columns:1fr}.exp-card .right{border-left:0;padding-left:0;border-top:1px solid var(--line2);padding-top:14px;margin-top:4px}
+.exp-row{grid-template-columns:44px minmax(0,1fr)}.exp-row .when{grid-column:2}.exp-row .pill{grid-column:2;justify-self:start}}
+@media (max-width:520px){.tile{padding:14px}.tile .v{font-size:26px}.tile .s{font-size:12px}.facts{grid-template-columns:1fr}.facts dt{margin-top:6px}.exp-tile{padding:14px}.exp-tile .v{font-size:26px}}
 </style>
 </head>
 <body>
@@ -267,18 +303,23 @@ input.search{border:1px solid var(--line2);background:var(--surface);color:var(-
 
   <!-- EXPIRY -->
   <section class="view" id="v-expiry">
-    <div class="vh"><div class="eyebrow">Expiry</div><h1>Temporary code, and whether its time is up.</h1><p>Mocks, demos, flags, shims and fixtures are recorded with a reason and a removal condition when Bob writes them. Whyline checks the condition on every run.</p></div>
-    <div class="filters" id="expFilters" role="group" aria-label="Filter by status">
+    <div class="vh"><div class="eyebrow">Expiry</div><h1 id="expHeadline"></h1><p>Mocks, demos, flags, shims and fixtures are recorded with a reason and a removal condition when Bob writes them. Whyline checks the condition on every run.</p></div>
+    <div class="exp-tiles" id="expTiles" role="group" aria-label="Filter by state">
+      <button class="exp-tile" data-st="due" data-f2="due" aria-pressed="false" type="button"><div class="k">Due</div><div class="v" id="expCntDue">0</div><div class="s">condition met, ready to remove</div></button>
+      <button class="exp-tile" data-st="active" data-f2="active" aria-pressed="false" type="button"><div class="k">Active</div><div class="v" id="expCntActive">0</div><div class="s">waiting on a condition</div></button>
+      <button class="exp-tile" data-st="kept" data-f2="kept" aria-pressed="false" type="button"><div class="k">Kept</div><div class="v" id="expCntKept">0</div><div class="s">held on purpose</div></button>
+      <button class="exp-tile" data-st="removed" data-f2="removed" aria-pressed="false" type="button"><div class="k">Removed</div><div class="v" id="expCntRemoved">0</div><div class="s">already cleaned up</div></button>
+    </div>
+    <div class="filters" id="expFilters" role="group" aria-label="Filter by status" style="display:none">
       <button class="on" data-f="all" aria-pressed="true">All</button>
       <button data-f="due" aria-pressed="false">Due</button>
       <button data-f="active" aria-pressed="false">Active</button>
       <button data-f="kept" aria-pressed="false">Kept</button>
       <button data-f="removed" aria-pressed="false">Removed</button>
     </div>
-    <div class="card">
-      <table id="expTable"><thead><tr><th>File</th><th>Kind</th><th>Reason</th><th>Removes when</th><th>Status</th></tr></thead><tbody></tbody></table>
-      <div class="hint">To remove a due item, say <code>remove &lt;file name&gt;</code> to Bob. To keep one: <code>whyline keep &lt;file&gt; "reason"</code>, or set a date: <code>whyline until &lt;file&gt; 2027-01-01</code>.</div>
-    </div>
+    <div id="expAttention"></div>
+    <div id="expTracked"></div>
+    <div class="hint" style="margin-top:16px">To remove a due item, say <code>remove &lt;file name&gt;</code> to Bob. To keep one, run <code>whyline keep &lt;file&gt; "reason"</code> in a terminal. To set a deadline, run <code>whyline until &lt;file&gt; 2027-01-01</code>. Nothing on this page changes code.</div>
   </section>
 
   <!-- UNREVIEWED -->
@@ -720,30 +761,147 @@ if (unrevFiles > 0) document.getElementById('unrevCnt').className = 'cnt rev';
 })();
 
 // EXPIRY
-function renderExpiry(f) {
-  var tb = document.querySelector('#expTable tbody');
-  tb.innerHTML = '';
-  allItems.filter(function(x) { return f === 'all' || x.state === f; }).forEach(function(x) {
-    var tr = document.createElement('tr');
-    tr.innerHTML =
-      '<td class="mono">' + esc(x.file || '') + '</td>' +
-      '<td><span class="kind">' + esc(x.kind || '') + '</span></td>' +
-      '<td style="min-width:180px">' + nd(x.reason) + '</td>' +
-      '<td>' + nd(waitingFor(x)) + '</td>' +
-      '<td><span class="pill ' + esc(x.state || 'dim') + '">' + esc(x.state) + '</span></td>';
-    tb.appendChild(tr);
+(function() {
+  var STATE_ORDER = ['due', 'active', 'kept', 'removed'];
+  var cntByState = { due: 0, active: 0, kept: 0, removed: 0 };
+  allItems.forEach(function(it) { if (cntByState[it.state] != null) cntByState[it.state]++; });
+  document.getElementById('expCntDue').textContent = cntByState.due;
+  document.getElementById('expCntActive').textContent = cntByState.active;
+  document.getElementById('expCntKept').textContent = cntByState.kept;
+  document.getElementById('expCntRemoved').textContent = cntByState.removed;
+
+  // headline
+  var dueN = cntByState.due, activeN = cntByState.active;
+  var hl = document.getElementById('expHeadline');
+  if (!allItems.length) {
+    hl.textContent = 'No temporary code recorded yet.';
+  } else if (dueN) {
+    hl.innerHTML = '<span class="hl-due">' + dueN + ' ' + plural(dueN, 'piece') + ' of temporary code ' + (dueN === 1 ? 'is' : 'are') + ' ready to remove.</span> ' + activeN + ' more ' + (activeN === 1 ? 'is' : 'are') + ' waiting on a condition.';
+  } else {
+    hl.innerHTML = 'No temporary code is due. ' + activeN + ' ' + plural(activeN, 'piece') + ' ' + (activeN === 1 ? 'is' : 'are') + ' waiting on a condition.';
+  }
+
+  // icon letter for kind
+  function kindIcon(k) {
+    var cls = ['mock','demo','flag','shim','fixture'].indexOf(k) >= 0 ? k : 'other';
+    return '<div class="exp-icon ' + cls + '" aria-hidden="true">' + esc((k || 'o').charAt(0).toUpperCase()) + '</div>';
+  }
+
+  // days until / since a date, from DATA.generatedAt
+  function daysUntil(dateStr) {
+    if (!dateStr) return null;
+    var ref = DATA.generatedAt ? new Date(DATA.generatedAt) : new Date();
+    var target = new Date(dateStr);
+    var diff = Math.round((target - ref) / 86400000);
+    return diff;
+  }
+
+  // "removes when" cell text
+  function whenText(it) {
+    if (it.state === 'kept') return 'kept on purpose';
+    if (it.state === 'removed') return 'removed on ' + esc(day(it.at) || 'no data') + (it.by ? ' by ' + esc(it.by) : '');
+    var wf = waitingFor(it);
+    if (!wf) return 'no condition recorded';
+    var c = it.condition || {};
+    var extra = '';
+    if (c.type === 'date' && c.on) {
+      var d = daysUntil(c.on);
+      if (d != null) extra = '<div class="days">' + (d > 0 ? 'in ' + d + ' ' + plural(d, 'day') : d === 0 ? 'today' : Math.abs(d) + ' ' + plural(Math.abs(d), 'day') + ' ago') + '</div>';
+    }
+    return esc(wf) + extra;
+  }
+
+  // attention section (due items only)
+  var attnEl = document.getElementById('expAttention');
+  var dueItems = allItems.filter(function(it) { return it.state === 'due'; });
+  if (dueItems.length) {
+    var secH = '<div class="sec"><div class="sec-h"><div><h2>Needs attention</h2><p>These items are due. Their removal condition is met.</p></div></div>';
+    var cards = dueItems.map(function(it) {
+      var evSummary = (it.evidence && it.evidence.summary) ? esc(it.evidence.summary) : esc(waitingFor(it) || 'condition met');
+      return '<div class="exp-card">' +
+        '<div class="left">' +
+        '<div style="display:flex;align-items:center;gap:8px">' +
+        '<span class="pill due">Due</span><span class="kind">' + esc(it.kind || 'temporary') + '</span>' +
+        '</div>' +
+        '<div class="file mono">' + esc(it.file || '') + '</div>' +
+        '<div class="field"><div class="lbl">Why it was added</div><div class="val">' + nd(it.reason) + '</div></div>' +
+        '<div class="field"><div class="lbl">Why it is due now</div><div class="val">' + evSummary + '</div></div>' +
+        '</div>' +
+        '<div class="right">' +
+        '<h3>To act</h3>' +
+        '<div class="act-row"><div class="act-lbl">Remove it</div>' + cmdChip('remove ' + base(it.file), 'bob') + '</div>' +
+        '<div class="act-row"><div class="act-lbl">Keep it, with a reason</div>' + cmdChip('whyline keep ' + base(it.file) + ' "reason"') + '</div>' +
+        '<div class="act-row"><div class="act-lbl">Give it a deadline</div>' + cmdChip('whyline until ' + base(it.file) + ' 2027-01-01') + '</div>' +
+        '</div>' +
+        '</div>';
+    }).join('');
+    attnEl.innerHTML = secH + cards + '</div>';
+  }
+
+  // current filter state
+  var curFilter = 'all';
+
+  function renderExpiry(f) {
+    curFilter = f;
+    // sync hidden chip buttons (tests depend on these)
+    document.querySelectorAll('#expFilters button').forEach(function(b) {
+      var active = b.getAttribute('data-f') === f;
+      b.classList.toggle('on', active);
+      b.setAttribute('aria-pressed', active ? 'true' : 'false');
+    });
+    // sync tile buttons
+    document.querySelectorAll('.exp-tile').forEach(function(b) {
+      var active = b.getAttribute('data-f2') === f;
+      b.setAttribute('aria-pressed', active ? 'true' : 'false');
+    });
+
+    var visible = allItems.filter(function(x) { return f === 'all' || x.state === f; });
+    // sort: due, active, kept, removed
+    visible.sort(function(a, b) { return STATE_ORDER.indexOf(a.state) - STATE_ORDER.indexOf(b.state); });
+
+    var trackedEl = document.getElementById('expTracked');
+    if (!allItems.length) {
+      trackedEl.innerHTML = '<div class="sec"><p class="empty">no temporary items yet (Whyline records one when Bob writes a mock, demo, flag, shim or fixture)</p></div>';
+      return;
+    }
+    if (!visible.length) {
+      trackedEl.innerHTML = '<div class="sec"><p class="empty">no ' + esc(f) + ' items <button class="linkbtn" type="button" id="expShowAll">Show all ' + allItems.length + ' items</button></p></div>';
+      return;
+    }
+
+    var label = f === 'all' ? 'Being tracked' : f.charAt(0).toUpperCase() + f.slice(1) + ' items';
+    var rows = visible.map(function(it) {
+      return '<div class="exp-row">' +
+        kindIcon(it.kind) +
+        '<div class="info"><div class="file">' + esc(it.file || '') + '</div>' +
+        '<div class="reason">' + esc(it.kind || 'temporary') + (it.reason ? ' \u00b7 ' + esc(it.reason) : '') + '</div></div>' +
+        '<div class="when">' + whenText(it) + '</div>' +
+        '<span class="pill ' + esc(it.state || 'dim') + '">' + esc(it.state || '') + '</span>' +
+        '</div>';
+    }).join('');
+
+    trackedEl.innerHTML = '<div class="sec"><div class="sec-h"><div><h2>' + esc(label) + '</h2></div>' +
+      (f !== 'all' ? '<button class="linkbtn" type="button" id="expShowAll">Show all ' + allItems.length + ' items</button>' : '') + '</div>' +
+      '<div class="exp-listbox">' + rows + '</div></div>';
+  }
+
+  document.getElementById('expTracked').addEventListener('click', function(e) {
+    if (e.target && e.target.id === 'expShowAll') renderExpiry('all');
   });
-  if (!tb.children.length) tb.innerHTML = '<tr><td colspan="5" class="empty">' + (allItems.length ? 'no ' + esc(f) + ' items' : 'no temporary items yet (Whyline records one when Bob writes a mock, demo, flag, shim or fixture)') + '</td></tr>';
+  renderExpiry('all');
+
+  // tile clicks: toggle off if already selected, else filter to that state
+  document.querySelectorAll('.exp-tile').forEach(function(b) {
+    b.onclick = function() {
+      var st = b.getAttribute('data-f2');
+      renderExpiry(curFilter === st ? 'all' : st);
+    };
+  });
+  // hidden chip buttons (kept for test compatibility)
   document.querySelectorAll('#expFilters button').forEach(function(b) {
-    var active = b.getAttribute('data-f') === f;
-    b.classList.toggle('on', active);
-    b.setAttribute('aria-pressed', active ? 'true' : 'false');
+    b.onclick = function() { renderExpiry(b.getAttribute('data-f')); };
   });
-}
-renderExpiry('all');
-document.querySelectorAll('#expFilters button').forEach(function(b) {
-  b.onclick = function() { renderExpiry(b.getAttribute('data-f')); };
-});
+})();
 
 // UNREVIEWED
 (function() {
@@ -753,7 +911,7 @@ document.querySelectorAll('#expFilters button').forEach(function(b) {
     '<div class="tile"><div class="k">Files with unreviewed AI lines</div><div class="v">' + nd(utotals.files || null) + '</div></div>';
   if ((unreviewed.missing || []).indexOf('coverage') >= 0) {
     var hw = document.getElementById('unrevHowto');
-    hw.style.display = 'flex';
+    hw.style.display = 'block';
     hw.innerHTML = 'No coverage report found. Add <code>coverage.xml</code> or <code>lcov.info</code> to the repo root to see test coverage per file.';
   }
   var tb = document.querySelector('#unrevTable tbody');
