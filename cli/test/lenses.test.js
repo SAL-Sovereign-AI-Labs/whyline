@@ -49,14 +49,14 @@ test('check carries lifecycle state and counts; watch changes the searched symbo
   assert.equal(cli(dir, ['watch', id, '--symbol', 'Clock']).status, 0);
   r = lenses.check(dir);
   assert.equal(r.active.length, 1);
-  assert.equal(r.active[0].evidence.references.length, 1); assert.match(r.active[0].evidence.summary, /1 reference: app\.py:1/);
+  assert.equal(r.active[0].evidence.references.length, 1); assert.match(r.active[0].evidence.summary, /still used in app\.py:1/);
   assert.equal(cli(dir, ['watch', 'L-nope', '--symbol', 'X']).status, 1, 'unknown item is an error with its fix');
   const text = cli(dir, ['check']).stdout;
-  assert.match(text, /1 active, 0 due, 0 kept, 0 removed/);
+  assert.match(text, /0 ready to delete, 1 waiting, 0 kept on purpose, 0 deleted/);
   // resolution by symbol and by kind
   assert.equal(lenses.resolveItem(dir, 'Clock').id, id);
   assert.equal(lenses.resolveItem(dir, 'mock').id, id);
-  assert.throws(() => lenses.resolveItem(dir, 'nothing-like-this'), /no item matches/);
+  assert.throws(() => lenses.resolveItem(dir, 'nothing-like-this'), /no temporary code matches/);
 });
 
 test('unreviewed: unchanged AI lines count, human-edited lines do not, coverage joins when a report exists', () => {
@@ -95,8 +95,8 @@ test('session-start names the due item and the remove skill, and mentions unrevi
   agentWrite(dir, 'demo_seed.py', 'def seed():\n    pass\n', 's3', 'Add a demo seed script.');
   git(dir, ['add', '.']); git(dir, ['commit', '-q', '-m', 'seed']); assert.ok(commit.run(dir).attached);
   const out = cli(dir, ['session-start']).stdout;
-  assert.match(out, /due for removal: demo_seed\.py \(L-[0-9a-f]{6}\)\. To act, say "remove demo_seed\.py" and the whyline-remove skill will guide the removal/);
-  assert.match(out, /2 AI-written line\(s\) in 1 file\(s\)/);
+  assert.match(out, /ready to delete: demo_seed\.py \(nothing uses \w+ any more\)\. To delete it, the user can say "remove demo_seed\.py" and the whyline-remove skill/);
+  assert.match(out, /2 AI-written lines in 1 file no person has changed since/);
 });
 
 test('a commit whose message says "remove L-xxxxxx" records the removed state; a message without a real change does not', () => {
@@ -104,7 +104,7 @@ test('a commit whose message says "remove L-xxxxxx" records the removed state; a
   agentWrite(dir, 'examples/old_demo.py', 'print("demo")\n', 's4', 'Add a quick demo script for the board.');
   git(dir, ['add', '.']); git(dir, ['commit', '-q', '-m', 'demo']); assert.ok(commit.run(dir).attached);
   const id = lenses.check(dir).due[0].id;
-  assert.equal(lenses.check(dir).due[0].evidence.summary, 'no references outside the file and its tests');
+  assert.equal(lenses.check(dir).due[0].evidence.summary, 'nothing uses old_demo any more');
   // a commit that only mentions the id but changes nothing in the item's file must not mark it removed
   fs.writeFileSync(path.join(dir, 'NOTES.md'), 'x\n'); git(dir, ['add', '.']); git(dir, ['commit', '-q', '-m', `talk about remove ${id}`]);
   commit.run(dir);
@@ -115,7 +115,7 @@ test('a commit whose message says "remove L-xxxxxx" records the removed state; a
   assert.deepEqual(r.removed, [id]);
   const c = lenses.check(dir);
   assert.equal(c.counts.removed, 1); assert.equal(c.other[0].state, 'removed');
-  assert.match(cli(dir, ['check']).stdout, /DECIDED[\s\S]*removed/);
+  assert.match(cli(dir, ['check']).stdout, /KEPT OR DELETED[\s\S]*deleted/);
   // explicit fallback command on another item
   agentWrite(dir, 'mocks/fake.py', 'def fake():\n    pass\n', 's5', 'Add a fake stub.');
   git(dir, ['add', '.']); git(dir, ['commit', '-q', '-m', 'stub']); commit.run(dir);
@@ -179,7 +179,7 @@ test('seed records temporary-looking code that predates whyline, once, with age 
   assert.equal(seed.run(dir).items.length, 0, 'second run adds nothing');
   const c = lenses.check(dir);
   assert.equal(c.due.length + c.active.length, 2);
-  assert.match(cli(dir, ['seed']).stdout, /nothing new to seed from comment markers \(2 file\(s\) already tracked\)/);
+  assert.match(cli(dir, ['seed']).stdout, /No new temporary code found in comments \(2 files already tracked\)/);
 });
 
 test('review S8 and S9: ordinary prompts and lowercase todo are not temporary', () => {

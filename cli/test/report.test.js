@@ -37,7 +37,7 @@ test('output contains no http(s) script src or stylesheet link tags', () => {
 
 test('null bom renders "no data" section gracefully, not throwing', () => {
   const html = report.render({ ...BASE_DATA, bom: null });
-  assert.ok(html.includes('BOM data not available'), 'null bom shows fallback message');
+  assert.ok(html.includes('AI report: no data'), 'null bom shows fallback message');
 });
 
 test('prompt text is HTML-escaped in the sessions table', () => {
@@ -61,8 +61,25 @@ test('a prompt containing $& or $\' is injected verbatim, not read as a replacem
 
 test('the report is one offline file with no em dashes', () => {
   const html = report.render(BASE_DATA);
-  assert.doesNotMatch(html, /—|&mdash;/);
+  assert.doesNotMatch(html, /\u2014|&mdash;/);
   assert.doesNotMatch(html, /\b(fetch|XMLHttpRequest)\s*\(/, 'read-only, no network');
+});
+
+test('the header explains the page in one sentence and links to the project, still fully offline', () => {
+  const html = report.render(BASE_DATA);
+  assert.ok(html.includes("This report shows, for every line an AI (IBM Bob, IBM's AI coding assistant) wrote in this repository, the request behind it, and which temporary code is ready to delete."), 'header sentence');
+  assert.match(html, /<a href="https:\/\/github\.com\/SAL-Sovereign-AI-Labs\/whyline">/, 'project link');
+  assert.doesNotMatch(html, /<script[^>]+src\s*=/i, 'no external script');
+  assert.doesNotMatch(html, /<link[^>]+rel\s*=\s*["']?stylesheet/i, 'no external stylesheet');
+  assert.doesNotMatch(html, /@import/i, 'no imported stylesheet');
+});
+
+test('people read plain words: tab names, status labels and conditions', () => {
+  const html = report.render(BASE_DATA);
+  for (const tab of ['Why is this here?', 'Temporary code', 'AI code nobody changed', 'AI report']) assert.ok(html.includes(`>${tab}`), tab);
+  for (const label of ["'waiting'", "'ready to delete'", "'kept on purpose'", "'deleted'", "'nothing uses '", "'after '"]) assert.ok(html.includes(label), label);
+  assert.ok(html.includes("plural(unrevFiles, 'file', 'files')"), 'the unreviewed badge says it counts files');
+  assert.doesNotMatch(html, /remove &lt;id&gt;/, 'removal is asked for by file name, not id');
 });
 
 test('generatedAt and repo appear in the output', () => {
@@ -128,7 +145,7 @@ test('collect: a repo with no notes gives an empty list, not an error', () => {
 
 test('empty repo: every view says what to do next instead of an empty table', () => {
   const html = report.render({ ...BASE_DATA, notes: 0, why: { files: [], skipped: 0 } });
-  for (const hint of ['no AI-written lines at HEAD yet', 'no temporary items yet', 'no AI-written lines recorded yet', 'no sessions yet']) assert.ok(html.includes(hint), hint);
+  for (const hint of ['no AI-written lines in the current code yet', 'no temporary code yet', 'no AI-written lines recorded yet', 'no Bob chats saved yet']) assert.ok(html.includes(hint), hint);
 });
 
 test('expiry filters cover every lifecycle state, kept included', () => {
@@ -139,7 +156,7 @@ test('expiry filters cover every lifecycle state, kept included', () => {
 test('overview panels: kinds, folders and last removal come from real data, and say so when empty', () => {
   const html = report.render(BASE_DATA);
   for (const id of ['ovKindTable', 'ovFolderTable', 'ovLastRemoval']) assert.ok(html.includes(`id="${id}"`), id);
-  assert.ok(html.includes('nothing removed yet'), 'empty last-removal message');
+  assert.ok(html.includes('nothing deleted yet'), 'empty last-removal message');
 });
 
 test('keyboard and screen reader hooks are in place', () => {

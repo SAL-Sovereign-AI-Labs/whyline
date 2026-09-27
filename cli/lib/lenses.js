@@ -20,7 +20,7 @@ function index(cwd) {
 
 function why(cwd, file, line) {
   const b = git.blameLine(cwd, file, line);
-  if (!b) return { found: false, reason: 'git blame failed (file not tracked?)' };
+  if (!b) return { found: false, reason: 'git blame could not read this line. Check that the file is committed and the line number exists.' };
   const note = git.notesShow(cwd, b.commit);
   const range = note && (note.ranges || []).find(r => r.file === b.origFile && patch.contains([r.lines], b.origLine));
   if (!range) return { found: true, origin: 'human', commit: b.commit, author: b.author };
@@ -55,27 +55,27 @@ function check(cwd, { today = new Date() } = {}) {
 function resolveItem(cwd, ref, { items } = index(cwd)) {
   const all = [...items.values()];
   const r = String(ref || '').trim();
-  if (!r) throw new Error('name an item: its id, file, symbol or kind (run: whyline check)');
+  if (!r) throw new Error('name the temporary code: its file, class or function name, or kind (run whyline check to see them)');
   const byId = items.get(r);
   if (byId) return byId;
   const lower = r.toLowerCase();
   const live = all.filter(i => i.status !== 'removed');
   const pick = list => {
     if (list.length === 1) return list[0];
-    if (list.length > 1) throw new Error(`"${r}" matches ${list.length} items: ${list.map(i => `${i.id} (${i.file})`).join(', ')}. Use the id.`);
+    if (list.length > 1) throw new Error(`"${r}" matches ${list.length} pieces of temporary code: ${list.map(i => `${i.file} (${i.id})`).join(', ')}. Name the full file path, or use the id.`);
     return null;
   };
   return pick(live.filter(i => i.file === r || i.file.endsWith('/' + r) || i.file.toLowerCase().endsWith(lower)))
     || pick(live.filter(i => i.condition && i.condition.symbol && i.condition.symbol.toLowerCase() === lower))
     || pick(live.filter(i => i.kind === lower))
     || pick(live.filter(i => i.file.toLowerCase().includes(lower) || String(i.reason || '').toLowerCase().includes(lower)))
-    || (() => { throw new Error(`no item matches "${r}" (run: whyline check to see ids, files and kinds)`); })();
+    || (() => { throw new Error(`no temporary code matches "${r}". Run whyline check to see the files.`); })();
 }
 
 // Record a decision or a condition change for an item as a note on HEAD (folded by readers, latest wins).
 function recordItemChange(cwd, ref, change) {
   const head = git.head(cwd);
-  if (!head) throw new Error('not a git repository with commits');
+  if (!head) throw new Error('this repository has no commits yet. Make a first commit, then try again.');
   const id = resolveItem(cwd, ref).id;
   const note = git.notesShow(cwd, head) || { v: 1, sessions: {}, ranges: [], items: [] };
   // if the item was born on HEAD itself, keep its original fields and layer the change on top
@@ -108,7 +108,7 @@ function evaluate(cwd, it, today) {
   if (c.type === 'date') {
     const on = new Date(c.on + 'T00:00:00');
     const due = today >= on;
-    return { due, evidence: { summary: due ? `date ${c.on} has passed` : `until ${c.on}`, references: [] } };
+    return { due, evidence: { summary: due ? `${c.on} has passed` : `after ${c.on}`, references: [] } };
   }
   if (c.type === 'no_references') {
     // a fixture exists for tests, so references from tests count for it; for everything else tests are excluded
@@ -118,10 +118,11 @@ function evaluate(cwd, it, today) {
     const stem = it.file.split('/').pop().replace(/\.[^.]+$/, '');
     const hits = [...new Set([...(c.symbol ? git.grep(cwd, c.symbol, excludes) : []), ...git.grep(cwd, stem, excludes)])];
     const references = hits.map(h => { const m = h.match(/^([^:]+):(\d+):(.*)$/); return m ? { file: m[1], line: +m[2], text: m[3].trim().slice(0, 80) } : { file: h, line: null, text: '' }; });
-    const summary = references.length ? `${references.length} reference${references.length === 1 ? '' : 's'}: ${references.slice(0, 2).map(r => `${r.file}:${r.line}`).join(', ')}${references.length > 2 ? ', ...' : ''}` : 'no references outside the file and its tests';
+    const more = references.length - 1;
+    const summary = references.length ? `still used in ${references[0].file}:${references[0].line}${more ? ` and ${more} more place${more === 1 ? '' : 's'}` : ''}` : `nothing uses ${c.symbol || stem} any more`;
     return { due: references.length === 0, evidence: { summary, references } };
   }
-  return { due: false, evidence: { summary: 'unknown condition', references: [] } };
+  return { due: false, evidence: { summary: 'no expiry Whyline can check', references: [] } };
 }
 
 module.exports = { index, why, check, evaluate, unreviewed, recordItemChange, resolveItem, LIFECYCLE };

@@ -37,13 +37,13 @@ test('check exits 0 by default and 2 only with --gate; keep and until accept a f
   const dir = repoWithItem();
   let r = run(dir, ['check']);
   assert.equal(r.status, 0, r.stdout + r.stderr);
-  assert.match(r.stdout, /DUE for removal \(1\)/);
-  assert.match(r.stdout, /L-[0-9a-f]{6}\s+demo\s+demo_seed\.py/);
+  assert.match(r.stdout, /READY TO DELETE \(1\)/);
+  assert.match(r.stdout, /demo_seed\.py\s+demo\s+.*L-[0-9a-f]{6}/);
   assert.equal(run(dir, ['check', '--gate']).status, 2);
   const id = r.stdout.match(/L-[0-9a-f]{6}/)[0];
   r = run(dir, ['keep', 'demo_seed.py', 'kept for the sales team']);
   assert.equal(r.status, 0, r.stderr);
-  assert.match(r.stdout, /demo_seed\.py \(L-/);
+  assert.match(r.stdout, /demo_seed\.py: kept on purpose/);
   assert.equal(run(dir, ['check', '--gate']).status, 0);
   r = run(dir, ['until', id, '2099-01-01']);
   assert.equal(r.status, 0, r.stderr);
@@ -59,7 +59,7 @@ test('check --gate prints a GitHub annotation per due item only inside GitHub Ac
   assert.doesNotMatch(outside.stdout, /::error/, 'no annotations outside Actions');
   const r = spawnSync(process.execPath, [CLI, 'check', '--gate'], { cwd: dir, encoding: 'utf8', env: { ...env, GITHUB_ACTIONS: 'true' } });
   assert.equal(r.status, 2);
-  assert.match(r.stdout, /^::error file=demo_seed\.py,line=1,title=whyline%3A temporary demo is due::/m);
+  assert.match(r.stdout, /^::error file=demo_seed\.py,line=1,title=whyline%3A temporary demo is ready to delete::/m);
   assert.doesNotMatch(spawnSync(process.execPath, [CLI, 'check'], { cwd: dir, encoding: 'utf8', env: { ...env, GITHUB_ACTIONS: 'true' } }).stdout, /::error/, 'plain check never annotates');
 });
 
@@ -67,7 +67,7 @@ test('session-start prints one line only when something is due, and always exits
   const dir = repoWithItem();
   const r = run(dir, ['session-start']);
   assert.equal(r.status, 0);
-  assert.match(r.stdout, /^whyline: 1 temporary item\(s\) due for removal: demo_seed\.py \(L-/);
+  assert.match(r.stdout, /^whyline: 1 piece of temporary code is ready to delete: demo_seed\.py \(/);
   assert.match(r.stdout, /say "remove demo_seed\.py"/);
   assert.equal(run(os.tmpdir(), ['session-start']).stdout, '');
 });

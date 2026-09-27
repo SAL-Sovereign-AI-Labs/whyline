@@ -4,6 +4,9 @@ All notable changes to this project are documented here. Format: Keep a Changelo
 
 ## [Unreleased]
 
+### Changed
+- Plain-language rewrite of every surface people read, following the new docs/VOICE.md: README (problem first, one worked example, screenshot), story diagram, CLI output and help, the six Bob skills, the guard message and the dashboard. Command names and `--json` keys are unchanged.
+
 ## [0.1.1] - 2026-09-27
 
 ### Added

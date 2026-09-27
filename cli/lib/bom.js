@@ -137,26 +137,22 @@ function run(cwd, range) {
 }
 
 function format(r) {
-  const title = r.range ? `BOM: ${r.range}` : 'BOM: all history';
+  const title = r.range ? `AI report for ${r.range}` : 'AI report for all history';
   const nd = v => (v == null ? 'no data' : String(v));
   const aiPct = r.ai.total != null && r.linesChanged > 0 ? Math.round(r.ai.total / r.linesChanged * 100) : null;
   const aiCell = nd(r.ai.total) + (aiPct !== null ? ` (${aiPct}%)` : '');
   const revCell = r.reviewed.lines == null ? 'no data' : r.reviewed.percent !== null ? `${r.reviewed.lines} (${r.reviewed.percent}%)` : `${r.reviewed.lines} (no data)`;
   const testedCell = 'no data';
-  let costCell;
-  if (r.cost.sum !== null) {
-    costCell = `${r.cost.sum} Bobcoin (${r.cost.sessionsWithCost} of ${r.cost.sessions} sessions)`;
-  } else {
-    costCell = `no data (${r.cost.sessionsWithCost} of ${r.cost.sessions} sessions)`;
-  }
+  const chats = `${r.cost.sessionsWithCost} of ${r.cost.sessions} Bob chats had a cost`;
+  const costCell = r.cost.sum !== null ? `${r.cost.sum} Bob usage credits (${chats})` : `no data (${chats})`;
   const rows = [
     ['lines changed', String(r.linesChanged)],
-    ['AI lines', aiCell],
-    ['reviewed', revCell],
-    ['tested', testedCell],
-    ['active items', nd(r.items.active)],
-    ['due items', nd(r.items.due)],
-    ['removed items', nd(r.items.removed)],
+    ['written by AI', aiCell],
+    ['AI lines a person changed since', revCell],
+    ['covered by tests', testedCell],
+    ['temporary code waiting', nd(r.items.active)],
+    ['temporary code ready to delete', nd(r.items.due)],
+    ['temporary code deleted', nd(r.items.removed)],
     ['cost', costCell],
   ];
   const colW = Math.max(...rows.map(([k]) => k.length));
@@ -164,7 +160,7 @@ function format(r) {
   for (const [k, v] of rows) {
     lines.push(`${k.padEnd(colW)}  ${v}`);
   }
-  if ((r.missing || []).includes('notes')) lines.push('', 'no notes yet (commit something Bob wrote, then run whyline bom again)');
+  if ((r.missing || []).includes('notes')) lines.push('', 'Nothing saved in your git history yet. Commit something Bob wrote, then run whyline bom again.');
   return lines.join('\n');
 }
 

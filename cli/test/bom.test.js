@@ -126,7 +126,7 @@ test('cost sums the sessions that have one, rounded, and names how many had it',
   const r = bom.run(dir, undefined);
   assert.deepEqual(r.cost, { sum: 0.3, sessionsWithCost: 2, sessions: 3 });
   assert.ok(r.missing.includes('cost'), 'one session had no cost');
-  assert.match(bom.format(r), /0\.3 Bobcoin \(2 of 3 sessions\)/);
+  assert.match(bom.format(r), /0\.3 Bob usage credits \(2 of 3 Bob chats had a cost\)/);
 });
 
 test('a repo with no notes: unknown is null with the fix named, never a zero', () => {
@@ -141,8 +141,8 @@ test('a repo with no notes: unknown is null with the fix named, never a zero', (
   assert.deepEqual(r.items, { active: null, due: null, removed: null });
   assert.ok(r.missing.includes('notes'));
   const out = bom.format(r);
-  assert.match(out, /AI lines\s+no data/);
-  assert.match(out, /no notes yet \(commit something Bob wrote/);
+  assert.match(out, /written by AI\s+no data/);
+  assert.match(out, /Nothing saved in your git history yet\. Commit something Bob wrote/);
   assert.doesNotMatch(out, /null/);
 });
 
@@ -171,8 +171,8 @@ test('text output: one table under 80 columns, count and percent in the same cel
   for (const line of out.split('\n')) assert.ok(line.length <= 80, `too wide: ${line}`);
   assert.match(out, /7 \(58%\)/, 'AI lines with their share of lines changed');
   assert.match(out, /1 \(14%\)/, 'reviewed with its share of AI lines');
-  assert.match(out, /tested.*no data/);
-  assert.match(out, /cost.*no data \(0 of 2 sessions\)/);
+  assert.match(out, /covered by tests.*no data/);
+  assert.match(out, /cost.*no data \(0 of 2 Bob chats had a cost\)/);
 });
 
 test('AI lines never exceed lines changed: a file Bob wrote and a human deleted counts in both, and counts as reviewed', () => {

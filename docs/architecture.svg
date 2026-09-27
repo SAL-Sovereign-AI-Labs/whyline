@@ -1,19 +1,81 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 300" font-family="-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="13">
-  <rect width="960" height="300" fill="#ffffff"/>
-  <rect x="10" y="14" width="940" height="128" rx="10" fill="#f4f6f9" stroke="#e1e5ea"/>
-  <text x="24" y="34" font-weight="700" fill="#5d6675">RECORDING, automatic, 0 Bobcoins</text>
-  <rect x="24" y="52" width="120" height="66" rx="8" fill="#fff" stroke="#e1e5ea"/><text x="84" y="80" text-anchor="middle" fill="#14171c">Developer</text><text x="84" y="98" text-anchor="middle" fill="#5d6675" font-size="11">prompts, commits</text>
-  <rect x="176" y="52" width="150" height="66" rx="8" fill="#e8f0ff" stroke="#0f62fe"/><text x="251" y="80" text-anchor="middle" fill="#14171c">IBM Bob</text><text x="251" y="98" text-anchor="middle" fill="#5d6675" font-size="11">write_file, apply_diff</text>
-  <rect x="358" y="52" width="150" height="66" rx="8" fill="#e8f0ff" stroke="#0f62fe"/><text x="433" y="80" text-anchor="middle" fill="#14171c">Bob hooks</text><text x="433" y="98" text-anchor="middle" fill="#5d6675" font-size="11">.bob/settings.json</text>
-  <rect x="540" y="52" width="150" height="66" rx="8" fill="#e6f4ea" stroke="#198038"/><text x="615" y="80" text-anchor="middle" fill="#14171c">whyline capture</text><text x="615" y="98" text-anchor="middle" fill="#5d6675" font-size="11">exact lines + prompt</text>
-  <rect x="722" y="52" width="214" height="66" rx="8" fill="#fff3c4" stroke="#b28600"/><text x="829" y="74" text-anchor="middle" fill="#14171c">git commit, then a note</text><text x="829" y="92" text-anchor="middle" fill="#5d6675" font-size="11">post-commit: ai / ai-edited / human</text><text x="829" y="108" text-anchor="middle" fill="#5d6675" font-size="11">refs/notes/whyline</text>
-  <path d="M144 85 H176 M326 85 H358 M508 85 H540 M690 85 H722" stroke="#5d6675" stroke-width="1.5" fill="none"/>
-  <rect x="10" y="158" width="940" height="128" rx="10" fill="#f4f6f9" stroke="#e1e5ea"/>
-  <text x="24" y="178" font-weight="700" fill="#5d6675">ANSWERING, read-only, from the notes</text>
-  <rect x="24" y="196" width="150" height="66" rx="8" fill="#e6f4ea" stroke="#198038"/><text x="99" y="222" text-anchor="middle" fill="#14171c">whyline why</text><text x="99" y="240" text-anchor="middle" fill="#5d6675" font-size="11">the prompt behind a line</text>
-  <rect x="200" y="196" width="150" height="66" rx="8" fill="#e6f4ea" stroke="#198038"/><text x="275" y="222" text-anchor="middle" fill="#14171c">whyline check</text><text x="275" y="240" text-anchor="middle" fill="#5d6675" font-size="11">temporary code: active, due</text>
-  <rect x="376" y="196" width="150" height="66" rx="8" fill="#e6f4ea" stroke="#198038"/><text x="451" y="222" text-anchor="middle" fill="#14171c">whyline unreviewed</text><text x="451" y="240" text-anchor="middle" fill="#5d6675" font-size="11">AI lines no human edited</text>
-  <rect x="552" y="196" width="150" height="66" rx="8" fill="#e6f4ea" stroke="#198038"/><text x="627" y="222" text-anchor="middle" fill="#14171c">whyline bom, report</text><text x="627" y="240" text-anchor="middle" fill="#5d6675" font-size="11">bill of materials, one HTML page</text>
-  <rect x="728" y="196" width="208" height="66" rx="8" fill="#e8f0ff" stroke="#0f62fe"/><text x="832" y="218" text-anchor="middle" fill="#14171c">Back into Bob</text><text x="832" y="236" text-anchor="middle" fill="#5d6675" font-size="11">session start: "1 item due"</text><text x="832" y="252" text-anchor="middle" fill="#5d6675" font-size="11">"remove the mock": evidence, approval</text>
-  <path d="M829 118 V158" stroke="#5d6675" stroke-width="1.5" fill="none"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="470" viewBox="0 0 1280 470" font-family="-apple-system, Segoe UI, Helvetica, Arial, sans-serif">
+  <title>Whyline in five steps</title>
+  <desc>You ask Bob for a mock until payments-v2 lands. Bob writes it and Whyline saves your request with those lines. You commit and the request is saved in your git history. payments-v2 merges and nothing uses the mock any more, so it is ready to delete. Bob shows the proof, you say yes, and it is deleted.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6c6f85"/></marker>
+  </defs>
+  <rect x="0" y="0" width="1280" height="470" rx="18" fill="#ffffff"/>
+  <text x="40" y="52" font-size="26" font-weight="700" fill="#1e1e2e">How Whyline works</text>
+  <text x="40" y="82" font-size="16" fill="#5c5f77">One example, start to finish: a mock payment gateway that was only meant to live until payments-v2.</text>
+
+  <g font-size="15" fill="#1e1e2e">
+    <!-- 1 -->
+    <rect x="40" y="118" width="220" height="250" rx="14" fill="#eff1f5" stroke="#ccd0da"/>
+    <circle cx="72" cy="150" r="17" fill="#1e66f5"/><text x="72" y="156" text-anchor="middle" fill="#fff" font-weight="700">1</text>
+    <text x="100" y="156" font-weight="700" font-size="17">You ask Bob</text>
+    <text x="60" y="196" fill="#5c5f77">In IBM Bob, IBM's AI</text>
+    <text x="60" y="216" fill="#5c5f77">coding assistant:</text>
+    <rect x="56" y="232" width="188" height="110" rx="10" fill="#ffffff" stroke="#ccd0da"/>
+    <text x="68" y="258" font-style="italic">"Add a mock payment</text>
+    <text x="68" y="280" font-style="italic">gateway so checkout</text>
+    <text x="68" y="302" font-style="italic">works until payments-v2</text>
+    <text x="68" y="326" font-style="italic">lands."</text>
+
+    <!-- 2 -->
+    <rect x="284" y="118" width="220" height="250" rx="14" fill="#eff1f5" stroke="#ccd0da"/>
+    <circle cx="316" cy="150" r="17" fill="#1e66f5"/><text x="316" y="156" text-anchor="middle" fill="#fff" font-weight="700">2</text>
+    <text x="344" y="156" font-weight="700" font-size="17">Bob writes it</text>
+    <text x="304" y="196" fill="#5c5f77">Whyline saves your</text>
+    <text x="304" y="216" fill="#5c5f77">request with the exact</text>
+    <text x="304" y="236" fill="#5c5f77">lines Bob wrote.</text>
+    <rect x="300" y="256" width="188" height="68" rx="10" fill="#ffffff" stroke="#ccd0da"/>
+    <text x="312" y="282" font-family="Menlo, Consolas, monospace" font-size="13">mock_gateway.py</text>
+    <text x="312" y="306" font-family="Menlo, Consolas, monospace" font-size="13" fill="#40a02b">lines 1 to 4: AI</text>
+    <text x="304" y="350" fill="#5c5f77" font-size="13">No AI call, no extra cost</text>
+
+    <!-- 3 -->
+    <rect x="528" y="118" width="220" height="250" rx="14" fill="#eff1f5" stroke="#ccd0da"/>
+    <circle cx="560" cy="150" r="17" fill="#1e66f5"/><text x="560" y="156" text-anchor="middle" fill="#fff" font-weight="700">3</text>
+    <text x="588" y="156" font-weight="700" font-size="17">You commit</text>
+    <text x="548" y="196" fill="#5c5f77">The request is saved in</text>
+    <text x="548" y="216" fill="#5c5f77">your git history, on the</text>
+    <text x="548" y="236" fill="#5c5f77">commit. Your files are</text>
+    <text x="548" y="256" fill="#5c5f77">not touched.</text>
+    <rect x="544" y="270" width="188" height="68" rx="10" fill="#ffffff" stroke="#ccd0da"/>
+    <text x="556" y="296" font-size="14">marked temporary:</text>
+    <text x="556" y="318" font-size="14" font-style="italic">"until payments-v2 lands"</text>
+
+    <!-- 4 -->
+    <rect x="772" y="118" width="220" height="250" rx="14" fill="#fdf1e3" stroke="#f5c28a"/>
+    <circle cx="804" cy="150" r="17" fill="#df8e1d"/><text x="804" y="156" text-anchor="middle" fill="#fff" font-weight="700">4</text>
+    <text x="832" y="156" font-weight="700" font-size="17">Weeks later</text>
+    <text x="792" y="196" fill="#5c5f77">payments-v2 merges.</text>
+    <text x="792" y="216" fill="#5c5f77">Nothing uses the mock</text>
+    <text x="792" y="236" fill="#5c5f77">any more.</text>
+    <rect x="788" y="256" width="188" height="86" rx="10" fill="#ffffff" stroke="#f5c28a"/>
+    <text x="800" y="284" font-weight="700" fill="#df8e1d">Ready to delete</text>
+    <text x="800" y="308" font-size="13" fill="#5c5f77">A pull request check can</text>
+    <text x="800" y="328" font-size="13" fill="#5c5f77">fail until it is gone.</text>
+
+    <!-- 5 -->
+    <rect x="1016" y="118" width="224" height="250" rx="14" fill="#e6f4ea" stroke="#9fd3a8"/>
+    <circle cx="1048" cy="150" r="17" fill="#40a02b"/><text x="1048" y="156" text-anchor="middle" fill="#fff" font-weight="700">5</text>
+    <text x="1076" y="156" font-weight="700" font-size="17">Bob cleans up</text>
+    <text x="1036" y="196" fill="#5c5f77">"Remove the mock."</text>
+    <text x="1036" y="216" fill="#5c5f77">Bob shows the proof</text>
+    <text x="1036" y="236" fill="#5c5f77">and asks you first.</text>
+    <rect x="1032" y="256" width="192" height="68" rx="10" fill="#ffffff" stroke="#9fd3a8"/>
+    <text x="1044" y="284" font-weight="700" fill="#40a02b">You say yes.</text>
+    <text x="1044" y="308" font-size="13" fill="#5c5f77">Deleted and committed.</text>
+  </g>
+
+  <g stroke="#6c6f85" stroke-width="2.5" fill="none" marker-end="url(#arrow)">
+    <line x1="262" y1="243" x2="281" y2="243"/>
+    <line x1="506" y1="243" x2="525" y2="243"/>
+    <line x1="750" y1="243" x2="769" y2="243"/>
+    <line x1="994" y1="243" x2="1013" y2="243"/>
+  </g>
+
+  <rect x="40" y="392" width="1200" height="50" rx="12" fill="#eff1f5" stroke="#ccd0da"/>
+  <text x="62" y="423" font-size="16" fill="#1e1e2e"><tspan font-weight="700">Any time:</tspan> ask "why is this line here?" and get the request that wrote it, on the command line, in Bob, or in the report page.</text>
 </svg>

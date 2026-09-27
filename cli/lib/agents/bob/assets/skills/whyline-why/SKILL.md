@@ -1,39 +1,42 @@
 ---
 name: whyline-why
-description: "When the user asks why a line exists, who wrote it, what prompt caused it, or whether a line is AI-written, run whyline why <file>:<line> --json and explain the result."
+description: "When the user asks why a line exists, who wrote it, what request caused it, or whether the AI wrote it, run whyline why <file>:<line> --json and explain the result in plain words."
 ---
 ## When to use
-Trigger phrases: "why does this line exist", "who wrote this line", "what prompt caused this", "is this line AI-written", "why is this here", "trace this line", "whyline why".
+Trigger phrases: "why does this line exist", "why is this here", "who wrote this line", "did the AI write this", "is this line AI-written", "what request caused this", "what prompt caused this", "what was Bob asked here", "trace this line", "whyline why".
 
 ## Input
-Ask for a file path and line number if the user has not given one. Accept `<file>:<line>` notation directly.
+Ask for a file path and line number if the user has not given one. Accept `<file>:<line>` directly.
 
 ## Workflow
 Run `whyline why <file>:<line> --json` with execute_command.
+If `item` is not null and `item.status` is "active", also run `whyline check --json` and find `item.id`: in `due` it is ready to delete, in `active` it is waiting. Use that entry's `evidence.summary` as the reason.
 
 ## Rules
 - Never guess the file or line number; ask the user if either is missing.
 - Show null values as "no data", never as 0.
 - Trust the CLI output over any note in context.
-- If the CLI exits non-zero (its exit code is 0 for normal answers, including a due list), stop and show its stderr as-is.
-- Read-only: never edit files or notes.
+- If the CLI exits non-zero (its exit code is 0 for normal answers), stop and show its stderr as-is.
+- Read-only: never edit files or the history Whyline keeps.
 
-## Interpreting the result
-- `found: false` -- git blame could not locate the line (file not tracked or line out of range). Show the `reason` field.
-- `origin: "human"` -- a human wrote this line. Show the author and short commit hash.
-- `origin: "ai"` -- the agent wrote every part of this line. Show all fields below.
-- `origin: "ai-edited"` -- a human and an agent both touched this line. Show all fields below.
+## Reading the result
+- `found: false`: git blame could not find the line (the file is not committed, or the line number is past the end). Show the `reason` field.
+- `origin: "human"`: a person wrote this line. Show "written by a person", the `author` and the short commit.
+- `origin: "ai"`: Bob wrote it and no person changed it before the commit. Show "AI (IBM Bob)" and every field below.
+- `origin: "ai-edited"`: Bob wrote it, then a person changed it before the commit. Show "AI (IBM Bob), then changed by a person" and every field below.
 
-## Output template (ai-written or ai-edited)
+## Output template (origin "ai" or "ai-edited")
 ```
 <file>:<line>
-origin   <origin> (<agent>) · session <first 8 chars of session> · <author> · <date> · <cost> Bobcoin
-prompt   "<prompt>"
-siblings <sibling ranges, or "none">
-item     <id> <kind> · <status> · <condition> · "<reason>"   (omit line if item is null)
-commit   <short hash>
+written by     AI (IBM Bob)   or   AI (IBM Bob), then changed by a person
+asked by       <author>, on <date from ts>, in Bob chat <first 8 chars of session> (cost <cost> Bob usage credits)
+request        "<prompt>"
+other files this request changed
+               <each entry of siblings, one per line>
+temporary code <item.kind>, <ready to delete | waiting | kept on purpose | deleted>: <evidence.summary from whyline check, when active>
+commit         <short hash>
 ```
-- Omit the `item` line when `item` is null.
-- Omit the `cost` segment when cost is null.
-- Omit the `siblings` line when the siblings array is empty.
-- End with one next command: `whyline check` to see all temporary items, or tell the user to say "remove `<item.id>`" with the whyline-remove skill if the item status is `due`.
+- Leave out the `temporary code` line when `item` is null. `item.status` "kept" is kept on purpose, "removed" is deleted; for "active" use what `whyline check --json` said.
+- Leave out the cost part when `cost` is null.
+- Leave out the "other files this request changed" lines when `siblings` is empty.
+- End with one next step: `whyline check` to see all temporary code, or, when the temporary code is ready to delete, tell the user to say "remove <file name>".

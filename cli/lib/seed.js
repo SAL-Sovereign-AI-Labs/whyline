@@ -38,7 +38,7 @@ function scan(cwd, { byName = false } = {}) {
 
 function run(cwd, { dryRun = false, byName = false } = {}) {
   const head = git.head(cwd);
-  if (!head) return { error: 'not a git repository with commits' };
+  if (!head) return { error: 'this repository has no commits yet. Make a first commit, then run whyline seed again.' };
   const idx = lenses.index(cwd);
   const known = new Set([...idx.items.values()].map(i => i.file));
   const candidates = scan(cwd, { byName: true });

@@ -43,19 +43,19 @@ function run() {
     fs.writeFileSync(path.join(dir, 'src/lib.py'), 'def a():\n    return 1\n\ndef b():\n    return 42\n');
     commitAll('helpers');
 
-    check('an AI line keeps the prompt that wrote it; a human line is not called AI',
+    check('why: an AI line shows the request that wrote it, and a line a person wrote is not called AI',
       () => { const w = lenses.why(dir, 'src/mock_gateway.py', 1); return w.origin === 'ai' && /mock gateway/.test(w.prompt); },
       () => lenses.why(dir, 'README.md', 1).origin === 'human');
-    check('a human edit before commit is marked ai-edited; the untouched AI line stays ai',
+    check('why: a line a person changed before the commit shows as "AI, then changed by a person"; untouched AI lines stay AI',
       () => lenses.why(dir, 'src/lib.py', 5).origin === 'ai-edited',
       () => lenses.why(dir, 'src/lib.py', 1).origin === 'ai');
-    check('temporary code stays active while referenced and becomes due when the last reference goes',
+    check('check: temporary code waits while something uses it, and is ready to delete once nothing does',
       () => lenses.check(dir).due.length === 0 && lenses.check(dir).active.some(i => i.file === 'src/mock_gateway.py'),
       () => { fs.writeFileSync(path.join(dir, 'src/checkout.py'), 'def checkout(total):\n    return True\n'); commitAll('real gateway'); return lenses.check(dir).due.some(i => i.file === 'src/mock_gateway.py'); });
-    check('the CI gate fails while something is due and passes once it is decided',
+    check('check --gate: fails the pull request check while something is ready to delete, and passes once it is decided',
       () => cli('check', '--gate').status === 2,
       () => cli('keep', 'mock_gateway.py', 'selftest keeps it').status === 0 && cli('check', '--gate').status === 0);
-    check('Bob cannot rewrite the record; ordinary commands still run',
+    check('Bob cannot edit the history Whyline keeps; ordinary commands still run',
       () => guard('git notes --ref=whyline remove HEAD') === 2 && guard('rm -rf .git/whyline') === 2,
       () => guard('git notes --ref=whyline show HEAD') === 0 && guard('git add -A && git commit -m done') === 0);
   } finally {

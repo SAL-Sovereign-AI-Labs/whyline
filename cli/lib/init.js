@@ -16,19 +16,21 @@ const GUARD = '#!/bin/sh\n# installed by whyline init. Never blocks: missing too
 
 function run(cwd, { agentIds = ['bob'] } = {}) {
   const root = git.repoRoot(cwd);
-  if (!root) { process.stderr.write('whyline init: not inside a git repository\n'); return 3; }
+  if (!root) { process.stderr.write('whyline init: this folder is not a git repository. Go to your project folder (or run git init first), then run whyline init again.\n'); return 3; }
   const written = [];
 
   for (const id of agentIds) {
     const adapter = agents.byId(id);
-    if (!adapter) { process.stderr.write(`whyline init: unknown agent "${id}". Known: ${agents.all().map(a => a.id).join(', ')}\n`); return 1; }
+    if (!adapter) { process.stderr.write(`whyline init: unknown agent "${id}". Use one of: ${agents.all().map(a => a.id).join(', ')}\n`); return 1; }
     written.push(...adapter.install(root).map(w => `${w} (${adapter.name})`));
   }
   written.push(...installGitHooks(root));
   written.push(...configureNotes(root));
 
-  console.log('whyline installed:\n  ' + written.join('\n  '));
-  console.log(`\nNext: commit the ${agentIds.map(id => agents.byId(id).configDir).join(' and ')} folder so your team gets the hooks, then start a task in ${agentIds.map(id => agents.byId(id).name).join(' or ')}.`);
+  const dirs = agentIds.map(id => agents.byId(id).configDir);
+  console.log('Whyline is set up. Files written:\n  ' + written.join('\n  '));
+  console.log(`\nFrom now on, each commit saves the request behind ${agentIds.map(id => agents.byId(id).name).join(' or ')}'s code in your git history (a git note, extra data attached to the commit; your files are not touched).`);
+  console.log(`Next: commit the ${dirs.join(' and ')} folder so your team gets it (git add ${dirs.join(' ')} && git commit -m "Add Whyline"), then give ${agentIds.map(id => agents.byId(id).name).join(' or ')} a request as usual.`);
   return 0;
 }
 
@@ -36,7 +38,7 @@ function run(cwd, { agentIds = ['bob'] } = {}) {
 // `whyline commit` that writes a note, because git warns "refs/notes/whyline is invalid" while the ref does not exist.
 function configureNotes(root) {
   git.git(['config', 'notes.rewriteRef', `refs/notes/${git.NOTES_REF}`], { cwd: root });
-  return ['git config notes.rewriteRef (notes.displayRef is added with the first note)'];
+  return ['git config notes.rewriteRef (keeps the history when you amend or rebase; notes.displayRef is added with the first commit Whyline saves)'];
 }
 
 function installGitHooks(root) {

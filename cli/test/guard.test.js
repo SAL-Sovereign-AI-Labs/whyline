@@ -28,6 +28,6 @@ test('guard lets ordinary commands run, including the whole removal flow and rea
 test('selftest proves every check can fail and exits 0', () => {
   const r = spawnSync(process.execPath, [path.join(__dirname, '..', 'index.js'), 'selftest'], { encoding: 'utf8' });
   assert.equal(r.status, 0, r.stdout + r.stderr);
-  assert.match(r.stdout, /(\d+)\/\1 checks proved able to fail\. Result: PROVEN\./);
+  assert.match(r.stdout, /(\d+) of \1 checks told the two cases apart\. Whyline works on this machine\./);
   assert.doesNotMatch(r.stdout, /^FAIL/m);
 });

@@ -3,34 +3,46 @@
 // whyline: provenance for AI-written code. Commands never throw at the agent: hook commands always exit 0.
 const fs = require('node:fs');
 
-const USAGE = `whyline <command> [--json]
+const USAGE = `whyline: know why your AI wrote every line, and clean up what it left behind.
 
-  init [--agent bob]        install the agent's hooks (.bob/) and git hooks in this repo
-  capture [--agent bob]     hook: read a hook payload on stdin, record the write (--dump or WHYLINE_DUMP=1 keeps raw payloads in .git/whyline/raw/)
-  session-start             hook: print a one-line summary for Bob's context
-  commit                    git post-commit: attach the provenance note to HEAD
-  why <file>:<line>         who wrote this line, and why
-  check [--json] [--gate]   temporary items and their lifecycle state (--gate: exit 2 when any is due, for hooks and CI)
-  unreviewed [--json]       AI lines no human has edited since, per file, with coverage if a report exists
-  bom [A..B] [--json]       AI bill of materials for a commit range (default: last tag..HEAD, else all)
-  report [--out file]       write the read-only HTML report (.whyline-report.html)
-  keep <item> "<reason>"    decision: keep permanently          (due -> kept)
-  until <item> <YYYY-MM-DD> change the condition to a date       (stays active)
-  watch <item> --symbol X   fix the symbol the reference check searches for
-  removed <item>            record a removal done by hand (a commit message naming the item does this automatically)
-  seed [--dry-run] [--by-name] first run on an existing repo: record code with TODO remove, FIXME, HACK, temporary or until markers; --by-name also records mock_, compat_, examples/, fixtures/ names
+Usage: whyline <command> [--json]
 
-  selftest                  prove every check can fail: plant a passing and a failing case for each, in a temp repo
+Set up
+  init [--agent bob]           set Whyline up in this repo: small scripts IBM Bob runs automatically (in .bob/) and git hooks
+  seed [--dry-run] [--by-name] first run on an older repo: find temporary code that is already there (comments like
+                               TODO remove, FIXME, HACK, "until X lands"); --by-name also takes mock_, compat_, examples/ and fixtures/ files
 
-  <item> is a file path (or its last part), a watched symbol, a kind (mock, demo, flag, shim, fixture) when unique,
-  or the id shown by check. People name files; ids are for notes and scripts.
+Ask
+  why <file>:<line>            who wrote this line, and why: the request you gave Bob, and the other files it changed
+  check [--gate]               temporary code: what is ready to delete and what is still waiting
+                               (--gate: fail the pull request check, exit 2, while anything is ready to delete)
+  unreviewed                   AI code no person has changed since, per file, with test coverage if a report exists
+  bom [A..B]                   AI report for a release (default: last tag..HEAD, or all history when there is no tag)
+  report [--out file]          write the read-only HTML dashboard (.whyline-report.html)
 
-Lifecycle:  active --(condition met)--> due --(you decide)--> kept | removed
-            active and due are recomputed from the repo on every check; kept and removed are recorded.
-  --version, --help
+Decide about temporary code
+  keep <file> "<reason>"       keep it on purpose, so it stops showing as ready to delete
+  until <file> <YYYY-MM-DD>    make it ready to delete after a date instead
+  watch <file> --symbol X      change the class or function name Whyline checks is still used
+  removed <file>               say you deleted it by hand (a commit message like "remove <file>" does this for you)
 
-Exit codes: 0 ok, 1 usage or error, 2 only with check --gate when items are due, 3 not a git repository.
-Env: WHYLINE_DEBUG=1 prints stack traces to stderr. WHYLINE_BOB_DB overrides the Bob database path.
+Check Whyline itself
+  selftest                     built-in self check: plants a passing and a failing case for every check in a throwaway repo
+
+Run for you automatically by Bob and git (you do not type these)
+  capture [--agent bob]        saves each request you send and each file Bob edits (--dump or WHYLINE_DUMP=1 keeps the raw input in .git/whyline/raw/)
+  session-start                prints one line for Bob when a Bob chat starts
+  commit                       after each git commit: saves the request behind Bob's code in your git history
+
+  <file> is the temporary code's file path (or just its file name). Its class or function name, or its kind
+  (mock, demo, flag, shim, fixture) when only one has that kind, work too. The id shown by check (like L-12d3fa) works too.
+
+Temporary code is waiting, then ready to delete once nothing uses it or its date passes.
+Then you decide: keep it on purpose, or delete it. Whyline works out the first two on every check.
+
+Every read command takes --json for scripts. Also: --version, --help.
+Exit codes: 0 ok, 1 wrong usage or an error, 2 only with check --gate while something is ready to delete, 3 not a git repository.
+Env: WHYLINE_DEBUG=1 prints stack traces to stderr. WHYLINE_BOB_DB points to a different Bob database file.
 `;
 
 function readStdin() {
@@ -53,7 +65,7 @@ function dispatch(argv) {
   const cwd = process.cwd();
   const json = rest.includes('--json');
   if (['why', 'check', 'unreviewed', 'bom', 'report', 'keep', 'until', 'watch', 'removed', 'seed'].includes(cmd) && !require('./lib/git').repoRoot(cwd)) {
-    process.stderr.write('not a git repository (run whyline inside a repo, or whyline init to set one up)\n'); return 3;
+    process.stderr.write('whyline: this folder is not a git repository. Go to your project folder (or run git init first), then try again.\n'); return 3;
   }
   const agentIds = [];
   const args = [];
@@ -85,34 +97,39 @@ function dispatch(argv) {
         const lenses = require('./lib/lenses');
         const r = lenses.check(cwd);
         const parts = [];
-        if (r.due.length) parts.push(`${r.due.length} temporary item(s) due for removal: ${r.due.map(i => `${i.file} (${i.id})`).join(', ')}. To act, say "remove ${r.due[0].file.split('/').pop()}" and the whyline-remove skill will guide the removal`);
+        if (r.due.length) parts.push(`${plural(r.due.length, 'piece of temporary code is', 'pieces of temporary code are')} ready to delete: ${r.due.map(i => `${i.file} (${i.evidence.summary})`).join(', ')}. To delete it, the user can say "remove ${r.due[0].file.split('/').pop()}" and the whyline-remove skill shows the proof and asks before changing anything`);
         const u = lenses.unreviewed(cwd);
-        if (u.totals.aiLines) parts.push(`${u.totals.aiLines} AI-written line(s) in ${u.totals.files} file(s) have had no human edit since (run: whyline unreviewed)`);
-        if (parts.length) process.stdout.write(`whyline: ${parts.join('. ')}\n`);
+        if (u.totals.aiLines) parts.push(`${plural(u.totals.aiLines, 'AI-written line')} in ${plural(u.totals.files, 'file')} no person has changed since (to see them: whyline unreviewed)`);
+        if (parts.length) process.stdout.write(`whyline: ${parts.join('. ')}.\n`);
       } catch { /* silent by design */ }
       return 0;
     }
     case 'commit': {
       try {
         const r = require('./lib/commit').run(cwd);
-        if (r.removed && r.removed.length) process.stderr.write(`whyline: recorded removed: ${r.removed.join(', ')}\n`);
-        if (r.note) process.stderr.write(`whyline: note attached to ${r.commit.slice(0, 7)} (${r.note.ranges.length} range(s), ${r.note.items.length} item(s))\n`);
+        if (r.removed && r.removed.length) {
+          const { items } = require('./lib/lenses').index(cwd);
+          process.stderr.write(`whyline: marked as deleted: ${r.removed.map(id => (items.get(id) || { file: id }).file).join(', ')}\n`);
+        }
+        if (r.note) process.stderr.write(`whyline: saved the request behind Bob's code in your git history, on commit ${r.commit.slice(0, 7)} (${plural(r.note.ranges.length, 'block')} of AI code, ${plural(r.note.items.length, 'piece')} of temporary code)\n`);
       } catch (e) { require('./lib/session').logError(cwd, `commit: ${e.message}`); }
       return 0;
     }
     case 'why': {
       const m = (args[0] || '').match(/^(.+):(\d+)$/);
-      if (!m) { process.stderr.write('usage: whyline why <file>:<line>\n'); return 1; }
+      if (!m) { process.stderr.write('usage: whyline why <file>:<line>, for example whyline why src/app.py:12\n'); return 1; }
       const r = require('./lib/lenses').why(cwd, m[1], +m[2]);
       if (json) { console.log(JSON.stringify(r, null, 2)); return 0; }
-      printWhy(m[1], +m[2], r);
+      printWhy(cwd, m[1], +m[2], r);
       return 0;
     }
     case 'selftest': {
       const r = require('./lib/selftest').run();
       if (json) { console.log(JSON.stringify(r, null, 2)); return r.proven ? 0 : 1; }
+      console.log('Built-in self check: for every check, a case that must pass and a case that must fail, in a throwaway repo.');
       for (const t of r.results) console.log(`${t.ok ? 'PASS' : 'FAIL'}  ${t.name}${t.detail ? ` (${t.detail})` : ''}`);
-      console.log(`${r.passed}/${r.total} checks proved able to fail. Result: ${r.proven ? 'PROVEN' : 'FAILED'}.`);
+      console.log(r.proven ? `${r.passed} of ${r.total} checks told the two cases apart. Whyline works on this machine.`
+        : `${r.passed} of ${r.total} checks told the two cases apart. Something is wrong: see the FAIL lines above, and run with WHYLINE_DEBUG=1 for details.`);
       return r.proven ? 0 : 1;
     }
     case 'check': {
@@ -120,7 +137,7 @@ function dispatch(argv) {
       const r = require('./lib/lenses').check(cwd);
       const exit = gate && r.due.length ? 2 : 0;
       if (json) { console.log(JSON.stringify(r, null, 2)); return exit; }
-      if (!r.due.length && !r.active.length && !r.other.length) { console.log('no temporary items yet (commit something Bob wrote, then check again)'); return 0; }
+      if (!r.due.length && !r.active.length && !r.other.length) { console.log('No temporary code yet. Commit something Bob wrote, then run whyline check again. On an older repo, run whyline seed first.'); return 0; }
       printCheck(r);
       if (gate && process.env.GITHUB_ACTIONS === 'true') annotate(r.due);
       return exit;
@@ -128,16 +145,18 @@ function dispatch(argv) {
     case 'unreviewed': {
       const r = require('./lib/lenses').unreviewed(cwd);
       if (json) { console.log(JSON.stringify(r, null, 2)); return 0; }
-      if (!r.files.length) { console.log('no AI-written lines recorded yet (commit something Bob wrote, then run again)'); return 0; }
-      console.log('file'.padEnd(44) + 'ai lines  edited ranges  coverage');
-      for (const f of r.files) console.log(`${f.file.padEnd(44)}${String(f.aiLines).padStart(8)}  ${String(f.editedRanges).padStart(13)}  ${f.coverage == null ? 'no data' : f.coverage + '%'}`);
-      console.log(`${r.totals.aiLines} unreviewed AI lines in ${r.totals.files} file(s)${r.totals.coverageSource ? `, coverage from ${r.totals.coverageSource}` : ', no coverage report found (coverage.xml or lcov.info)'}`);
+      if (!r.files.length) { console.log('No AI-written lines saved yet. Commit something Bob wrote, then run whyline unreviewed again.'); return 0; }
+      console.log('AI CODE NO PERSON HAS CHANGED SINCE');
+      console.log('  ' + 'file'.padEnd(44) + 'AI lines  blocks a person changed  test coverage');
+      for (const f of r.files) console.log(`  ${f.file.padEnd(44)}${String(f.aiLines).padStart(8)}  ${String(f.editedRanges).padStart(22)}  ${f.coverage == null ? 'no data' : f.coverage + '%'}`);
+      console.log(`${plural(r.totals.aiLines, 'AI-written line')} in ${plural(r.totals.files, 'file')} no person has changed since Bob wrote them.${r.totals.coverageSource ? ` Test coverage from ${r.totals.coverageSource}.` : ' No test coverage report found (coverage.xml or lcov.info), so coverage shows no data.'}`);
+      console.log('Next: read the top file first, or run whyline why <file>:<line> to see the request behind a line.');
       return 0;
     }
     case 'bom': {
       // optional module: cli/lib/bom.js exporting bom(cwd, range) -> JSON and format(result) -> text
       const mod = optional('./lib/bom');
-      if (!mod) { process.stderr.write('bom is not built yet (cli/lib/bom.js missing)\n'); return 1; }
+      if (!mod) { process.stderr.write('bom is not built yet (cli/lib/bom.js missing). Reinstall whyline.\n'); return 1; }
       const range = args[0] || defaultRange(cwd);
       const r = (mod.bom || mod.run)(cwd, range);
       console.log(json ? JSON.stringify(r, null, 2) : mod.format(r));
@@ -146,11 +165,11 @@ function dispatch(argv) {
     case 'report': {
       // optional module: cli/lib/report.js exporting render(data) -> HTML string. The router gathers the data.
       const mod = optional('./lib/report');
-      if (!mod) { process.stderr.write('report is not built yet (cli/lib/report.js missing)\n'); return 1; }
+      if (!mod) { process.stderr.write('report is not built yet (cli/lib/report.js missing). Reinstall whyline.\n'); return 1; }
       const lenses = require('./lib/lenses');
       const git = require('./lib/git');
       const root = git.repoRoot(cwd);
-      if (!root) { process.stderr.write('not a git repository\n'); return 3; }
+      if (!root) { process.stderr.write('whyline: this folder is not a git repository. Go to your project folder, then try again.\n'); return 3; }
       const bomMod = optional('./lib/bom');
       const range = defaultRange(cwd);
       const idx = lenses.index(cwd);
@@ -169,7 +188,7 @@ function dispatch(argv) {
       const outIdx = args.indexOf('--out');
       const out = outIdx >= 0 && args[outIdx + 1] ? args[outIdx + 1] : require('node:path').join(root, '.whyline-report.html');
       fs.writeFileSync(out, mod.render(data));
-      console.log(`report written: ${out} (${data.notes} note(s), ${data.ranges.length} range(s))`);
+      console.log(`Dashboard written: ${out} (from ${plural(data.notes, 'commit')} with Whyline history, ${plural(data.ranges.length, 'block')} of AI code). Open it in your browser.`);
       return 0;
     }
     case 'keep':
@@ -177,9 +196,9 @@ function dispatch(argv) {
     case 'watch':
     case 'removed': {
       const id = args[0], value = cmd === 'removed' ? (args[1] || 'removed by hand') : (args[1] === '--symbol' ? args[2] : args[1]);
-      const usage = { keep: '"<reason>"', until: '<YYYY-MM-DD>', watch: '--symbol <Name>', removed: '' }[cmd];
-      if (!id || !value) { process.stderr.write(`usage: whyline ${cmd} <file|symbol|kind|id> ${usage}\n`); return 1; }
-      if (cmd === 'until' && (!/^\d{4}-\d{2}-\d{2}$/.test(value) || isNaN(Date.parse(value + 'T00:00:00Z')) || new Date(value + 'T00:00:00Z').toISOString().slice(0, 10) !== value)) { process.stderr.write('until: date must be a real date in YYYY-MM-DD form\n'); return 1; }
+      const usage = { keep: ' "<reason>"', until: ' <YYYY-MM-DD>', watch: ' --symbol <class or function name>', removed: '' }[cmd];
+      if (!id || !value) { process.stderr.write(`usage: whyline ${cmd} <file>${usage}  (run whyline check to see the files)\n`); return 1; }
+      if (cmd === 'until' && (!/^\d{4}-\d{2}-\d{2}$/.test(value) || isNaN(Date.parse(value + 'T00:00:00Z')) || new Date(value + 'T00:00:00Z').toISOString().slice(0, 10) !== value)) { process.stderr.write('until: give a real date as YYYY-MM-DD, for example 2026-12-01\n'); return 1; }
       const lenses = require('./lib/lenses');
       const change = cmd === 'keep' ? { status: 'kept', reason: value }
         : cmd === 'until' ? { status: 'active', condition: { type: 'date', on: value } }
@@ -187,25 +206,25 @@ function dispatch(argv) {
         : { status: 'removed', reason: value };
       const item = lenses.resolveItem(cwd, id);
       const head = lenses.recordItemChange(cwd, item.id, change);
-      const said = { keep: 'kept permanently', until: `due on ${value}`, watch: `now watching symbol ${value}`, removed: 'recorded as removed' }[cmd];
-      console.log(`${item.file} (${item.id}): ${said} (recorded on ${head.slice(0, 7)})`);
+      const said = { keep: 'kept on purpose', until: `ready to delete after ${value}`, watch: `waits until nothing uses ${value} any more`, removed: 'marked as deleted' }[cmd];
+      console.log(`${item.file}: ${said}. Saved in your git history on commit ${head.slice(0, 7)}. Run whyline check to see the list.`);
       return 0;
     }
     case 'seed': {
       const r = require('./lib/seed').run(cwd, { dryRun: args.includes('--dry-run'), byName: args.includes('--by-name') });
       if (r.error) { process.stderr.write(`seed: ${r.error}\n`); return 3; }
       if (json) { console.log(JSON.stringify(r, null, 2)); return 0; }
-      for (const it of r.items) console.log(`  ${it.id}  ${it.kind.padEnd(8)} ${it.file.padEnd(40)} since ${it.created}  "${it.reason}"`);
-      if (r.items.length) console.log(`${r.items.length} item(s) ${args.includes('--dry-run') ? 'found (dry run, nothing recorded)' : 'recorded on ' + r.head.slice(0, 7)}. Next: whyline check`);
-      else console.log(`nothing new to seed from comment markers (${r.skipped} file(s) already tracked)`);
-      if (r.byNameOnly.length) console.log(`${r.byNameOnly.length} file(s) look temporary by name only (mock_, compat_, examples/, fixtures/): ${r.byNameOnly.slice(0, 5).join(', ')}${r.byNameOnly.length > 5 ? ', ...' : ''}. Add --by-name to record them.`);
+      for (const it of r.items) console.log(`  ${it.file.padEnd(40)} ${it.kind.padEnd(8)} since ${it.created}  "${it.reason}"  ${it.id}`);
+      if (r.items.length) console.log(`Found ${plural(r.items.length, 'piece')} of temporary code${args.includes('--dry-run') ? ' (dry run, nothing saved)' : `, saved in your git history on commit ${r.head.slice(0, 7)}`}. Next: run whyline check to see what is ready to delete.`);
+      else console.log(`No new temporary code found in comments (${plural(r.skipped, 'file')} already tracked).`);
+      if (r.byNameOnly.length) console.log(`${plural(r.byNameOnly.length, 'file')} only look temporary by name (mock_, compat_, examples/, fixtures/): ${r.byNameOnly.slice(0, 5).join(', ')}${r.byNameOnly.length > 5 ? ', ...' : ''}. To track them too, run whyline seed --by-name.`);
       return 0;
     }
     case 'init':
       return require('./lib/init').run(cwd, { agentIds: agentIds.length ? agentIds : ['bob'] });
     default:
       if (!cmd) { process.stdout.write(USAGE); return 0; }
-      process.stderr.write(`Unknown command: ${cmd}\nRun whyline --help for usage.\n`);
+      process.stderr.write(`whyline: unknown command "${cmd}". Run whyline --help to see the commands.\n`);
       return 1;
   }
 }
@@ -231,27 +250,63 @@ function defaultRange(cwd) {
   return tag ? `${tag}..HEAD` : undefined;
 }
 
+// "1 file", "2 files". Plural defaults to singular + "s".
+function plural(n, one, many = one + 's') { return `${n} ${n === 1 ? one : many}`; }
+
+const STATE_WORDS = { active: 'waiting', due: 'ready to delete', kept: 'kept on purpose', removed: 'deleted' };
+
 function printCheck(r) {
   const col = (s, n) => String(s == null ? '' : s).padEnd(n).slice(0, n);
-  const row = it => `  ${col(it.id, 9)} ${col(it.kind, 8)} ${col(it.file, 38)} ${col(it.evidence ? it.evidence.summary : (it.reason || ''), 60)}`;
-  const section = (title, list) => { if (!list.length) return; console.log(`${title} (${list.length})`); console.log(`  ${col('id', 9)} ${col('kind', 8)} ${col('file', 38)} ${col('evidence', 60)}`); list.forEach(it => console.log(row(it))); };
-  section('DUE for removal', r.due);
-  section('ACTIVE', r.active);
-  section('DECIDED', r.other.map(it => ({ ...it, evidence: { summary: `${it.state}${it.reason ? ': ' + it.reason : ''}` } })));
+  const head = `  ${col('file', 38)} ${col('kind', 8)} ${col('why', 60)} id`;
+  const row = it => `  ${col(it.file, 38)} ${col(it.kind, 8)} ${col(it.evidence ? it.evidence.summary : (it.reason || ''), 60)} ${it.id}`;
+  const section = (title, list) => { if (!list.length) return; console.log(`${title} (${list.length})`); console.log(head); list.forEach(it => console.log(row(it))); console.log(''); };
+  section('READY TO DELETE', r.due);
+  section('WAITING', r.active);
+  section('KEPT OR DELETED', r.other.map(it => ({ ...it, evidence: { summary: `${STATE_WORDS[it.state] || it.state}${it.reason ? ': ' + it.reason : ''}` } })));
   const c = r.counts;
-  const next = r.due.length ? `Next: tell Bob "remove ${r.due[0].file.split('/').pop()}", or whyline keep <file> "<reason>", or whyline why <file>:<line>` : 'Nothing is due.';
-  console.log(`${c.active} active, ${c.due} due, ${c.kept} kept, ${c.removed} removed. ${next}`);
+  const next = r.due.length
+    ? `Next: tell Bob "remove ${r.due[0].file.split('/').pop()}" and it shows the proof and asks before deleting. To keep it instead: whyline keep ${r.due[0].file.split('/').pop()} "<reason>".`
+    : 'Nothing is ready to delete.';
+  console.log(`${c.due} ready to delete, ${c.active} waiting, ${c.kept} kept on purpose, ${c.removed} deleted. ${next}`);
 }
 
-function printWhy(file, line, r) {
+// Condition in plain words: when this temporary code becomes ready to delete.
+function expiryText(cond) {
+  const c = cond || {};
+  if (c.type === 'date') return `after ${c.on}`;
+  if (c.type === 'no_references') return `when nothing uses ${c.symbol || 'it'} any more`;
+  return 'no expiry set';
+}
+
+function printWhy(cwd, file, line, r) {
+  const row = (label, value) => console.log(`${label.padEnd(15)}${value}`);
   if (!r.found) { console.log(`${file}:${line}: ${r.reason}`); return; }
-  if (r.origin === 'human') { console.log(`${file}:${line}\norigin   human (${r.author || 'unknown'}, commit ${r.commit.slice(0, 7)})`); return; }
   console.log(`${file}:${line}`);
-  console.log(`origin   ${r.origin} (${r.agent || 'agent'}) · session ${String(r.session).slice(0, 8)} · ${r.author || '?'} · ${r.ts ? r.ts.slice(0, 10) : '?'}${r.cost != null ? ` · ${r.cost} Bobcoin` : ''}`);
-  if (r.prompt) console.log(`prompt   "${r.prompt}"`);
-  if (r.siblings.length) console.log(`siblings ${r.siblings.join(' · ')}`);
-  if (r.item) console.log(`item     ${r.item.id} ${r.item.kind} · ${r.item.status} · ${JSON.stringify(r.item.condition)} · "${r.item.reason}"`);
-  console.log(`commit   ${r.commit.slice(0, 7)}`);
+  if (r.origin === 'human') {
+    row('written by', `a person (${r.author || 'name unknown'})`);
+    row('commit', r.commit.slice(0, 7));
+    console.log('Whyline saved no request for this line: Bob did not write it.');
+    return;
+  }
+  const adapter = require('./lib/agents').byId(r.agent);
+  const agentName = adapter ? adapter.name : (r.agent || 'an AI assistant');
+  row('written by', r.origin === 'ai-edited' ? `AI (${agentName}), then changed by a person` : `AI (${agentName})`);
+  row('asked by', `${r.author || 'name unknown'}, on ${r.ts ? r.ts.slice(0, 10) : 'an unknown date'}, in Bob chat ${String(r.session).slice(0, 8)}${r.cost != null ? ` (cost ${r.cost} Bob usage credits)` : ''}`);
+  row('request', r.prompt ? `"${r.prompt}"` : 'no data');
+  if (r.siblings.length) { console.log('other files this request changed'); for (const s of r.siblings) console.log(`${''.padEnd(15)}${s.replace(/:(\d+)-\1$/, ':$1')}`); }
+  let due = false;
+  if (r.item) {
+    let state;
+    if (r.item.status === 'active') {
+      const e = require('./lib/lenses').evaluate(cwd, r.item, new Date());
+      due = e.due;
+      state = `${due ? 'ready to delete' : 'waiting'}: ${e.evidence.summary}`;
+    } else state = `${STATE_WORDS[r.item.status] || r.item.status}${r.item.status === 'kept' && r.item.reason ? ': ' + r.item.reason : ''}`;
+    row('temporary code', `${r.item.kind}, ${state} (id ${r.item.id})`);
+    if (r.item.status === 'active' && !due && (r.item.condition || {}).type !== 'date') row('can go', expiryText(r.item.condition));
+  }
+  row('commit', r.commit.slice(0, 7));
+  if (due) console.log(`Next: tell Bob "remove ${r.item.file.split('/').pop()}" and it shows the proof and asks before deleting.`);
 }
 
 // GitHub Actions annotations for due items (check --gate inside Actions only): the error shows on the file in the pull request.
@@ -259,9 +314,9 @@ function annotate(due) {
   const esc = (v, prop) => String(v).replace(/%/g, '%25').replace(/\r/g, '%0D').replace(/\n/g, '%0A').replace(prop ? /[:,]/g : /$^/, c => (c === ':' ? '%3A' : '%2C'));
   for (const it of due) {
     const line = (it.lines && it.lines[0] && it.lines[0][0]) || 1;
-    const why = it.reason ? `recorded as temporary: "${it.reason}". ` : '';
-    const msg = `${why}${it.evidence && it.evidence.summary ? it.evidence.summary + '. ' : ''}Remove it in Bob ("remove ${it.file}"), or whyline keep ${it.file} "<reason>".`;
-    console.log(`::error file=${esc(it.file, true)},line=${line},title=${esc(`whyline: temporary ${it.kind} is due`, true)}::${esc(msg)}`);
+    const why = it.reason ? `Saved as temporary code: "${it.reason}". ` : '';
+    const msg = `${why}${it.evidence && it.evidence.summary ? 'Ready to delete: ' + it.evidence.summary + '. ' : ''}Delete it with Bob (say "remove ${it.file}"), or keep it on purpose: whyline keep ${it.file} "<reason>".`;
+    console.log(`::error file=${esc(it.file, true)},line=${line},title=${esc(`whyline: temporary ${it.kind} is ready to delete`, true)}::${esc(msg)}`);
   }
 }
 

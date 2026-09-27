@@ -1,7 +1,7 @@
 {
   "name": "@sal-sovereign-ai-labs/whyline",
   "version": "0.1.1",
-  "description": "Provenance for AI-written code. Every line keeps the prompt that caused it. Built for IBM Bob.",
+  "description": "Know why your AI wrote every line, and clean up what it left behind. Saves the request behind every line IBM Bob writes in your git history, and tells you when its temporary code is safe to delete.",
   "type": "commonjs",
   "license": "MIT",
   "bin": {
@@ -25,11 +25,13 @@
   },
   "keywords": [
     "ibm-bob",
-    "ai",
-    "provenance",
-    "attribution",
+    "ai-code",
+    "git-blame",
+    "code-review",
+    "temporary-code",
+    "feature-flags",
     "git-notes",
-    "hooks"
+    "developer-tools"
   ],
   "repository": {
     "type": "git",

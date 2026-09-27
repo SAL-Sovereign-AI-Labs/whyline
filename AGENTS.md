@@ -6,7 +6,7 @@ Read this first. IBM Bob loads it automatically.
 Whyline is provenance for AI-written code. Every line an agent writes keeps the prompt that caused it, stored as git notes. Answers: why a line exists, which temporary code is due, which AI code nobody reviewed, an AI bill of materials. IBM Bob is inside the product (hooks and skills) and is used to build it.
 
 ## Positioning (say it once, exactly like this)
-Pedigree (last hackathon's winner) proved that a commit was AI-written, for auditors. Whyline keeps why each line exists and acts on it, for developers. Demo order: lifecycle (mock written, due, removed by Bob), then why, then unreviewed, then bill of materials.
+Headline: "Know why your AI wrote every line, and clean up what it left behind." Second line: "`git blame` tells you who. Whyline tells you why." Every word people read (README, CLI output, skills, dashboard, video, submission) follows docs/VOICE.md: problem before solution, the one Sara example, plain words instead of internal terms. Command names and `--json` keys never change. Demo order: temporary code (mock written, ready to delete, deleted by Bob), then why, then AI code nobody changed, then the AI report.
 
 ## Principles
 - Hooks record, deterministic scripts decide, Bob acts, humans approve. `check` is free and reproducible; Bob is used only for removals and questions.

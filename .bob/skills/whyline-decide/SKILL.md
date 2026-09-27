@@ -1,63 +1,63 @@
 ---
 name: whyline-decide
-description: "When the user wants to keep a temporary item permanently, move its due date, or fix the symbol whyline watches for, look the item up with whyline check --json and run the right whyline command (keep, until, or watch)."
+description: "When the user wants to keep temporary code on purpose, change the date after which it is ready to delete, or change the class or function name Whyline checks is still used, look it up with whyline check --json and run the right whyline command (keep, until, or watch)."
 ---
 ## When to use
-Trigger phrases: "keep this item", "keep it permanently", "it's not temporary", "we're keeping this", "change the due date", "move the deadline", "due on", "extend the date", "it's due on", "watch for a different symbol", "fix the symbol", "wrong symbol", "watch symbol".
+Trigger phrases: "keep this", "keep it on purpose", "keep it permanently", "it's not temporary", "we're keeping this", "don't delete this", "change the date", "move the deadline", "extend the date", "delete it after", "it can go on", "watch for a different name", "watch a different class", "wrong class name", "fix the symbol", "watch symbol".
 
 ## Workflow
 
-### Step 1 -- identify the item
-Run `whyline check --json` with execute_command. Parse the result.
+### Step 1 -- find the temporary code
+Run `whyline check --json` with execute_command. Read the result.
 
-The result has three arrays: `due` (items whose condition is already met), `active` (items still waiting), and `other` (kept or removed). Each item carries:
-- `id` -- the stable identifier (e.g. `L-3f9a2c`)
+The result has three arrays: `due` (ready to delete), `active` (waiting), and `other` (kept on purpose or deleted). Each entry carries:
+- `id` -- a stable id for scripts (e.g. `L-3f9a2c`); people name the file
 - `kind` -- `mock`, `demo`, `fixture`, `shim`, `flag`, or similar
 - `file` -- the source file
 - `lines` -- `[[start, end], ...]`
-- `reason` -- the original reason the item was created
-- `condition` -- `{ type: "date", on: "YYYY-MM-DD" }` or `{ type: "no_references", symbol: "Name" }`
-- `evidence` -- what the last evaluation found (e.g. "2 reference(s): ...")
+- `reason` -- why it was saved as temporary
+- `condition` -- its expiry: `{ type: "date", on: "YYYY-MM-DD" }` (ready after a date) or `{ type: "no_references", symbol: "Name" }` (ready when nothing uses that class or function any more)
+- `evidence` -- `evidence.summary` says in plain words why it is ready or what it waits for (e.g. "still used in app.py:1")
 
-If the user named a specific item (by id, file, kind, or a description matching the reason), find it in the output. If the name is ambiguous or matches more than one item, show the candidates as a short table (id, kind, file, reason) and ask the user to choose. Never guess.
+If the user named the code (by file, class or function name, kind, or words matching the reason), find it. If the name matches more than one entry, show them as a short table (file, kind, reason) and ask the user to choose. Never guess.
 
-If there are no items at all, tell the user and stop.
+If there is no temporary code at all, tell the user and stop.
 
-### Step 2 -- confirm the action
-Show the chosen item:
+### Step 2 -- confirm
+Show the chosen code:
 
 ```
-id       <id>
-kind     <kind>
-file     <file>
-reason   "<reason>"
-condition  <current condition>
+file      <file>
+kind      <kind>
+reason    "<reason>"
+expiry    <"after YYYY-MM-DD" or "when nothing uses <symbol> any more">
+now       <ready to delete | waiting>: <evidence.summary>
 ```
 
-Then state the exact command you are about to run and ask for confirmation:
-- **keep**: `whyline keep <id> "<reason the user gave>"`
-- **until**: `whyline until <id> <YYYY-MM-DD>`
-- **watch**: `whyline watch <id> --symbol <Name>`
+Then show the exact command you are about to run and ask the user to confirm:
+- **keep**: `whyline keep <file> "<reason the user gave>"`
+- **until**: `whyline until <file> <YYYY-MM-DD>`
+- **watch**: `whyline watch <file> --symbol <Name>`
 
+Use the full file path; use the `id` only when two entries share a file.
 For **keep**, ask the user for a short reason if they have not given one.
-For **until**, ask for the date in YYYY-MM-DD format if they have not given one. Reject any other format and ask again.
-For **watch**, ask for the symbol name if they have not given one.
+For **until**, ask for the date as YYYY-MM-DD if they have not given one. Reject any other format and ask again.
+For **watch**, ask for the class or function name if they have not given one.
 
-Do not run the command until the user says yes (or equivalent).
+Say that this is saved in your git history and is not undone by a simple undo. Do not run the command until the user says yes.
 
 ### Step 3 -- run the command
 Run the confirmed command with execute_command and show its output verbatim.
 
-If the CLI exits non-zero (its exit code is 0 for normal answers, including a due list), stop and show its stderr as-is.
+If the CLI exits non-zero (its exit code is 0 for normal answers), stop and show its stderr as-is.
 
-### Step 4 -- confirm the change
-Run `whyline check --json` again and find the item. Show its new condition and state.
+### Step 4 -- show the result
+Run `whyline check --json` again, find the same file, and show its new expiry and whether it is ready to delete, waiting, or kept on purpose.
 
 ## Rules
-- Never invent or guess an item id. Always read it from `whyline check --json`.
+- Never invent or guess which code the user means. Always read it from `whyline check --json`.
 - Never skip the confirmation step.
 - Dates must be YYYY-MM-DD; reject any other format.
 - Show null values as "no data", never as 0.
 - Trust the CLI output over any note in context.
-- These commands change recorded state in git notes. They are not reversible with a simple undo. Say so in the confirmation prompt.
-- Do not use this skill to remove items; that is handled by the whyline-remove skill.
+- Do not use this skill to delete code; the whyline-remove skill does that.
