@@ -16,7 +16,7 @@ Built for IBM Bob 2.0. Bob's free lifecycle hooks record every write; six skills
 | The package | `npm install -g @sal-sovereign-ai-labs/whyline` ([npm](https://www.npmjs.com/package/@sal-sovereign-ai-labs/whyline)) |
 | The Bob pack a repo gets from `whyline init` | [.bob/settings.json](.bob/settings.json) (3 hooks), [.bob/skills/](.bob/skills/) (6 skills) |
 | Bob building and using Whyline | [bob_sessions/](bob_sessions/) (task screenshots) and [bob_sessions/costs.md](bob_sessions/costs.md) (29.28 Bobcoins) |
-| The CI gate on a real repo: a green PR and a red PR | [whyline-demo-shop](https://github.com/SAL-Sovereign-AI-Labs/whyline-demo-shop): [PR 1, mock removed](https://github.com/SAL-Sovereign-AI-Labs/whyline-demo-shop/pull/1) and [its check passing](https://github.com/SAL-Sovereign-AI-Labs/whyline-demo-shop/actions/runs/36303214774); [PR 2, mock left behind](https://github.com/SAL-Sovereign-AI-Labs/whyline-demo-shop/pull/2) and [its check failing](https://github.com/SAL-Sovereign-AI-Labs/whyline-demo-shop/actions/runs/36303213127) |
+| The CI gate on a real repo: a green PR and a red PR | [whyline-demo-shop](https://github.com/SAL-Sovereign-AI-Labs/whyline-demo-shop): [PR 1, mock removed](https://github.com/SAL-Sovereign-AI-Labs/whyline-demo-shop/pull/1) and [its check passing](https://github.com/SAL-Sovereign-AI-Labs/whyline-demo-shop/actions/runs/36303214774); [PR 2, mock left behind](https://github.com/SAL-Sovereign-AI-Labs/whyline-demo-shop/pull/2) and [its check failing](https://github.com/SAL-Sovereign-AI-Labs/whyline-demo-shop/actions/runs/36303836900) |
 | Tests and CI | [cli/test/](cli/test/) (72 tests), [Actions](https://github.com/SAL-Sovereign-AI-Labs/whyline/actions) |
 | Check every claim yourself | [the table below](#dont-take-our-word-for-it) |
 
@@ -145,7 +145,7 @@ Bob also built part of it: 16 Bob IDE tasks across two developers, 29.28 Bobcoin
 | | What | Who pays |
 |---|---|---|
 | Free | The CLI, the six skills and the dashboard, MIT, on npm | Nobody |
-| Team | Enforced hooks rolled out to every developer through Bob's EnforcedHooks group policy, an organisation dashboard across repositories, and the report kept as a compliance record per release. $20 per repository per month | The engineering lead who signs off releases, in regulated teams (fintech, health, public sector) |
+| Team | Enforced hooks rolled out to every developer through Bob's EnforcedHooks group policy, an organisation dashboard across repositories, and the report kept as a compliance record per release. $20 per repository per month (example price) | The engineering lead who signs off releases, in regulated teams (fintech, health, public sector) |
 | Bob | Each developer's own Bob seat. Recording itself costs 0 Bobcoins | The team, as today |
 
 ## Troubleshooting

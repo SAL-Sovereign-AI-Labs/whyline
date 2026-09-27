@@ -27,7 +27,7 @@ git blame tells you who. Whyline tells you why. Provenance for AI-written code i
 
 **Limits.** A prompt shows intent, not correctness. Git notes are an audit trail, not tamper-proof. Shell-command edits bypass the write hooks.
 
-**Business model.** Free CLI. Teams pay $20 per repository per month for enforced hooks and a compliance record per release.
+**Business model.** Free CLI. Teams would pay, for example, $20 per repository per month for enforced hooks and a compliance record per release.
 
 ## IBM Bob usage statement
 
