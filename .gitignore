@@ -9,3 +9,4 @@ docs/design/
 
 # architecture page build output
 architecture/dist/
+site/dist/

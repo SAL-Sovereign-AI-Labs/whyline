@@ -1,4 +1,5 @@
-# The page is the demo shop after the payments-v2 merge, rebuilt from recorded sessions, no secrets used.
+# The front page is the Whyline website (site/). /report/ is the demo shop after the payments-v2 merge,
+# rebuilt from recorded sessions, no secrets used.
 # Its project picker also lists Whyline's own repository, with the notes recorded while building it.
 name: pages
 
@@ -30,14 +31,18 @@ jobs:
         working-directory: ${{ github.workspace }}
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
       - run: git config --global user.name ci && git config --global user.email ci@example.invalid
       - run: node demo/build.js "$RUNNER_TEMP/whyline-demo-shop"
       - run: cd "$RUNNER_TEMP/whyline-demo-shop" && git merge --no-edit payments-v2
+      # The website (site/) is the front page; it embeds the architecture diagrams from architecture/.
+      - run: npm ci && npm run build && mkdir -p "$GITHUB_WORKSPACE/_site" && cp -R dist/. "$GITHUB_WORKSPACE/_site/"
+        working-directory: site
+      # The live report lives under /report/.
       - run: |
-          mkdir -p "$GITHUB_WORKSPACE/_site"
+          mkdir -p "$GITHUB_WORKSPACE/_site/report"
           cd "$RUNNER_TEMP/whyline-demo-shop"
-          WHYLINE_PROJECTS="$GITHUB_WORKSPACE" WHYLINE_BOB_DB=/nonexistent node "$GITHUB_WORKSPACE/cli/index.js" report --out "$GITHUB_WORKSPACE/_site/index.html"
+          WHYLINE_PROJECTS="$GITHUB_WORKSPACE" WHYLINE_BOB_DB=/nonexistent node "$GITHUB_WORKSPACE/cli/index.js" report --out "$GITHUB_WORKSPACE/_site/report/index.html"
           touch "$GITHUB_WORKSPACE/_site/.nojekyll"
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3

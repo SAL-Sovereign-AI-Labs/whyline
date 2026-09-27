@@ -81,7 +81,7 @@ export function Story() {
 
         <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginTop: 24 }}>
           <Link href="https://github.com/SAL-Sovereign-AI-Labs/whyline">GitHub repo</Link>
-          <Link href="https://sal-sovereign-ai-labs.github.io/whyline/">Live dashboard</Link>
+          <Link href="https://sal-sovereign-ai-labs.github.io/whyline/report/">Live dashboard</Link>
           <Link href="https://github.com/SAL-Sovereign-AI-Labs/whyline-demo-shop/pulls?q=is%3Apr">CI gate: green PR and red PR</Link>
         </div>
 

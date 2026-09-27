@@ -6,6 +6,8 @@
 
 Whyline saves the request behind every line IBM Bob writes, right in your git history, and tells you when its temporary code is safe to delete. It works with [IBM Bob](https://bob.ibm.com), IBM's AI coding assistant.
 
+**Website:** https://sal-sovereign-ai-labs.github.io/whyline/ (the story in one page, with the live diagrams)
+
 **Before:** `git blame` says who and when.
 
 ```
@@ -49,7 +51,7 @@ git add .bob && git commit -m "add whyline"
 
 Then work in Bob as usual. There is nothing new to type.
 
-No Bob at hand? Look at a repository that already has it: [whyline-demo-shop](https://github.com/SAL-Sovereign-AI-Labs/whyline-demo-shop), or the [live report](https://sal-sovereign-ai-labs.github.io/whyline/) built from it.
+No Bob at hand? Look at a repository that already has it: [whyline-demo-shop](https://github.com/SAL-Sovereign-AI-Labs/whyline-demo-shop), or the [live report](https://sal-sovereign-ai-labs.github.io/whyline/report/) built from it.
 
 ## How it works
 
@@ -73,7 +75,7 @@ Bob cannot edit the history Whyline keeps: a check blocks any Bob command that w
 | How much of this release is AI? | "give me the AI report for this release" | `whyline bom` |
 | Keep something on purpose | "keep the beta flag until the Q1 review" | `whyline keep flags.yaml "beta flag stays until Q1 review"` |
 
-`whyline report` writes one offline page with all of it, like the [live report](https://sal-sovereign-ai-labs.github.io/whyline/), and refreshes it after every commit.
+`whyline report` writes one offline page with all of it, like the [live report](https://sal-sovereign-ai-labs.github.io/whyline/report/), and refreshes it after every commit.
 
 ## Good to know
 
@@ -194,7 +196,8 @@ Whyline was built for the IBM Bob 2.0 hackathon (25 to 27 Sep 2026). For judges:
 
 | What you want to see | Where |
 |---|---|
-| The live report (the demo shop after payments-v2 merged, rebuilt by CI, no login) | https://sal-sovereign-ai-labs.github.io/whyline/ |
+| The website: the idea, the story and the live diagrams in one page | https://sal-sovereign-ai-labs.github.io/whyline/ |
+| The live report (the demo shop after payments-v2 merged, rebuilt by CI, no login) | https://sal-sovereign-ai-labs.github.io/whyline/report/ |
 | A pull request check passing and failing on a real repository | [whyline-demo-shop](https://github.com/SAL-Sovereign-AI-Labs/whyline-demo-shop): [PR 1, the mock is deleted](https://github.com/SAL-Sovereign-AI-Labs/whyline-demo-shop/pull/1) and [its check passing](https://github.com/SAL-Sovereign-AI-Labs/whyline-demo-shop/actions/runs/36303214774); [PR 2, the mock is left behind](https://github.com/SAL-Sovereign-AI-Labs/whyline-demo-shop/pull/2) and [its check failing on the file](https://github.com/SAL-Sovereign-AI-Labs/whyline-demo-shop/actions/runs/36303836900) |
 | The package | `npm install -g @sal-sovereign-ai-labs/whyline` ([npm](https://www.npmjs.com/package/@sal-sovereign-ai-labs/whyline)) |
 | What `whyline init` adds to a repository | [.bob/settings.json](.bob/settings.json) (4 Bob scripts), [.bob/skills/](.bob/skills/) (6 instruction files that let you ask Bob in plain English) |

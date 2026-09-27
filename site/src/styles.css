@@ -1,0 +1,479 @@
+/* Whyline site: one design system.
+   Warm paper, near-black ink, one orange accent. A hairline blueprint frame, film grain,
+   Manrope (light vs bold), Instrument Serif italic for the one emphasised word, JetBrains Mono labels,
+   Doto dot-matrix numerals for numbers. */
+
+:root {
+  --paper: #ecebe6;
+  --paper-2: #e3e1da;
+  --card: #f6f5f1;
+  --ink: #0c0c0d;
+  --ink-2: #2b2a28;
+  --muted: #6b6860;
+  --faint: #9a968c;
+  --line: #cfccc3;
+  --line-2: #dcd9d1;
+  --accent: #ff5a1f;
+  --accent-ink: #c73d0c;
+  --accent-soft: #ffe3d4;
+  --dark: #111110;
+  --dark-2: #1a1a19;
+  --dark-line: #2c2b29;
+  --dark-muted: #9b978d;
+  --pass: #1f9d5c;
+  --fail: #e0453a;
+
+  --sans: 'Manrope', ui-sans-serif, system-ui, sans-serif;
+  --serif: 'Instrument Serif', Georgia, serif;
+  --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --dots: 'Doto', 'JetBrains Mono', monospace;
+
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --gutter: clamp(20px, 5vw, 86px);
+  --maxw: 1240px;
+  --section: clamp(96px, 12vw, 168px);
+  --radius: 18px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-padding-top: 96px;
+}
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 18px;
+  line-height: 1.6;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: var(--accent);
+  color: #fff;
+}
+
+a {
+  color: inherit;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+code,
+kbd,
+pre {
+  font-family: var(--mono);
+}
+
+/* Film grain over everything, very faint (austinserb.com). */
+body::after {
+  content: '';
+  position: fixed;
+  inset: -50%;
+  z-index: 100;
+  pointer-events: none;
+  opacity: 0.06;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: grain 8s steps(8) infinite;
+}
+@keyframes grain {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(-3%, 2%); }
+  50% { transform: translate(2%, -3%); }
+  75% { transform: translate(-2%, -1%); }
+}
+
+/* The blueprint frame: two hairlines running the full page height at the container edges. */
+.frame {
+  position: relative;
+  max-width: calc(var(--maxw) + 2 * var(--gutter));
+  margin: 0 auto;
+}
+.frame::before,
+.frame::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--line);
+  pointer-events: none;
+  z-index: 0;
+}
+.frame::before {
+  left: var(--gutter);
+}
+.frame::after {
+  right: var(--gutter);
+}
+
+.wrap {
+  position: relative;
+  z-index: 1;
+  max-width: calc(var(--maxw) + 2 * var(--gutter));
+  margin: 0 auto;
+  padding-inline: calc(var(--gutter) + clamp(16px, 3vw, 48px));
+}
+
+.section {
+  position: relative;
+  padding-block: var(--section);
+  border-top: 1px solid var(--line);
+}
+
+/* Dark sections (anshulraman.com): same system, inverted, with a faint orange glow in a corner. */
+.dark {
+  background: var(--dark);
+  color: #f1efe9;
+  --line: var(--dark-line);
+  --muted: var(--dark-muted);
+  --card: var(--dark-2);
+  border-top: none;
+  /* Full-bleed dark band past the frame: a shadow paints the sides, clip-path keeps it horizontal only.
+     overflow: clip (not hidden) so position: sticky still works inside. */
+  z-index: 1;
+  box-shadow: 0 0 0 100vmax var(--dark);
+  clip-path: inset(0 -100vmax);
+  overflow: clip;
+}
+.dark .numeral {
+  color: var(--dark);
+}
+.dark::before {
+  content: '';
+  position: absolute;
+  width: 60vw;
+  height: 60vw;
+  right: -20vw;
+  top: -30vw;
+  background: radial-gradient(circle, rgba(255, 90, 31, 0.18), transparent 60%);
+  pointer-events: none;
+}
+
+/* Type */
+.display {
+  font-weight: 300;
+  font-size: clamp(52px, 8.4vw, 124px);
+  line-height: 0.94;
+  letter-spacing: -0.045em;
+  margin: 0;
+}
+.display strong,
+.h2 strong {
+  font-weight: 700;
+}
+.h2 {
+  font-weight: 300;
+  font-size: clamp(38px, 5.4vw, 80px);
+  line-height: 1;
+  letter-spacing: -0.04em;
+  margin: 0;
+}
+.h3 {
+  font-weight: 600;
+  font-size: clamp(20px, 1.8vw, 24px);
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+.em {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 400;
+  color: var(--accent);
+  letter-spacing: -0.02em;
+}
+.lead {
+  font-size: clamp(18px, 1.6vw, 22px);
+  line-height: 1.6;
+  color: var(--muted);
+  font-weight: 400;
+  max-width: 640px;
+}
+.lead b,
+.lead strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+.dark .lead b,
+.dark .lead strong {
+  color: #fff;
+}
+.mono {
+  font-family: var(--mono);
+}
+.label {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* Section eyebrow: FIG number, mono label, a hairline to the right (neevgupta.com, anshulraman.com). */
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.eyebrow .fig {
+  color: var(--accent);
+}
+.eyebrow::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+
+/* Giant outlined section numeral (gabrielthecode.com). */
+.numeral {
+  font-family: var(--sans);
+  font-weight: 800;
+  font-size: clamp(90px, 14vw, 200px);
+  line-height: 0.8;
+  letter-spacing: -0.06em;
+  /* Stroke painted under a paper-coloured fill hides the font's inner overlap lines. */
+  color: var(--paper);
+  -webkit-text-stroke: 2.4px var(--line);
+  paint-order: stroke fill;
+  user-select: none;
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 52px;
+  padding: 0 24px;
+  border-radius: 999px;
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border: 1px solid var(--ink);
+  transition: transform 0.3s var(--ease), background 0.3s var(--ease), color 0.3s var(--ease);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.btn:hover {
+  transform: translateY(-2px);
+}
+.btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+.btn-primary:hover {
+  background: var(--ink);
+  border-color: var(--ink);
+}
+.btn-ghost {
+  background: transparent;
+  color: var(--ink);
+}
+.btn-ghost:hover {
+  background: var(--ink);
+  color: var(--paper);
+}
+.dark .btn-ghost {
+  color: #fff;
+  border-color: #fff;
+}
+.dark .btn-ghost:hover {
+  background: #fff;
+  color: var(--ink);
+}
+.btn .arrow {
+  transition: transform 0.3s var(--ease);
+}
+.btn:hover .arrow {
+  transform: translateX(4px);
+}
+
+/* Cards */
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: clamp(22px, 2.4vw, 32px);
+}
+
+/* Status dot that pulses (anshulraman.com, swagata.tech). */
+.dot {
+  position: relative;
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex: none;
+}
+.dot::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: inherit;
+  animation: ping 2s var(--ease) infinite;
+}
+.dot.green {
+  background: var(--pass);
+}
+@keyframes ping {
+  0% { transform: scale(1); opacity: 0.6; }
+  80%, 100% { transform: scale(3.2); opacity: 0; }
+}
+
+/* Scroll reveals: .reveal starts hidden, .in plays it (IntersectionObserver in ui/Reveal.tsx). */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  filter: blur(6px);
+  transition: opacity 0.9s var(--ease-out), transform 0.9s var(--ease-out), filter 0.9s var(--ease-out);
+  transition-delay: calc(var(--i, 0) * 80ms);
+}
+.reveal.in {
+  opacity: 1;
+  transform: none;
+  filter: none;
+}
+
+/* Words that light up as they scroll through the viewport (swagata.tech). */
+.lit-word {
+  opacity: 0.18;
+  transition: opacity 0.35s linear;
+}
+.lit-word.on {
+  opacity: 1;
+}
+
+/* Blinking caret */
+.caret {
+  display: inline-block;
+  width: 0.55em;
+  height: 1.05em;
+  margin-left: 2px;
+  vertical-align: -0.15em;
+  background: currentColor;
+  animation: caret 1s steps(1) infinite;
+}
+@keyframes caret {
+  50% { opacity: 0; }
+}
+
+/* Marquee (anshulraman.com, gabrielthecode.com) */
+.marquee {
+  overflow: hidden;
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee var(--speed, 40s) linear infinite;
+}
+.marquee:hover .marquee-track {
+  animation-play-state: paused;
+}
+@keyframes marquee {
+  to { transform: translateX(-50%); }
+}
+
+/* Terminal window */
+.term {
+  background: #141413;
+  color: #e9e6df;
+  border-radius: 14px;
+  border: 1px solid #2c2b29;
+  box-shadow: 0 30px 80px -30px rgba(0, 0, 0, 0.45);
+  overflow: hidden;
+  font-family: var(--mono);
+  font-size: 13.5px;
+  line-height: 1.65;
+}
+.term-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border-bottom: 1px solid #2c2b29;
+  color: #8f8b82;
+  font-size: 12px;
+}
+.term-bar i {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: #3a3936;
+}
+.term-bar i:nth-child(1) { background: #ff5f57; }
+.term-bar i:nth-child(2) { background: #febc2e; }
+.term-bar i:nth-child(3) { background: #28c840; }
+.term-bar span {
+  margin-left: 8px;
+}
+.term-body {
+  padding: 18px 20px 22px;
+  white-space: pre-wrap;
+  overflow-x: auto;
+}
+.term .p { color: var(--accent); }
+.term .c { color: #8f8b82; }
+.term .g { color: #4ade80; }
+.term .r { color: #ff6b5e; }
+.term .y { color: #ffd166; }
+.term .b { color: #fff; font-weight: 700; }
+
+/* Dot-matrix numerals (anshulraman.com) */
+.dots {
+  font-family: var(--dots);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  line-height: 0.9;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+  .reveal {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+  .lit-word {
+    opacity: 1;
+  }
+}
