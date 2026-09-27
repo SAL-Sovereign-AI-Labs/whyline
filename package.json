@@ -1,6 +1,6 @@
 {
   "name": "@sal-sovereign-ai-labs/whyline",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Know why your AI wrote every line, and clean up what it left behind. Saves the request behind every line IBM Bob writes in your git history, and tells you when its temporary code is safe to delete.",
   "type": "commonjs",
   "license": "MIT",

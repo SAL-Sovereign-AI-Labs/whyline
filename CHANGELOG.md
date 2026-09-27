@@ -4,10 +4,13 @@ All notable changes to this project are documented here. Format: Keep a Changelo
 
 ## [Unreleased]
 
+## [0.1.2] - 2026-09-27
+
 ### Added
 - The product website (site/), published at the Pages root; the live report moved to /report/. The website, the report, the README and npm link to each other.
 
 ### Changed
+- The report page redesign: one design system, a Status timeline, a picker across projects, and plain labels ("Changed by a person since" instead of "reviewed").
 - Plain-language rewrite of every surface people read, following the new docs/VOICE.md: README (problem first, one worked example, screenshot), story diagram, CLI output and help, the six Bob skills, the guard message and the dashboard. Command names and `--json` keys are unchanged.
 
 ## [0.1.1] - 2026-09-27
