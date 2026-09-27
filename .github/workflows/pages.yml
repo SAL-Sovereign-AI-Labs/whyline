@@ -1,4 +1,5 @@
 # The page is the demo shop after the payments-v2 merge, rebuilt from recorded sessions, no secrets used.
+# Its project picker also lists Whyline's own repository, with the notes recorded while building it.
 name: pages
 
 on:
@@ -22,6 +23,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      # Whyline's own dogfood notes: the report lists this repository as a second project
+      - run: git fetch origin refs/notes/whyline:refs/notes/whyline || true
+        working-directory: ${{ github.workspace }}
       - uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -31,7 +37,7 @@ jobs:
       - run: |
           mkdir -p "$GITHUB_WORKSPACE/_site"
           cd "$RUNNER_TEMP/whyline-demo-shop"
-          WHYLINE_BOB_DB=/nonexistent node "$GITHUB_WORKSPACE/cli/index.js" report --out "$GITHUB_WORKSPACE/_site/index.html"
+          WHYLINE_PROJECTS="$GITHUB_WORKSPACE" WHYLINE_BOB_DB=/nonexistent node "$GITHUB_WORKSPACE/cli/index.js" report --out "$GITHUB_WORKSPACE/_site/index.html"
           touch "$GITHUB_WORKSPACE/_site/.nojekyll"
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
