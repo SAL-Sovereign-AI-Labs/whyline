@@ -76,4 +76,4 @@ Technology: IBM Bob, Node.js, git. Categories: Developer Tools, Code Review, Pro
 
 ## Video
 
-The video (2 min 57 s) follows one story: Sara, the mock gateway, the request Bob kept, the merge, the check that fails, and Bob removing it after her yes. Its narration, sentence by sentence, is in the video project (`remotion/src/script.json`) and uses the same words as this page.
+The video (2 min 17 s) follows one story: Sara, the mock gateway, the request Bob kept, the merge, the check that fails, and Bob removing it after her yes. Its narration, sentence by sentence, is in the video project (`remotion/src/script.json`) and uses the same words as this page.
