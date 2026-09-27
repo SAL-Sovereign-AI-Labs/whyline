@@ -6,20 +6,20 @@
 <title>Whyline Report</title>
 <style>
 /* ---- design tokens: one palette for origin (ai, edited, temporary, human) and one for state (due, active, kept, removed) ---- */
-:root{--bg:#f6f5f1;--surface:#fff;--surface2:#f1efe9;--ink:#15171c;--muted:#5d6471;--faint:#8b919c;--line:#e5e2da;--line2:#d9d5cb;
+:root{--bg:#f6f5f1;--surface:#fff;--surface2:#f1efe9;--ink:#15171c;--muted:#5d6471;--faint:#676d78;--line:#e5e2da;--line2:#d9d5cb;
 --side:#fbfaf7;--sideink:#3a3f48;--navon:#15171c;--navonink:#fff;
---ai:#2f6bff;--aibg:rgba(47,107,255,.10);--edit:#b77d00;--editbg:rgba(201,138,0,.13);--tmp:#7c4dff;--tmpbg:rgba(124,77,255,.11);--human:#a3a9b3;
---due:#d7263d;--duebg:rgba(215,38,61,.08);--ok:#15803d;--okbg:rgba(21,128,61,.10);--kept:#4f6077;--keptbg:rgba(79,96,119,.12);--removed:#7b818c;--removedbg:rgba(123,129,140,.12);
+--ai:#2f6bff;--aibg:rgba(47,107,255,.10);--edit:#8c5f00;--editbg:rgba(201,138,0,.13);--tmp:#7c4dff;--tmpbg:rgba(124,77,255,.11);--human:#a3a9b3;
+--due:#d7263d;--duebg:rgba(215,38,61,.08);--ok:#15803d;--okbg:rgba(21,128,61,.10);--kept:#4f6077;--keptbg:rgba(79,96,119,.12);--removed:#8e949f;--removedbg:rgba(142,148,159,.10);
 --term:#14161b;--termink:#dfe4ec;--termmuted:#8d96a5;--shadow:0 1px 2px rgba(20,23,28,.04),0 2px 8px rgba(20,23,28,.04)}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#0b0d11;--surface:#12151b;--surface2:#191d25;--ink:#e9ecf1;--muted:#9aa3b1;--faint:#6c7482;--line:#232833;--line2:#2e3441;
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#0b0d11;--surface:#12151b;--surface2:#191d25;--ink:#e9ecf1;--muted:#9aa3b1;--faint:#808896;--line:#232833;--line2:#2e3441;
 --side:#090b0e;--sideink:#b8bfca;--navon:#1d2230;--navonink:#fff;
 --ai:#5b8cff;--aibg:rgba(91,140,255,.14);--edit:#e3a92b;--editbg:rgba(227,169,43,.14);--tmp:#a78bfa;--tmpbg:rgba(167,139,250,.15);--human:#5c6370;
---due:#ff5b6b;--duebg:rgba(255,91,107,.09);--ok:#3ecf7a;--okbg:rgba(62,207,122,.11);--kept:#93a4bc;--keptbg:rgba(147,164,188,.13);--removed:#8a919d;--removedbg:rgba(138,145,157,.13);
+--due:#ff5b6b;--duebg:rgba(255,91,107,.09);--ok:#3ecf7a;--okbg:rgba(62,207,122,.11);--kept:#93a4bc;--keptbg:rgba(147,164,188,.13);--removed:#6c7482;--removedbg:rgba(108,116,130,.10);
 --term:#07090c;--termink:#dfe4ec;--termmuted:#7d8695;--shadow:none}}
-:root[data-theme="dark"]{--bg:#0b0d11;--surface:#12151b;--surface2:#191d25;--ink:#e9ecf1;--muted:#9aa3b1;--faint:#6c7482;--line:#232833;--line2:#2e3441;
+:root[data-theme="dark"]{--bg:#0b0d11;--surface:#12151b;--surface2:#191d25;--ink:#e9ecf1;--muted:#9aa3b1;--faint:#808896;--line:#232833;--line2:#2e3441;
 --side:#090b0e;--sideink:#b8bfca;--navon:#1d2230;--navonink:#fff;
 --ai:#5b8cff;--aibg:rgba(91,140,255,.14);--edit:#e3a92b;--editbg:rgba(227,169,43,.14);--tmp:#a78bfa;--tmpbg:rgba(167,139,250,.15);--human:#5c6370;
---due:#ff5b6b;--duebg:rgba(255,91,107,.09);--ok:#3ecf7a;--okbg:rgba(62,207,122,.11);--kept:#93a4bc;--keptbg:rgba(147,164,188,.13);--removed:#8a919d;--removedbg:rgba(138,145,157,.13);
+--due:#ff5b6b;--duebg:rgba(255,91,107,.09);--ok:#3ecf7a;--okbg:rgba(62,207,122,.11);--kept:#93a4bc;--keptbg:rgba(147,164,188,.13);--removed:#6c7482;--removedbg:rgba(108,116,130,.10);
 --term:#07090c;--termink:#dfe4ec;--termmuted:#7d8695;--shadow:none}
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
@@ -37,7 +37,7 @@ aside{background:var(--side);color:var(--sideink);border-right:1px solid var(--l
 .brand small{display:block;color:var(--faint);font-size:11.5px;line-height:1.2}
 .repo{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:12px}
 .repo b{display:block;color:var(--ink);font-size:13.5px;word-break:break-all}
-.repo .meta{color:var(--faint);font-size:11.5px;margin-top:2px}
+.repo .meta{color:var(--faint);font-size:11.5px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .authbar{display:flex;height:6px;border-radius:99px;overflow:hidden;background:var(--line);margin-top:10px}
 .authbar i{display:block;height:100%}
 .authleg{display:flex;justify-content:space-between;font-size:11.5px;color:var(--muted);margin-top:6px}
@@ -51,6 +51,7 @@ nav .cnt{margin-left:auto;font-size:11px;font-weight:600;padding:1px 7px;border-
 nav .cnt.due{background:var(--due);color:#fff}
 nav .cnt.rev{background:var(--editbg);color:var(--edit)}
 nav button.on .cnt:not(.due){background:rgba(255,255,255,.18);color:inherit}
+nav .cnt:empty{display:none}
 .side-note{margin-top:auto;border:1px solid var(--line);border-radius:12px;padding:12px;font-size:12px;color:var(--muted);background:var(--surface)}
 .side-note b{display:block;color:var(--ink);font-size:12.5px;margin-bottom:2px}
 .side-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:11.5px;color:var(--faint);padding:0 4px}
@@ -90,6 +91,7 @@ main{padding:36px 44px 72px;min-width:0}
 .tile .k{font-size:12.5px;color:var(--muted)}
 .tile .v{font-size:32px;font-weight:680;letter-spacing:-.02em;line-height:1.15;margin-top:4px;font-variant-numeric:tabular-nums}
 .tile .v small{font-size:16px;color:var(--faint);font-weight:500;margin-left:1px}
+.tile .v.nd{font-size:18px;font-weight:500;color:var(--faint);letter-spacing:0;line-height:1.3;padding-top:8px}
 .tile .v .flag{font-size:13px;font-weight:600;color:var(--due);margin-left:8px;letter-spacing:0}
 .tile .s{font-size:12.5px;color:var(--faint);margin-top:8px}
 .tile .bar{margin-top:12px}
@@ -100,7 +102,10 @@ main{padding:36px 44px 72px;min-width:0}
 .segs i{flex:1;height:6px;border-radius:99px;background:var(--surface2)}
 .segs i.due{background:var(--due)}.segs i.active{background:var(--ok)}.segs i.kept{background:var(--kept)}.segs i.removed{background:var(--removed)}
 .pill{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:650;letter-spacing:.04em;text-transform:uppercase;padding:3px 8px;border-radius:99px;white-space:nowrap;line-height:1.4}
-.pill.due{background:var(--due);color:#fff}.pill.active{background:var(--okbg);color:var(--ok)}.pill.kept{background:var(--keptbg);color:var(--kept)}.pill.removed{background:var(--removedbg);color:var(--removed)}
+.pill.due{background:var(--due);color:#fff}.pill.active{background:var(--okbg);color:var(--ok)}.pill.kept{background:var(--keptbg);color:var(--kept)}.pill.removed{background:transparent;color:var(--muted);box-shadow:inset 0 0 0 1px var(--line2)}
+/* dark: white on the bright due red is 3:1, so due pills and badges use a very dark red text instead */
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .pill.due,:root:not([data-theme="light"]) nav .cnt.due{color:#2a0006}}
+:root[data-theme="dark"] .pill.due,:root[data-theme="dark"] nav .cnt.due{color:#2a0006}
 .pill.review{background:var(--editbg);color:var(--edit)}.pill.ai{background:var(--aibg);color:var(--ai)}.pill.tmp{background:var(--tmpbg);color:var(--tmp)}.pill.dim{background:var(--surface2);color:var(--muted)}
 .kind{font-size:12px;color:var(--muted);text-transform:capitalize}
 .dot{display:inline-block;width:8px;height:8px;border-radius:99px;background:var(--ai);flex:none}
@@ -121,7 +126,7 @@ main{padding:36px 44px 72px;min-width:0}
 .cmd code{font-size:inherit;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0}
 .cmd .cp{flex:none;font:600 11px/1 Inter,ui-sans-serif,-apple-system,sans-serif;background:rgba(255,255,255,.08);color:var(--termink);border:1px solid rgba(255,255,255,.16);border-radius:6px;padding:5px 8px;cursor:pointer}
 .cmd .cp:hover{background:rgba(255,255,255,.16)}
-.cmd-where{font-size:11.5px;color:var(--faint);margin-top:5px;text-align:right}
+.cmd-where{font-size:11.5px;color:var(--muted);margin-top:5px;text-align:right}
 
 /* ---- overview: what needs you ---- */
 .queue{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:var(--shadow)}
@@ -132,24 +137,41 @@ main{padding:36px 44px 72px;min-width:0}
 .q-row.due::before{background:var(--due)}
 .q-row .badge{display:flex;flex-direction:column;align-items:flex-start;gap:5px;font-size:12px;color:var(--muted)}
 .q-row .file{font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13.5px;font-weight:600;word-break:break-all}
-.q-row .why{font-size:13px;color:var(--muted);margin-top:3px}
+.q-row .why{font-size:13px;color:var(--muted);margin-top:3px;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden;word-break:break-word}
+.q-row.empty-row{grid-template-columns:1fr}
+.q-row.empty-row::before{display:none}
+.q-foot .linkbtn{white-space:nowrap}
+.start{padding:20px}
+.start h3{margin:0 0 4px;font-size:15px;letter-spacing:-.01em}
+.start > p{margin:0 0 16px;font-size:13px;color:var(--muted)}
+.start ol{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.start li{display:flex;flex-direction:column;gap:8px;min-width:0;font-size:13px;color:var(--muted)}
+.start .n{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:99px;background:var(--surface2);color:var(--ink);font-size:12px;font-weight:700;margin-right:6px}
+.start .step{display:flex;align-items:center;color:var(--ink);font-weight:600}
+.start .plain{display:flex;align-items:center;min-height:36px;border:1px dashed var(--line2);border-radius:10px;padding:7px 12px;color:var(--muted)}
 .q-row .act{display:flex;flex-direction:column;align-items:stretch;min-width:0}
 .q-row .act .btn{align-self:flex-end}
 .q-foot{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 20px;border-top:1px solid var(--line);font-size:13px;color:var(--muted);background:var(--surface2)}
 
 /* overview lists */
-.hrow{display:grid;grid-template-columns:minmax(0,150px) minmax(0,1fr) auto;gap:12px;align-items:center;padding:7px 0}
+.hrow{display:grid;grid-template-columns:minmax(0,150px) minmax(0,1fr) 120px;gap:12px;align-items:center;padding:7px 0}
 .hrow .name{font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.hrow .num{font-size:12.5px;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+.hrow .num{font-size:12.5px;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums;text-align:right}
 .hrow .num b{color:var(--ink);font-weight:600}
 .krow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
 .krow:first-child{border-top:0;padding-top:2px}
 .krow .kn{font-weight:600;text-transform:capitalize}
 .krow .kd{font-size:12.5px;color:var(--faint)}
 .krow .ks{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
-.note-bad{border:1px solid var(--duebg);background:var(--duebg);color:var(--ink);border-radius:10px;padding:10px 12px;font-size:12.5px;margin-top:12px}
+.note-adv{background:var(--editbg);color:var(--ink);border-radius:10px;padding:10px 12px;font-size:12.5px;margin-top:12px}
 .facts{display:grid;grid-template-columns:110px minmax(0,1fr);gap:6px 12px;margin:0;font-size:13px}
 .facts dt{color:var(--faint)}.facts dd{margin:0;word-break:break-word}
+/* overview cards: two stacked columns; the last card in each stretches so both columns end on one line */
+.ov-cols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:stretch}
+.ov-col{display:flex;flex-direction:column;gap:16px;min-width:0}
+.ov-col > .card:last-child{flex:1 1 auto}
+@media (max-width:980px){.ov-cols{grid-template-columns:1fr}}
+@media (max-width:640px){#ovQueueMeta{display:none}.start ol{grid-template-columns:1fr}}
 
 /* ---- tables (views not yet redesigned keep tables; they stack on phones) ---- */
 table{width:100%;border-collapse:collapse;font-size:13px}
@@ -460,7 +482,7 @@ input.search{border:1px solid var(--line2);background:var(--surface);color:var(-
 </aside>
 <main>
 <div class="wrap">
-  <div class="mobilebar"><div class="brand"><span class="mark" aria-hidden="true">W</span><b>Whyline</b></div>
+  <div class="mobilebar"><div class="brand"><span class="mark" aria-hidden="true">W</span><div><b>Whyline</b><small>provenance for AI-written code</small></div></div>
     <button class="burger" id="burger" aria-expanded="false" aria-controls="side" onclick="var s=document.getElementById('side');var open=s.classList.toggle('open');this.setAttribute('aria-expanded',open)">Menu</button></div>
 
   <!-- OVERVIEW -->
@@ -471,13 +493,15 @@ input.search{border:1px solid var(--line2);background:var(--surface);color:var(-
       <div class="sec-h"><div><h2>What needs you</h2><p>One row per thing to look at, with the exact next step.</p></div><span class="faint" id="ovQueueMeta"></span></div>
       <div class="queue" id="needsHuman"></div>
     </div>
-    <div class="sec grid2">
-      <div class="card" id="ovFolderCard"><div class="card-h"><div><h2>AI share by folder</h2><p>Of the lines in files Bob touched, how many are AI-written.</p></div></div><div id="ovFolderTable"></div></div>
-      <div class="card"><div class="card-h"><div><h2>Temporary code, by kind</h2><p>Code written to go away, and where each piece stands.</p></div></div><div id="ovKindTable"></div></div>
-    </div>
-    <div class="sec grid2">
-      <div class="card"><div class="card-h"><div><h2>Who wrote the lines</h2><p>Lines changed in this range, by author.</p></div></div><div id="agentTable"></div></div>
-      <div class="card"><div class="card-h"><div><h2>Last removal</h2><p>The most recent temporary code taken out, with its evidence.</p></div></div><div id="ovLastRemoval"></div></div>
+    <div class="sec ov-cols">
+      <div class="ov-col">
+        <div class="card"><div class="card-h"><div><h2>Temporary code, by kind</h2><p>Code written to go away, and where each piece stands.</p></div></div><div id="ovKindTable"></div></div>
+        <div class="card"><div class="card-h"><div><h2>Who wrote the lines</h2><p>Lines changed in this range, by author.</p></div></div><div id="agentTable"></div></div>
+      </div>
+      <div class="ov-col">
+        <div class="card" id="ovFolderCard"><div class="card-h"><div><h2>AI share by folder</h2><p>Of the lines in files Bob touched, how many are AI-written.</p></div></div><div id="ovFolderTable"></div></div>
+        <div class="card"><div class="card-h"><div><h2>Last removal</h2><p>The most recent temporary code taken out, with its evidence.</p></div></div><div id="ovLastRemoval"></div></div>
+      </div>
     </div>
   </section>
 
@@ -664,7 +688,7 @@ var revLines = bom && bom.reviewed ? bom.reviewed.lines : null;
 
 // repo box with the authorship bar
 (function() {
-  var h = '<b>' + esc(DATA.repo) + '</b><div class="meta mono">' + esc(shortHead || 'no HEAD') + ' &middot; ' + (DATA.notes || 0) + ' ' + plural(DATA.notes || 0, 'note') + ' &middot; ' + ranges.length + ' ' + plural(ranges.length, 'range') + '</div>';
+  var h = '<b>' + esc(DATA.repo) + '</b><div class="meta"><span class="mono">' + esc(shortHead || 'no commit yet') + '</span> &middot; ' + sessions.length + ' ' + plural(sessions.length, 'session') + '</div>';
   if (aiPct != null) {
     var ed = revLines ? Math.round(revLines / linesChanged * 100) : 0;
     h += '<div class="authbar" aria-hidden="true"><i style="width:' + (aiPct - ed) + '%;background:var(--ai)"></i><i style="width:' + ed + '%;background:var(--edit)"></i><i style="width:' + (100 - aiPct) + '%;background:var(--human)"></i></div>' +
@@ -689,19 +713,26 @@ if (unrevFiles > 0) document.getElementById('unrevCnt').className = 'cnt rev';
 (function() {
   var notes = DATA.notes || 0;
   var H = document.getElementById('ovHeadline'), S = document.getElementById('ovSub');
-  document.getElementById('ovEyebrow').textContent = 'Status of ' + (DATA.repo || 'this repository');
+  document.getElementById('ovEyebrow').textContent = 'Whyline · ' + (DATA.repo || 'this repository');
   var dueTxt = due + ' ' + plural(due, 'piece') + ' of temporary code ' + (due === 1 ? 'is' : 'are') + ' due';
   if (due && unrevFiles) H.innerHTML = '<span class="hl-due">' + dueTxt + '</span> and ' + unrevFiles + ' ' + plural(unrevFiles, 'file has', 'files have') + ' AI-written lines no human has edited.';
   else if (due) H.innerHTML = '<span class="hl-due">' + dueTxt + '</span>. Everything else is on track.';
   else if (unrevFiles) H.innerHTML = '<span class="hl-rev">' + unrevLines + ' AI-written ' + plural(unrevLines, 'line') + '</span> in ' + unrevFiles + ' ' + plural(unrevFiles, 'file') + ' have no human edit yet.';
   else if (notes) H.textContent = 'Nothing needs a human right now.';
   else H.textContent = 'No AI-written code recorded yet.';
-  S.innerHTML = notes
-    ? 'Recorded by Bob hooks at commit <code>' + esc(shortHead) + '</code>. Every line keeps the prompt that caused it. Nothing on this page changes code: each next step is a command you run in Bob or a terminal.'
-    : 'Run <code>whyline init</code>, work in Bob, commit, then run <code>whyline report</code>. Every line Bob writes will keep the prompt that caused it.';
+  S.innerHTML = 'Whyline keeps the prompt behind every line IBM Bob writes, stored as git notes in this repo, and tells you what to remove, what to review and what shipped. ' +
+    (shortHead ? 'Snapshot of commit <code>' + esc(shortHead) + '</code>.' : 'No commit yet.');
 
   // KPI strip
-  var tracked = counts.active != null ? counts.active + counts.due : null;
+  // total temporary items in every state; null only when check reported no counts at all
+  var tracked = (counts.active != null || allItems.length) ? allItems.length : null;
+  var byState = { due: 0, active: 0, kept: 0, removed: 0 };
+  allItems.forEach(function(it) { var st = it.state || 'active'; if (byState[st] != null) byState[st]++; });
+  var tmpSub = allItems.length
+    ? [[byState.active, 'waiting'], [byState.kept, 'kept'], [byState.removed, 'removed']].filter(function(p) { return p[0]; }).map(function(p) { return p[0] + ' ' + p[1]; }).join(' &middot; ')
+    : 'None recorded yet.';
+  if (!tmpSub) tmpSub = 'All of it is due.';
+  function kv(v, inner) { return '<div class="v' + (v == null ? ' nd' : '') + '">' + (v == null ? 'no data' : inner) + '</div>'; }
   var agents = {};
   sessions.forEach(function(s) { agents[s.agent || 'unknown'] = 1; });
   var agentList = Object.keys(agents);
@@ -712,14 +743,14 @@ if (unrevFiles > 0) document.getElementById('unrevCnt').className = 'cnt rev';
     for (var i = 0; i < n; i++) stateSegs += '<i class="' + st + '"></i>';
   });
   var kp = [
-    '<div class="tile"><div class="k">AI-written</div><div class="v">' + (aiPct != null ? aiPct + '<small>%</small>' : 'no data') + '</div>' +
-      (aiPct != null ? '<div class="bar"><i style="width:' + aiPct + '%"></i></div><div class="s">' + aiTotal + ' of ' + linesChanged + ' lines changed</div>' : '<div class="s">no notes yet</div>') + '</div>',
-    '<div class="tile"><div class="k">Reviewed by a human</div><div class="v"' + (revPct === 0 ? ' style="color:var(--edit)"' : '') + '>' + (revPct != null ? revPct + '<small>%</small>' : 'no data') + '</div>' +
-      (revPct != null ? '<div class="bar"><i class="edit" style="width:' + revPct + '%"></i></div><div class="s">' + revLines + ' of ' + aiTotal + ' AI lines have a human edit</div>' : '<div class="s">no AI lines yet</div>') + '</div>',
-    '<div class="tile"><div class="k">Temporary code tracked</div><div class="v">' + nd(tracked) + (due ? '<span class="flag">' + due + ' due</span>' : '') + '</div>' +
-      (stateSegs ? '<div class="segs" aria-hidden="true">' + stateSegs + '</div>' : '') + '<div class="s">mocks, demos, flags, shims, fixtures</div></div>',
-    '<div class="tile"><div class="k">Agent sessions</div><div class="v">' + nd(sessions.length) + '</div>' +
-      '<div class="s">' + (agentList.length ? 'by ' + agentList.map(esc).join(', ') + (lastTs ? ' &middot; last ' + esc(day(lastTs)) : '') : 'none on record') + '</div></div>'
+    '<div class="tile"><div class="k">AI-written</div>' + kv(aiPct, aiPct + '<small>%</small>') +
+      (aiPct != null ? '<div class="bar"><i style="width:' + aiPct + '%"></i></div><div class="s">' + aiTotal + ' of ' + linesChanged + ' lines changed</div>' : '<div class="s">No notes yet.</div>') + '</div>',
+    '<div class="tile"><div class="k">Reviewed by a human</div>' + kv(revPct, revPct + '<small>%</small>') +
+      (revPct != null ? '<div class="bar"><i class="ok" style="width:' + revPct + '%"></i></div><div class="s">' + revLines + ' of ' + aiTotal + ' AI lines have a human edit</div>' : '<div class="s">No AI lines yet.</div>') + '</div>',
+    '<div class="tile"><div class="k">Temporary code</div>' + kv(tracked, tracked + (due ? '<span class="flag">' + due + ' due</span>' : '')) +
+      (stateSegs ? '<div class="segs" aria-hidden="true">' + stateSegs + '</div>' : '') + '<div class="s">' + tmpSub + '</div></div>',
+    '<div class="tile"><div class="k">Agent sessions</div>' + kv(sessions.length, sessions.length) +
+      '<div class="s">' + (agentList.length ? 'by ' + agentList.map(esc).join(', ') + (lastTs ? ' &middot; last ' + esc(day(lastTs)) : '') : 'None on record.') + '</div></div>'
   ];
   document.getElementById('ovKpis').innerHTML = kp.join('');
 
@@ -740,7 +771,11 @@ if (unrevFiles > 0) document.getElementById('unrevCnt').className = 'cnt rev';
       '<div class="act"><button class="btn" type="button" data-go="why" data-file="' + esc(f.file) + '">See why it exists &rarr;</button></div></div>';
   });
   var more = unrevList.length - topRev.length;
-  if (!q) q = '<div class="q-row" style="grid-template-columns:1fr"><div class="empty">nothing needs attention right now' + (notes ? '' : ' (no notes yet)') + '</div></div>';
+  if (!q && !notes) q = '<div class="start"><h3>Start recording in three steps</h3><p>Nothing is recorded in this repo yet. Once Bob writes code here, this list fills in by itself.</p><ol>' +
+    '<li><span class="step"><span class="n">1</span>Install the hooks</span>' + cmdChip('whyline init') + '</li>' +
+    '<li><span class="step"><span class="n">2</span>Work in Bob and commit</span><span class="plain">Every line Bob writes keeps its prompt</span></li>' +
+    '<li><span class="step"><span class="n">3</span>Open this report again</span>' + cmdChip('whyline report') + '</li></ol></div>';
+  else if (!q) q = '<div class="q-row empty-row"><div class="empty">nothing needs attention right now</div></div>';
   else q += '<div class="q-foot"><span>' + (more > 0 ? more + ' more ' + plural(more, 'file') + ' with unreviewed AI lines' : 'Nothing else needs a human right now.') + '</span>' +
     (more > 0 ? '<button class="linkbtn" type="button" data-go="unreviewed">Open Unreviewed &rarr;</button>' : '') + '</div>';
   document.getElementById('needsHuman').innerHTML = q;
@@ -753,7 +788,7 @@ if (unrevFiles > 0) document.getElementById('unrevCnt').className = 'cnt rev';
   var why = DATA.why;
   var files = (why && why.files) || [];
   if (!files.length) {
-    document.getElementById('ovFolderCard').style.display = 'none';
+    document.getElementById('ovFolderTable').innerHTML = '<div class="empty">No AI-written files at HEAD yet.</div>';
     return;
   }
   // group by folder: use first two segments when first is "src", else first segment
@@ -775,7 +810,7 @@ if (unrevFiles > 0) document.getElementById('unrevCnt').className = 'cnt rev';
       '<div class="bar"><i style="width:' + p + '%"></i></div>' +
       '<span class="num"><b>' + d.aiLines + '</b> of ' + d.lines + ' &middot; ' + p + '%</span></div>';
   });
-  if (full) html += '<div class="note-bad">' + full + ' ' + plural(full, 'folder is', 'folders are') + ' entirely AI-written. Worth a human read end to end before shipping.</div>';
+  if (full) html += '<div class="note-adv">' + full + ' ' + plural(full, 'folder is', 'folders are') + ' entirely AI-written. Worth a human read end to end before shipping.</div>';
   document.getElementById('ovFolderTable').innerHTML = html;
 })();
 
@@ -816,7 +851,7 @@ if (unrevFiles > 0) document.getElementById('unrevCnt').className = 'cnt rev';
     html += '<div class="hrow"><span class="name">human</span><div class="bar"><i class="human" style="width:' + hw + '%"></i></div><span class="num"><b>' + hu + '</b> ' + plural(hu, 'line') + ' &middot; ' + hw + '%</span></div>';
     html += '<p class="faint" style="font-size:12.5px;margin:10px 0 0">' + (bom.range ? 'Range ' + esc(bom.range) : 'All history (no release tag yet)') + '. The <b>AI Bill of Materials</b> has the full breakdown.</p>';
   }
-  if (!html) html = '<div class="empty">no AI ranges in this range</div>';
+  if (!html) html = '<div class="empty">No AI-written lines in this range.</div>';
   document.getElementById('agentTable').innerHTML = html;
 })();
 
@@ -832,7 +867,7 @@ if (unrevFiles > 0) document.getElementById('unrevCnt').className = 'cnt rev';
   var it = removed[0];
   var short = it.removedIn ? it.removedIn.slice(0, 7) : null;
   el.innerHTML = '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><span class="pill removed">Removed</span><span class="kind">' + esc(it.kind || '') + '</span></div>' +
-    '<div class="q-row" style="padding:0;display:block;border:0"><div class="file">' + esc(it.file || '') + '</div></div>' +
+    '<div class="mono" style="font-weight:600;word-break:break-all">' + esc(it.file || '') + '</div>' +
     '<dl class="facts" style="margin-top:12px">' +
     '<dt>Reason</dt><dd>' + nd(it.reason) + '</dd>' +
     (waitingFor(it) ? '<dt>Condition</dt><dd>' + esc(waitingFor(it)) + '</dd>' : '') +
