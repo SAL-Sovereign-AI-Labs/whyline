@@ -16,7 +16,8 @@ Built for IBM Bob 2.0. Bob's free lifecycle hooks record every write; six skills
 | The package | `npm install -g @sal-sovereign-ai-labs/whyline` ([npm](https://www.npmjs.com/package/@sal-sovereign-ai-labs/whyline)) |
 | The Bob pack a repo gets from `whyline init` | [.bob/settings.json](.bob/settings.json) (3 hooks), [.bob/skills/](.bob/skills/) (6 skills) |
 | Bob building and using Whyline | [bob_sessions/](bob_sessions/) (task screenshots) and [bob_sessions/costs.md](bob_sessions/costs.md) (29.28 Bobcoins) |
-| Tests and CI | [cli/test/](cli/test/) (71 tests), [Actions](https://github.com/SAL-Sovereign-AI-Labs/whyline/actions) |
+| The CI gate on a real repo: a green PR and a red PR | [whyline-demo-shop](https://github.com/SAL-Sovereign-AI-Labs/whyline-demo-shop): [PR 1, mock removed](https://github.com/SAL-Sovereign-AI-Labs/whyline-demo-shop/pull/1) and [its check passing](https://github.com/SAL-Sovereign-AI-Labs/whyline-demo-shop/actions/runs/36303214774); [PR 2, mock left behind](https://github.com/SAL-Sovereign-AI-Labs/whyline-demo-shop/pull/2) and [its check failing](https://github.com/SAL-Sovereign-AI-Labs/whyline-demo-shop/actions/runs/36303213127) |
+| Tests and CI | [cli/test/](cli/test/) (72 tests), [Actions](https://github.com/SAL-Sovereign-AI-Labs/whyline/actions) |
 | Check every claim yourself | [the table below](#dont-take-our-word-for-it) |
 
 ![Whyline architecture: Bob writes, hooks record, a commit seals a git note, commands answer, Bob acts](docs/architecture.svg)
@@ -36,7 +37,7 @@ Every value below comes from running the command. Build the demo first: `git clo
 
 | Claim | Check it | You should see |
 |---|---|---|
-| 71 tests, zero dependencies | `npm test` and `node -e "console.log(Object.keys(require('./package.json').dependencies \|\| {}).length)"` | `pass 71`, `fail 0`, and `0` |
+| 72 tests, zero dependencies | `npm test` and `node -e "console.log(Object.keys(require('./package.json').dependencies \|\| {}).length)"` | `pass 72`, `fail 0`, and `0` |
 | Every AI line keeps its prompt | `cd /tmp/shop && whyline why src/payments/mock_gateway.py:3` | `origin ai (bob)` and the prompt that wrote it |
 | The record lives in git itself | `git notes --ref=whyline list \| wc -l` and `git log --notes=whyline -1 <commit>` | 7 notes, each a JSON note under its commit |
 | Temporary code has a lifecycle | `git merge payments-v2 && whyline check` | `mock_gateway.py` listed as due: "no references outside the file and its tests" |
