@@ -239,17 +239,50 @@ input.search{border:1px solid var(--line2);background:var(--surface);color:var(-
 .unrev-info .excerpt{font-size:12px;color:var(--faint);margin-top:4px;font-style:italic;word-break:break-word}
 .unrev-bar-cell .cnt{font-size:11.5px;color:var(--muted);margin-top:3px;white-space:nowrap;font-variant-numeric:tabular-nums}
 .unrev-show-more{display:flex;justify-content:center;padding:14px;border-top:1px solid var(--line);background:var(--surface)}
+/* ---- bom ---- */
+.bom-attn{background:var(--editbg);border:1px solid var(--edit);border-left:4px solid var(--edit);border-radius:14px;padding:18px 20px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+.bom-attn-txt h3{font-size:14px;font-weight:700;color:var(--edit);margin:0 0 4px}
+.bom-attn-txt p{margin:0;font-size:13px;color:var(--ink)}
+.bom-prov{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px;box-shadow:var(--shadow);min-width:0;margin-bottom:20px}
+.bom-prov-row{display:grid;grid-template-columns:180px minmax(0,1fr) 80px;gap:10px 16px;align-items:center;padding:14px 0;position:relative}
+.bom-prov-row + .bom-prov-row{border-top:1px solid var(--line)}
+.bom-prov-row + .bom-prov-row::after{content:"";position:absolute;left:8px;top:-14px;height:14px;width:2px;background:var(--line2)}
+.bom-prov-lbl{font-size:13px;font-weight:600;color:var(--ink)}
+.bom-prov-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.bom-prov-pct{font-size:15px;font-weight:700;font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+.bom-prov-pct.nd{color:var(--faint);font-size:13px;font-weight:500}
+.bom-stripe{background:repeating-linear-gradient(45deg,var(--surface2),var(--surface2) 4px,var(--line) 4px,var(--line) 8px);height:6px;border-radius:99px}
+.bom-grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-bottom:20px}
+.bom-grid3 > .card{height:100%}
+.bom-donut-wrap{display:flex;gap:20px;align-items:center;flex-wrap:wrap}
+.bom-donut{width:80px;height:80px;border-radius:50%;flex:none}
+.bom-legend{display:flex;flex-direction:column;gap:6px;min-width:0;flex:1}
+.bom-legend-row{display:flex;align-items:center;gap:8px;font-size:13px}
+.bom-legend-dot{width:10px;height:10px;border-radius:50%;flex:none}
+.bom-legend-val{font-variant-numeric:tabular-nums;margin-left:auto;color:var(--muted);font-size:12.5px;white-space:nowrap}
+.bom-counter{display:flex;flex-direction:column;gap:12px}
+.bom-cnt-row{display:flex;justify-content:space-between;align-items:baseline;gap:8px;padding:10px 0;border-top:1px solid var(--line)}
+.bom-cnt-row:first-child{border-top:0;padding-top:0}
+.bom-cnt-lbl{font-size:13px;color:var(--muted)}
+.bom-cnt-val{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.bom-cnt-val.due{color:var(--due)}
+.bom-cost-main{font-size:26px;font-weight:700;letter-spacing:-.02em;margin:6px 0 2px;font-variant-numeric:tabular-nums}
+.bom-cost-main.nd{font-size:18px;color:var(--faint);font-weight:500}
+.bom-cost-sub{font-size:12.5px;color:var(--muted)}
+.bom-foot{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 20px;box-shadow:var(--shadow);display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.bom-foot .cmd{max-width:280px}
 /* ---- responsive ---- */
 @media (max-width:1100px){.q-row{grid-template-columns:100px minmax(0,1fr)}.q-row .act{grid-column:2}}
-@media (max-width:980px){.grid2{grid-template-columns:1fr}.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}.tile:nth-child(3){border-left:0}.tile:nth-child(n+3){border-top:1px solid var(--line)}.exp-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}.exp-tile:nth-child(n+3){border-top:1px solid var(--line)}.exp-tile:nth-child(3){border-left:0}.unrev-row{grid-template-columns:36px minmax(0,1fr) auto}}
+@media (max-width:980px){.grid2{grid-template-columns:1fr}.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}.tile:nth-child(3){border-left:0}.tile:nth-child(n+3){border-top:1px solid var(--line)}.exp-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}.exp-tile:nth-child(n+3){border-top:1px solid var(--line)}.exp-tile:nth-child(3){border-left:0}.unrev-row{grid-template-columns:36px minmax(0,1fr) auto}.bom-grid3{grid-template-columns:1fr}.bom-prov-row{grid-template-columns:1fr auto}}
 @media (max-width:900px){.app{grid-template-columns:1fr}aside{position:fixed;left:-270px;width:260px;transition:left .2s;z-index:20;box-shadow:0 0 40px rgba(0,0,0,.25)}aside.open{left:0}
 .mobilebar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:18px}main{padding:18px 16px 60px}.vh h1{font-size:24px}}
 @media (max-width:640px){.q-row{grid-template-columns:1fr;gap:10px;padding:14px 16px}.q-row .act{grid-column:1}.q-row .badge{flex-direction:row;align-items:center}.hrow{grid-template-columns:minmax(0,1fr) auto}.hrow .bar{grid-column:1/-1;grid-row:2}
 #v-why .row2c{grid-template-columns:1fr !important}.card{overflow-x:auto}table.stack thead{display:none}table.stack tr{display:block;padding:10px 0;border-bottom:1px solid var(--line)}table.stack td{display:block;border:0;padding:2px 0;max-width:none !important;min-width:0 !important}table.stack td[data-label]::before{content:attr(data-label) ": ";color:var(--faint);font-size:12px}
 .exp-card{grid-template-columns:1fr}.exp-card .right{border-left:0;padding-left:0;border-top:1px solid var(--line2);padding-top:14px;margin-top:4px}
 .exp-row{grid-template-columns:44px minmax(0,1fr)}.exp-row .when{grid-column:2}.exp-row .pill{grid-column:2;justify-self:start}
-.unrev-row{grid-template-columns:36px minmax(0,1fr) auto;align-items:start;row-gap:10px}.unrev-row .unrev-info{grid-column:2/4}.unrev-row .unrev-bar-cell{grid-column:2;align-self:center}.unrev-row .unrev-cov{grid-column:2}.unrev-row .unrev-cov:empty{display:none}.unrev-row .unrev-act{grid-column:3;grid-row:2}}
-@media (max-width:520px){.tile{padding:14px}.tile .v{font-size:26px}.tile .s{font-size:12px}.facts{grid-template-columns:1fr}.facts dt{margin-top:6px}.exp-tile{padding:14px}.exp-tile .v{font-size:26px}}
+.unrev-row{grid-template-columns:36px minmax(0,1fr) auto;align-items:start;row-gap:10px}.unrev-row .unrev-info{grid-column:2/4}.unrev-row .unrev-bar-cell{grid-column:2;align-self:center}.unrev-row .unrev-cov{grid-column:2}.unrev-row .unrev-cov:empty{display:none}.unrev-row .unrev-act{grid-column:3;grid-row:2}
+.bom-attn{flex-direction:column;align-items:flex-start}.bom-foot{flex-direction:column;align-items:flex-start}}
+@media (max-width:520px){.tile{padding:14px}.tile .v{font-size:26px}.tile .s{font-size:12px}.facts{grid-template-columns:1fr}.facts dt{margin-top:6px}.exp-tile{padding:14px}.exp-tile .v{font-size:26px}.bom-prov-row{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -351,8 +384,8 @@ input.search{border:1px solid var(--line2);background:var(--surface);color:var(-
 
   <!-- BOM -->
   <section class="view" id="v-bom">
-    <div class="vh"><div class="eyebrow" id="bomTitle">AI Bill of Materials</div><h1>What the AI wrote in this range, and what was checked.</h1><p>Lines changed, AI share, human review, tests, temporary code and cost.</p></div>
-    <div class="card" id="bomCard"><table id="bomTable"></table></div>
+    <div class="vh"><div class="eyebrow" id="bomEyebrow">AI Bill of Materials</div><h1 id="bomHeadline"></h1><p id="bomSub"></p></div>
+    <div id="bomBody"></div>
   </section>
 
   <!-- STATUS -->
@@ -1034,28 +1067,169 @@ if (unrevFiles > 0) document.getElementById('unrevCnt').className = 'cnt rev';
 })();
 
 // BOM
-if (bom) {
-  document.getElementById('bomTitle').textContent = 'AI Bill of Materials · ' + (bom.range || 'all history');
-  var bomRows = [
-    ['Lines changed', nd(bom.linesChanged)],
-    ['AI-written', nd(bom.ai.total) + (aiPct != null ? ' (' + aiPct + '%)' : '')],
-    ['By agent', Object.keys(bom.ai.byAgent || {}).map(function(a) { return esc(a) + ' ' + bom.ai.byAgent[a]; }).join(' &middot; ') || 'no data'],
-    ['AI lines reviewed', bom.reviewed.lines == null ? 'no data' : bom.reviewed.lines + (bom.reviewed.percent != null ? ' (' + bom.reviewed.percent + '%)' : ' (no data)')],
-    ['AI lines covered by tests', bom.tested.lines != null ? String(bom.tested.lines) : 'no data'],
-    ['Temporary items (active)', nd(bom.items && bom.items.active)],
-    ['Temporary items (due)', nd(bom.items && bom.items.due)],
-    ['Temporary items (removed)', nd(bom.items && bom.items.removed)],
-    ['Cost', bom.cost.sum != null ? bom.cost.sum + ' (' + bom.cost.sessionsWithCost + ' of ' + bom.cost.sessions + ' sessions)' : 'no data (' + bom.cost.sessionsWithCost + ' of ' + bom.cost.sessions + ' sessions)']
-  ];
-  var bomHtml = '';
-  bomRows.forEach(function(r) { bomHtml += '<tr><td>' + esc(r[0]) + '</td><td>' + r[1] + '</td></tr>'; });
-  document.getElementById('bomTable').innerHTML = bomHtml;
-  if (bom.missing && bom.missing.length) {
-    document.getElementById('bomCard').innerHTML += '<div class="hint">Missing data: ' + bom.missing.map(esc).join(', ') + '</div>';
+(function() {
+  var bomEyebrow = document.getElementById('bomEyebrow');
+  var bomHeadline = document.getElementById('bomHeadline');
+  var bomSub = document.getElementById('bomSub');
+  var bomBody = document.getElementById('bomBody');
+
+  if (!bom) {
+    bomHeadline.textContent = 'BOM data not available (run: whyline bom).';
+    bomSub.textContent = '';
+    return;
   }
-} else {
-  document.getElementById('bomCard').innerHTML = '<p class="empty">BOM data not available (run: whyline bom).</p>';
-}
+
+  var range = bom.range || 'all history';
+  bomEyebrow.textContent = 'AI Bill of Materials \u00b7 ' + range;
+
+  // safe accessors
+  var bAi = bom.ai || {};
+  var bRev = bom.reviewed || {};
+  var bTest = bom.tested || {};
+  var bItems = bom.items || {};
+  var bCost = bom.cost || {};
+  var bLc = bom.linesChanged;
+  var bAiTotal = bAi.total != null ? bAi.total : null;
+  var bRevLines = bRev.lines != null ? bRev.lines : null;
+  var bRevPct = bRev.percent != null ? bRev.percent : null;
+  var bTestPct = bTest.percent != null ? bTest.percent : null;
+  var bSessions = bCost.sessions != null ? bCost.sessions : (sessions.length > 0 ? sessions.length : null);
+
+  // headline
+  var aiPctStr = (aiPct != null) ? aiPct + '%' : 'no data';
+  var revPctStr;
+  if (bRevPct === 0) {
+    revPctStr = 'none of them has had a human edit yet';
+    bomHeadline.innerHTML = aiPctStr + ' of the lines changed were written by AI, and ' + revPctStr + '.';
+  } else if (bRevPct != null) {
+    revPctStr = bRevPct + '% of those have had a human edit';
+    bomHeadline.innerHTML = aiPctStr + ' of the lines changed were written by AI, and ' + revPctStr + '.';
+  } else {
+    bomHeadline.textContent = aiPctStr + ' of the lines changed were written by AI.';
+  }
+
+  bomSub.textContent = (bLc != null ? bLc : 'no data') + ' lines changed across ' + (bSessions != null ? bSessions : 'no data') + ' agent ' + plural(bSessions || 0, 'session') + '.';
+
+  var html = '';
+
+  // attention banner when revPct below 50
+  var unrevAI = unreviewed.totals ? (unreviewed.totals.aiLines || 0) : 0;
+  if (bRevPct != null && bRevPct < 50 && unrevAI > 0) {
+    html += '<div class="bom-attn"><div class="bom-attn-txt"><h3>Needs attention</h3>' +
+      '<p>' + unrevAI + ' AI ' + plural(unrevAI, 'line') + ' ' + (unrevAI === 1 ? 'has' : 'have') + ' no human edit.</p></div>' +
+      '<button class="btn" type="button" data-go="unreviewed">Open Unreviewed &rarr;</button></div>';
+  }
+
+  // provenance card
+  function provBar(w, cls, isStripe) {
+    if (isStripe) return '<div class="bom-stripe"></div>';
+    return '<div class="bar"><i class="' + cls + '" style="width:' + w + '%"></i></div>';
+  }
+  var aiW = (bAiTotal != null && bLc) ? Math.round(bAiTotal / bLc * 100) : 0;
+  var revW2 = (bRevLines != null && bAiTotal) ? Math.round(bRevLines / bAiTotal * 100) : 0;
+  var testW = bTestPct != null ? bTestPct : 0;
+  var testNoData = bTestPct == null;
+
+  html += '<div class="bom-prov"><div class="card-h" style="margin-bottom:4px"><h2 style="font-size:14px">Provenance</h2></div>';
+  // row 1: written by AI
+  html += '<div class="bom-prov-row">' +
+    '<div><div class="bom-prov-lbl">Written by AI</div>' +
+    (bAiTotal != null && bLc != null ? '<div class="bom-prov-sub">' + bAiTotal + ' of ' + bLc + ' lines</div>' : '') +
+    '</div>' +
+    '<div>' + provBar(aiW, '', false) + '</div>' +
+    '<div class="bom-prov-pct' + (aiPct == null ? ' nd' : '') + '">' + (aiPct != null ? aiPct + '%' : 'no data') + '</div>' +
+    '</div>';
+  // row 2: reviewed by a human
+  html += '<div class="bom-prov-row">' +
+    '<div><div class="bom-prov-lbl">Reviewed by a human</div>' +
+    (bRevLines != null && bAiTotal != null ? '<div class="bom-prov-sub">' + bRevLines + ' of ' + bAiTotal + ' AI lines</div>' : '') +
+    '</div>' +
+    '<div><div class="bar"><i class="edit" style="width:' + revW2 + '%"></i></div></div>' +
+    '<div class="bom-prov-pct' + (bRevPct == null ? ' nd' : '') + '">' + (bRevPct != null ? bRevPct + '%' : 'no data') + '</div>' +
+    '</div>';
+  // row 3: covered by tests
+  html += '<div class="bom-prov-row">' +
+    '<div><div class="bom-prov-lbl">Covered by tests</div>' +
+    (testNoData ? '<div class="bom-prov-sub">no data: add coverage.xml or lcov.info</div>' : '') +
+    '</div>' +
+    '<div>' + provBar(testW, 'ok', testNoData) + '</div>' +
+    '<div class="bom-prov-pct' + (testNoData ? ' nd' : '') + '">' + (testNoData ? 'no data' : bTestPct + '%') + '</div>' +
+    '</div>';
+  html += '</div>';
+
+  // three-card row
+  // card 1: who wrote it - conic donut
+  var byAgent = bAi.byAgent || {};
+  var agentKeys = Object.keys(byAgent).sort(function(a, b) { return byAgent[b] - byAgent[a]; });
+  var humanLines = (bLc != null && bAiTotal != null) ? bLc - bAiTotal : null;
+  var AI_COLORS = ['#2f6bff','#7c4dff','#00b4d8','#06d6a0','#f77f00'];
+  var HUMAN_COLOR = '#a3a9b3';
+  // build conic gradient stops
+  var donutStyle = 'background:var(--surface2)';
+  var legendRows = '';
+  if (bLc && bAiTotal != null) {
+    var stops = [], curDeg = 0;
+    agentKeys.forEach(function(ag, i) {
+      var w = Math.round(byAgent[ag] / bLc * 360);
+      var color = AI_COLORS[i % AI_COLORS.length];
+      stops.push(color + ' ' + curDeg + 'deg ' + (curDeg + w) + 'deg');
+      legendRows += '<div class="bom-legend-row"><div class="bom-legend-dot" style="background:' + color + '"></div>' +
+        '<span>' + esc(ag) + ' (AI)</span><span class="bom-legend-val">' + byAgent[ag] + ' lines</span></div>';
+      curDeg += w;
+    });
+    if (humanLines != null && humanLines > 0) {
+      stops.push(HUMAN_COLOR + ' ' + curDeg + 'deg 360deg');
+      legendRows += '<div class="bom-legend-row"><div class="bom-legend-dot" style="background:' + HUMAN_COLOR + '"></div>' +
+        '<span>human</span><span class="bom-legend-val">' + humanLines + ' lines</span></div>';
+    }
+    if (stops.length) {
+      donutStyle = 'background:conic-gradient(' + stops.join(',') + ');mask:radial-gradient(transparent 40%,#000 41%)';
+    }
+  } else {
+    legendRows = '<div class="bom-legend-row" style="color:var(--faint)">no data</div>';
+  }
+  var card1 = '<div class="card"><div class="card-h"><h2 style="font-size:14px">Who wrote it</h2></div>' +
+    '<div class="bom-donut-wrap"><div class="bom-donut" aria-hidden="true" style="' + donutStyle + '"></div>' +
+    '<div class="bom-legend">' + legendRows + '</div></div></div>';
+
+  // card 2: temporary code
+  var itActive = bItems.active != null ? bItems.active : null;
+  var itDue = bItems.due != null ? bItems.due : null;
+  var itRemoved = bItems.removed != null ? bItems.removed : null;
+  var card2 = '<div class="card"><div class="card-h"><h2 style="font-size:14px">Temporary code</h2></div>' +
+    '<div class="bom-counter">' +
+    '<div class="bom-cnt-row"><span class="bom-cnt-lbl">Active</span><span class="bom-cnt-val">' + nd(itActive) + '</span></div>' +
+    '<div class="bom-cnt-row"><span class="bom-cnt-lbl">Due</span>' +
+    '<span class="bom-cnt-val' + (itDue > 0 ? ' due' : '') + '">' + nd(itDue) + '</span></div>' +
+    '<div class="bom-cnt-row"><span class="bom-cnt-lbl">Removed</span><span class="bom-cnt-val">' + nd(itRemoved) + '</span></div>' +
+    '</div></div>';
+
+  // card 3: cost
+  var costSum = bCost.sum != null ? bCost.sum : null;
+  var scWCost = bCost.sessionsWithCost != null ? bCost.sessionsWithCost : null;
+  var scTotal = bCost.sessions != null ? bCost.sessions : null;
+  var card3 = '<div class="card"><div class="card-h"><h2 style="font-size:14px">Cost</h2></div>' +
+    '<div class="bom-cost-main' + (costSum == null ? ' nd' : '') + '">' + nd(costSum) + '</div>' +
+    '<div class="bom-cost-sub">' +
+    (scWCost != null && scTotal != null ? scWCost + ' of ' + scTotal + ' ' + plural(scTotal, 'session') + ' reported a cost' : 'no sessions with cost data') +
+    '</div></div>';
+
+  html += '<div class="bom-grid3">' + card1 + card2 + card3 + '</div>';
+
+  // footer strip
+  var footMeta = (bom.range ? 'Range: ' + esc(bom.range) : 'all history') +
+    (scTotal != null ? ' &middot; ' + scTotal + ' ' + plural(scTotal, 'session') : '') +
+    ' &middot; ' + ranges.length + ' ' + plural(ranges.length, 'range') +
+    (shortHead ? ' &middot; commit ' + esc(shortHead) : '');
+  html += '<div class="bom-foot"><span>' + footMeta + '</span>' + cmdChip('whyline bom --json') + '</div>';
+
+  // missing hint
+  if (bom.missing && bom.missing.length) {
+    html += '<div class="hint" style="margin-top:14px">Missing data: ' + bom.missing.map(esc).join(', ') + '. These show as "no data", never as zero.</div>';
+  }
+
+  bomBody.innerHTML = html;
+})();
 
 // STATUS
 (function() {
