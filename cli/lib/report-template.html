@@ -199,7 +199,7 @@ input.search{border:1px solid var(--line2);background:var(--surface);color:var(-
 .exp-tile .v{font-size:32px;font-weight:680;letter-spacing:-.02em;line-height:1.15;margin-top:4px;font-variant-numeric:tabular-nums}
 .exp-tile[data-st="due"] .v{color:var(--due)}.exp-tile[data-st="active"] .v{color:var(--ok)}.exp-tile[data-st="kept"] .v{color:var(--kept)}.exp-tile[data-st="removed"] .v{color:var(--removed)}
 .exp-tile .s{font-size:12px;color:var(--faint);margin-top:6px;line-height:1.4}
-.exp-card{background:var(--duebg);border:1px solid var(--due);border-left:4px solid var(--due);border-radius:14px;padding:20px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,380px);gap:24px;align-items:start;min-width:0}
+.exp-card{background:var(--duebg);border:1px solid var(--due);border-left:4px solid var(--due);border-radius:14px;padding:20px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,420px);gap:24px;align-items:start;min-width:0}
 .exp-card + .exp-card{margin-top:12px}
 .exp-card .left .file{font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:15px;font-weight:600;word-break:break-all;margin:8px 0 10px}
 .exp-card .left .lbl{font-size:11.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);margin-bottom:2px}
@@ -208,18 +208,19 @@ input.search{border:1px solid var(--line2);background:var(--surface);color:var(-
 .exp-card .right{border-left:1px solid var(--line2);padding-left:20px}
 .exp-card .right h3{font-size:12.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--faint);margin:0 0 12px}
 .exp-card .right .act-row{margin-bottom:10px}
-.exp-card .cmd code{white-space:normal;word-break:break-all;overflow:visible}
+.exp-card .cmd code{white-space:normal;word-break:normal;overflow-wrap:anywhere;overflow:visible}
 .exp-card .right .act-row .act-lbl{font-size:11.5px;color:var(--muted);margin-bottom:4px}
 .exp-listbox{background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);overflow:hidden}
-.exp-row{display:grid;grid-template-columns:44px minmax(0,1fr) minmax(0,220px) auto;gap:12px;align-items:center;padding:12px 16px;border-top:1px solid var(--line);background:var(--surface)}
+.exp-row{display:grid;grid-template-columns:44px minmax(0,1fr) minmax(0,240px) 84px;gap:12px;align-items:center;padding:12px 16px;border-top:1px solid var(--line);background:var(--surface)}
 .exp-listbox .exp-row:first-child{border-top:0}
+.exp-row > .pill{justify-self:end}
 .exp-icon{width:32px;height:32px;border-radius:8px;display:grid;place-items:center;font-size:14px;font-weight:700;text-transform:uppercase;flex:none}
-.exp-icon.mock{background:rgba(124,77,255,.15);color:var(--tmp)}.exp-icon.demo{background:rgba(215,38,61,.12);color:var(--due)}.exp-icon.flag{background:rgba(47,107,255,.12);color:var(--ai)}.exp-icon.shim{background:rgba(201,138,0,.14);color:var(--edit)}.exp-icon.fixture{background:rgba(139,145,156,.15);color:var(--faint)}
-.exp-icon.other{background:var(--surface2);color:var(--muted)}
+.exp-icon{background:var(--tmpbg);color:var(--tmp)}
 .exp-row .info .file{font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13px;font-weight:600;word-break:break-all}
 .exp-row .info .reason{font-size:12px;color:var(--muted);margin-top:3px;word-break:break-word}
 .exp-row .when{font-size:12.5px;color:var(--muted);word-break:break-word}
-.exp-row .when .days{font-size:11.5px;color:var(--faint);margin-top:2px}
+.exp-row .when .days,.exp-row .when .was{font-size:11.5px;color:var(--faint);margin-top:2px}
+.exp-row .when .met{color:var(--due);font-weight:600}
 /* ---- unreviewed ---- */
 .unrev-progress{margin-bottom:24px}
 .unrev-prog-bar{height:10px;background:var(--surface2);border-radius:99px;overflow:hidden;display:flex;margin:10px 0 6px}
@@ -230,11 +231,13 @@ input.search{border:1px solid var(--line2);background:var(--surface);color:var(-
 .unrev-list{background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);overflow:hidden}
 .unrev-row{display:grid;grid-template-columns:36px minmax(0,1fr) minmax(0,120px) 90px auto;gap:12px;align-items:center;padding:14px 18px;border-top:1px solid var(--line);background:var(--surface)}
 .unrev-list .unrev-row:first-child{border-top:0}
-.unrev-row.top{background:var(--editbg);border-left:3px solid var(--edit)}
+.unrev-list.nocov .unrev-row{grid-template-columns:36px minmax(0,1fr) minmax(0,120px) auto}
+.unrev-list.nocov .unrev-cov{display:none}
+.unrev-row.top{background:var(--editbg);border-left:0;box-shadow:inset 3px 0 0 var(--edit)}
 .unrev-rank{width:28px;height:28px;border-radius:8px;background:var(--surface2);color:var(--muted);display:grid;place-items:center;font-size:12px;font-weight:700;flex:none;font-variant-numeric:tabular-nums}
 .unrev-row.top .unrev-rank{background:var(--edit);color:#fff}
 .unrev-info .file{font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13px;font-weight:600;word-break:break-all}
-.unrev-info .folder{display:inline-flex;align-items:center;font-size:11px;font-weight:600;letter-spacing:.03em;background:var(--surface2);color:var(--muted);border-radius:99px;padding:1px 7px;margin-left:6px;vertical-align:middle;white-space:nowrap}
+.unrev-info .file .faint{font-weight:400}
 .unrev-start{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--edit);margin-bottom:3px}
 .unrev-info .excerpt{font-size:12px;color:var(--faint);margin-top:4px;font-style:italic;word-break:break-word}
 .unrev-bar-cell .cnt{font-size:11.5px;color:var(--muted);margin-top:3px;white-space:nowrap;font-variant-numeric:tabular-nums}
@@ -244,13 +247,12 @@ input.search{border:1px solid var(--line2);background:var(--surface);color:var(-
 .bom-attn-txt h3{font-size:14px;font-weight:700;color:var(--edit);margin:0 0 4px}
 .bom-attn-txt p{margin:0;font-size:13px;color:var(--ink)}
 .bom-prov{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px;box-shadow:var(--shadow);min-width:0;margin-bottom:20px}
-.bom-prov-row{display:grid;grid-template-columns:180px minmax(0,1fr) 80px;gap:10px 16px;align-items:center;padding:14px 0;position:relative}
+.bom-prov-row{display:grid;grid-template-columns:180px minmax(0,1fr) 80px;gap:10px 16px;align-items:center;padding:14px 0}
 .bom-prov-row + .bom-prov-row{border-top:1px solid var(--line)}
-.bom-prov-row + .bom-prov-row::after{content:"";position:absolute;left:8px;top:-14px;height:14px;width:2px;background:var(--line2)}
 .bom-prov-lbl{font-size:13px;font-weight:600;color:var(--ink)}
 .bom-prov-sub{font-size:12px;color:var(--muted);margin-top:2px}
 .bom-prov-pct{font-size:15px;font-weight:700;font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
-.bom-prov-pct.nd{color:var(--faint);font-size:13px;font-weight:500}
+.bom-prov-pct.nd{color:var(--faint);font-size:18px;font-weight:500}
 .bom-stripe{background:repeating-linear-gradient(45deg,var(--surface2),var(--surface2) 4px,var(--line) 4px,var(--line) 8px);height:6px;border-radius:99px}
 .bom-grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-bottom:20px}
 .bom-grid3 > .card{height:100%}
@@ -260,17 +262,24 @@ input.search{border:1px solid var(--line2);background:var(--surface);color:var(-
 .bom-legend-row{display:flex;align-items:center;gap:8px;font-size:13px}
 .bom-legend-dot{width:10px;height:10px;border-radius:50%;flex:none}
 .bom-legend-val{font-variant-numeric:tabular-nums;margin-left:auto;color:var(--muted);font-size:12.5px;white-space:nowrap}
-.bom-counter{display:flex;flex-direction:column;gap:12px}
-.bom-cnt-row{display:flex;justify-content:space-between;align-items:baseline;gap:8px;padding:10px 0;border-top:1px solid var(--line)}
-.bom-cnt-row:first-child{border-top:0;padding-top:0}
-.bom-cnt-lbl{font-size:13px;color:var(--muted)}
-.bom-cnt-val{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
-.bom-cnt-val.due{color:var(--due)}
+.bom-states{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.bom-state{display:block;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:9px 12px;cursor:pointer;min-width:0;position:relative;overflow:hidden}
+.bom-state::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--line2)}
+.bom-state:hover{background:var(--surface2)}
+.bom-state .k{display:block;font-size:12px;color:var(--muted)}
+.bom-state .v{display:block;font-size:22px;font-weight:680;letter-spacing:-.02em;line-height:1.2;font-variant-numeric:tabular-nums}
+.bom-state[data-st="due"]::before{background:var(--due)}.bom-state[data-st="active"]::before{background:var(--ok)}.bom-state[data-st="kept"]::before{background:var(--kept)}.bom-state[data-st="removed"]::before{background:var(--removed)}
+.bom-state[data-st="due"] .v.hot{color:var(--due)}.bom-state[data-st="active"] .v{color:var(--ok)}.bom-state[data-st="kept"] .v{color:var(--kept)}.bom-state[data-st="removed"] .v{color:var(--removed)}
+.bom-grid3 .bom-nd,.bom-state .v.bom-nd{font-size:18px;font-weight:500;color:var(--faint);letter-spacing:0}
+.bom-states-note{font-size:12px;color:var(--faint);margin-top:10px}
 .bom-cost-main{font-size:26px;font-weight:700;letter-spacing:-.02em;margin:6px 0 2px;font-variant-numeric:tabular-nums}
-.bom-cost-main.nd{font-size:18px;color:var(--faint);font-weight:500}
+.bom-cost-main.nd{font-size:18px;color:var(--faint);font-weight:500;letter-spacing:0}
 .bom-cost-sub{font-size:12.5px;color:var(--muted)}
 .bom-foot{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 20px;box-shadow:var(--shadow);display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
 .bom-foot .cmd{max-width:280px}
+.bom-foot-l{display:flex;flex-direction:column;gap:2px;min-width:0}
+.bom-foot-l b{color:var(--ink);font-size:13.5px}
+.bom-foot-l span{font-size:12.5px;color:var(--faint);word-break:break-word}
 /* ---- why ---- */
 #v-why .wy-grid{display:grid;grid-template-columns:276px minmax(0,1fr);gap:16px;align-items:start}
 #v-why .wy-empty{padding:22px 24px}
@@ -428,7 +437,7 @@ input.search{border:1px solid var(--line2);background:var(--surface);color:var(-
 #v-why .row2c{grid-template-columns:1fr !important}.card{overflow-x:auto}table.stack thead{display:none}table.stack tr{display:block;padding:10px 0;border-bottom:1px solid var(--line)}table.stack td{display:block;border:0;padding:2px 0;max-width:none !important;min-width:0 !important}table.stack td[data-label]::before{content:attr(data-label) ": ";color:var(--faint);font-size:12px}
 .exp-card{grid-template-columns:1fr}.exp-card .right{border-left:0;padding-left:0;border-top:1px solid var(--line2);padding-top:14px;margin-top:4px}
 .exp-row{grid-template-columns:44px minmax(0,1fr)}.exp-row .when{grid-column:2}.exp-row .pill{grid-column:2;justify-self:start}
-.unrev-row{grid-template-columns:36px minmax(0,1fr) auto;align-items:start;row-gap:10px}.unrev-row .unrev-info{grid-column:2/4}.unrev-row .unrev-bar-cell{grid-column:2;align-self:center}.unrev-row .unrev-cov{grid-column:2}.unrev-row .unrev-cov:empty{display:none}.unrev-row .unrev-act{grid-column:3;grid-row:2}
+.unrev-row,.unrev-list.nocov .unrev-row{grid-template-columns:36px minmax(0,1fr) auto;align-items:start;row-gap:10px}.unrev-row .unrev-info{grid-column:2/4}.unrev-row .unrev-bar-cell{grid-column:2;align-self:center}.unrev-row .unrev-cov{grid-column:2}.unrev-row .unrev-cov:empty{display:none}.unrev-row .unrev-act{grid-column:3;grid-row:2}
 .bom-attn{flex-direction:column;align-items:flex-start}.bom-foot{flex-direction:column;align-items:flex-start}}
 @media (max-width:520px){.tile{padding:14px}.tile .v{font-size:26px}.tile .s{font-size:12px}.facts{grid-template-columns:1fr}.facts dt{margin-top:6px}.exp-tile{padding:14px}.exp-tile .v{font-size:26px}.bom-prov-row{grid-template-columns:1fr}}
 </style>
@@ -521,7 +530,7 @@ input.search{border:1px solid var(--line2);background:var(--surface);color:var(-
     </div>
     <div id="expAttention"></div>
     <div id="expTracked"></div>
-    <div class="hint" style="margin-top:16px">To remove a due item, say <code>remove &lt;file name&gt;</code> to Bob. To keep one, run <code>whyline keep &lt;file&gt; "reason"</code> in a terminal. To set a deadline, run <code>whyline until &lt;file&gt; 2027-01-01</code>. Nothing on this page changes code.</div>
+    <div class="hint" id="expHint" style="margin-top:16px">To remove a due item, say <code>remove &lt;file name&gt;</code> to Bob. To keep one, run <code>whyline keep &lt;file&gt; "reason"</code> in a terminal. To set a deadline, run <code>whyline until &lt;file&gt; 2027-01-01</code>. Nothing on this page changes code.</div>
   </section>
 
   <!-- UNREVIEWED -->
@@ -1126,6 +1135,10 @@ if (unrevFiles > 0) document.getElementById('unrevCnt').className = 'cnt rev';
   // "removes when" cell text
   function whenText(it) {
     if (it.state === 'kept') return 'kept on purpose';
+    if (it.state === 'due') {
+      var was = waitingFor(it);
+      return '<div class="met">condition met</div>' + (was ? '<div class="was">was: ' + esc(was) + '</div>' : '');
+    }
     if (it.state === 'removed') return 'removed on ' + esc(day(it.at) || 'no data') + (it.by ? ' by ' + esc(it.by) : '');
     var wf = waitingFor(it);
     if (!wf) return 'no condition recorded';
@@ -1151,7 +1164,7 @@ if (unrevFiles > 0) document.getElementById('unrevCnt').className = 'cnt rev';
         '<span class="pill due">Due</span><span class="kind">' + esc(it.kind || 'temporary') + '</span>' +
         '</div>' +
         '<div class="file mono">' + esc(it.file || '') + '</div>' +
-        '<div class="field"><div class="lbl">Why it was added</div><div class="val">' + nd(it.reason) + '</div></div>' +
+        '<div class="field"><div class="lbl">Reason</div><div class="val">' + nd(it.reason) + '</div></div>' +
         '<div class="field"><div class="lbl">Why it is due now</div><div class="val">' + evSummary + '</div></div>' +
         '</div>' +
         '<div class="right">' +
@@ -1164,6 +1177,8 @@ if (unrevFiles > 0) document.getElementById('unrevCnt').className = 'cnt rev';
     }).join('');
     attnEl.innerHTML = secH + cards + '</div>';
   }
+  // the due cards already carry the actions, so the generic hint shows only without them
+  document.getElementById('expHint').style.display = dueItems.length ? 'none' : '';
 
   // current filter state
   var curFilter = 'all';
@@ -1201,7 +1216,7 @@ if (unrevFiles > 0) document.getElementById('unrevCnt').className = 'cnt rev';
       return '<div class="exp-row">' +
         kindIcon(it.kind) +
         '<div class="info"><div class="file">' + esc(it.file || '') + '</div>' +
-        '<div class="reason">' + esc(it.kind || 'temporary') + (it.reason ? ' \u00b7 ' + esc(it.reason) : '') + '</div></div>' +
+        '<div class="reason"><span class="kind">' + esc(it.kind || 'temporary') + '</span>' + (it.reason ? ' \u00b7 ' + esc(it.reason) : '') + '</div></div>' +
         '<div class="when">' + whenText(it) + '</div>' +
         '<span class="pill ' + esc(it.state || 'dim') + '">' + esc(it.state || '') + '</span>' +
         '</div>';
@@ -1275,11 +1290,13 @@ if (unrevFiles > 0) document.getElementById('unrevCnt').className = 'cnt rev';
   var maxLines = unrevList.reduce(function(m, f) { return Math.max(m, f.aiLines); }, 1);
   var SHOW = 6;
   var hasCovMissing = (unreviewed.missing || []).indexOf('coverage') >= 0;
+  var anyCov = unrevList.some(function(f) { return f.coverage != null; });
 
   function buildRow(f, rank) {
     var isTop = rank === 1;
-    var parts = (f.file || '').split('/');
-    var folder = parts.length < 2 ? '' : (parts[0] === 'src' && parts.length > 2) ? parts[0] + '/' + parts[1] : parts[0];
+    var fpath = String(f.file || '');
+    var cut = fpath.lastIndexOf('/');
+    var folder = cut >= 0 ? fpath.slice(0, cut + 1) : '';
     var barW = Math.round(f.aiLines / maxLines * 100);
     // first prompt excerpt from the first session
     var excerpt = '';
@@ -1300,7 +1317,7 @@ if (unrevFiles > 0) document.getElementById('unrevCnt').className = 'cnt rev';
       '<div class="unrev-rank">' + rank + '</div>' +
       '<div class="unrev-info">' +
         (isTop ? '<div class="unrev-start">Start here</div>' : '') +
-        '<div class="file">' + esc(f.file || '') + (folder ? '<span class="folder">' + esc(folder) + '</span>' : '') + '</div>' +
+        '<div class="file mono">' + (folder ? '<span class="faint">' + esc(folder) + '</span>' : '') + '<b>' + esc(base(fpath)) + '</b></div>' +
         (excerpt ? '<div class="excerpt">' + excerpt + '</div>' : '') +
       '</div>' +
       '<div class="unrev-bar-cell">' +
@@ -1315,7 +1332,7 @@ if (unrevFiles > 0) document.getElementById('unrevCnt').className = 'cnt rev';
   var visibleRows = unrevList.slice(0, SHOW);
   var hiddenRows = unrevList.slice(SHOW);
 
-  var html = '<div class="sec"><div class="unrev-list">';
+  var html = '<div class="sec"><div class="unrev-list' + (anyCov ? '' : ' nocov') + '">';
   visibleRows.forEach(function(f, i) { html += buildRow(f, i + 1); });
 
   if (hiddenRows.length) {
@@ -1373,9 +1390,11 @@ if (unrevFiles > 0) document.getElementById('unrevCnt').className = 'cnt rev';
   var bSessions = bCost.sessions != null ? bCost.sessions : (sessions.length > 0 ? sessions.length : null);
 
   // headline
-  var aiPctStr = (aiPct != null) ? aiPct + '%' : 'no data';
+  var aiPctStr = aiPct + '%';
   var revPctStr;
-  if (bRevPct === 0) {
+  if (aiPct == null) {
+    bomHeadline.textContent = 'No AI-written lines recorded yet.';
+  } else if (bRevPct === 0) {
     revPctStr = 'none of them has had a human edit yet';
     bomHeadline.innerHTML = aiPctStr + ' of the lines changed were written by AI, and ' + revPctStr + '.';
   } else if (bRevPct != null) {
@@ -1385,7 +1404,12 @@ if (unrevFiles > 0) document.getElementById('unrevCnt').className = 'cnt rev';
     bomHeadline.textContent = aiPctStr + ' of the lines changed were written by AI.';
   }
 
-  bomSub.textContent = (bLc != null ? bLc : 'no data') + ' lines changed across ' + (bSessions != null ? bSessions : 'no data') + ' agent ' + plural(bSessions || 0, 'session') + '.';
+  if (aiPct == null) {
+    bomSub.innerHTML = 'Run <code>whyline init</code>, work in Bob, commit, then run <code>whyline report</code>.';
+  } else {
+    bomSub.textContent = 'What went into this code: who wrote it, how much a human checked, what is temporary and what it cost. ' +
+      (bLc != null ? bLc : 'no data') + ' ' + plural(bLc, 'line') + ' changed across ' + (bSessions != null ? bSessions : 'no data') + ' agent ' + plural(bSessions, 'session') + '.';
+  }
 
   var html = '';
 
@@ -1421,7 +1445,7 @@ if (unrevFiles > 0) document.getElementById('unrevCnt').className = 'cnt rev';
     '<div><div class="bom-prov-lbl">Reviewed by a human</div>' +
     (bRevLines != null && bAiTotal != null ? '<div class="bom-prov-sub">' + bRevLines + ' of ' + bAiTotal + ' AI lines</div>' : '') +
     '</div>' +
-    '<div><div class="bar"><i class="edit" style="width:' + revW2 + '%"></i></div></div>' +
+    '<div><div class="bar"><i class="ok" style="width:' + revW2 + '%"></i></div></div>' +
     '<div class="bom-prov-pct' + (bRevPct == null ? ' nd' : '') + '">' + (bRevPct != null ? bRevPct + '%' : 'no data') + '</div>' +
     '</div>';
   // row 3: covered by tests
@@ -1439,8 +1463,8 @@ if (unrevFiles > 0) document.getElementById('unrevCnt').className = 'cnt rev';
   var byAgent = bAi.byAgent || {};
   var agentKeys = Object.keys(byAgent).sort(function(a, b) { return byAgent[b] - byAgent[a]; });
   var humanLines = (bLc != null && bAiTotal != null) ? bLc - bAiTotal : null;
-  var AI_COLORS = ['#2f6bff','#7c4dff','#00b4d8','#06d6a0','#f77f00'];
-  var HUMAN_COLOR = '#a3a9b3';
+  var AI_COLORS = ['var(--ai)','#22a3c4','#0f9d77','#c2410c'];
+  var HUMAN_COLOR = 'var(--human)';
   // build conic gradient stops
   var donutStyle = 'background:var(--surface2)';
   var legendRows = '';
@@ -1463,42 +1487,42 @@ if (unrevFiles > 0) document.getElementById('unrevCnt').className = 'cnt rev';
       donutStyle = 'background:conic-gradient(' + stops.join(',') + ');mask:radial-gradient(transparent 40%,#000 41%)';
     }
   } else {
-    legendRows = '<div class="bom-legend-row" style="color:var(--faint)">no data</div>';
+    legendRows = '<div class="bom-legend-row bom-nd">no data</div>';
   }
   var card1 = '<div class="card"><div class="card-h"><h2 style="font-size:14px">Who wrote it</h2></div>' +
     '<div class="bom-donut-wrap"><div class="bom-donut" aria-hidden="true" style="' + donutStyle + '"></div>' +
     '<div class="bom-legend">' + legendRows + '</div></div></div>';
 
-  // card 2: temporary code
-  var itActive = bItems.active != null ? bItems.active : null;
-  var itDue = bItems.due != null ? bItems.due : null;
-  var itRemoved = bItems.removed != null ? bItems.removed : null;
-  var card2 = '<div class="card"><div class="card-h"><h2 style="font-size:14px">Temporary code</h2></div>' +
-    '<div class="bom-counter">' +
-    '<div class="bom-cnt-row"><span class="bom-cnt-lbl">Active</span><span class="bom-cnt-val">' + nd(itActive) + '</span></div>' +
-    '<div class="bom-cnt-row"><span class="bom-cnt-lbl">Due</span>' +
-    '<span class="bom-cnt-val' + (itDue > 0 ? ' due' : '') + '">' + nd(itDue) + '</span></div>' +
-    '<div class="bom-cnt-row"><span class="bom-cnt-lbl">Removed</span><span class="bom-cnt-val">' + nd(itRemoved) + '</span></div>' +
-    '</div></div>';
+  // card 2: temporary code, the four Expiry states in Expiry order, each a jump to Expiry
+  // bom counts items in its range; kept is not in older bom output, so it falls back to check counts
+  var itKept = bItems.kept != null ? bItems.kept : (bItems.active != null && counts.kept != null ? counts.kept : null);
+  var states = [['due', 'Due', bItems.due], ['active', 'Active', bItems.active], ['kept', 'Kept', itKept], ['removed', 'Removed', bItems.removed]];
+  var card2 = '<div class="card"><div class="card-h"><h2 style="font-size:14px">Temporary code</h2>' +
+    '<button class="linkbtn" type="button" data-go="expiry">Open Expiry &rarr;</button></div>' +
+    '<div class="bom-states">' + states.map(function(st) {
+      var v = st[2] != null ? st[2] : null;
+      var cls = v == null ? ' bom-nd' : (st[0] === 'due' && v > 0 ? ' hot' : '');
+      return '<button class="bom-state" type="button" data-go="expiry" data-st="' + st[0] + '" aria-label="' + st[1] + ': ' + nd(v) + ', open Expiry">' +
+        '<span class="k">' + st[1] + '</span><span class="v' + cls + '">' + nd(v) + '</span></button>';
+    }).join('') + '</div></div>';
 
   // card 3: cost
   var costSum = bCost.sum != null ? bCost.sum : null;
   var scWCost = bCost.sessionsWithCost != null ? bCost.sessionsWithCost : null;
   var scTotal = bCost.sessions != null ? bCost.sessions : null;
   var card3 = '<div class="card"><div class="card-h"><h2 style="font-size:14px">Cost</h2></div>' +
-    '<div class="bom-cost-main' + (costSum == null ? ' nd' : '') + '">' + nd(costSum) + '</div>' +
+    '<div class="bom-cost-main' + (costSum == null ? ' nd bom-nd' : '') + '">' + nd(costSum) + '</div>' +
     '<div class="bom-cost-sub">' +
-    (scWCost != null && scTotal != null ? scWCost + ' of ' + scTotal + ' ' + plural(scTotal, 'session') + ' reported a cost' : 'no sessions with cost data') +
+    (scTotal === 0 ? 'no agent sessions recorded' : scWCost != null && scTotal != null ? scWCost + ' of ' + scTotal + ' ' + plural(scTotal, 'session') + ' reported a cost' : 'no sessions with cost data') +
     '</div></div>';
 
   html += '<div class="bom-grid3">' + card1 + card2 + card3 + '</div>';
 
   // footer strip
-  var footMeta = (bom.range ? 'Range: ' + esc(bom.range) : 'all history') +
+  var footMeta = (bom.range ? 'Range: ' + esc(bom.range) : 'All history') +
     (scTotal != null ? ' &middot; ' + scTotal + ' ' + plural(scTotal, 'session') : '') +
-    ' &middot; ' + ranges.length + ' ' + plural(ranges.length, 'range') +
     (shortHead ? ' &middot; commit ' + esc(shortHead) : '');
-  html += '<div class="bom-foot"><span>' + footMeta + '</span>' + cmdChip('whyline bom --json') + '</div>';
+  html += '<div class="bom-foot"><div class="bom-foot-l"><b>Export for audit or CI</b><span>' + footMeta + '</span></div>' + cmdChip('whyline bom --json') + '</div>';
 
   // missing hint
   if (bom.missing && bom.missing.length) {
