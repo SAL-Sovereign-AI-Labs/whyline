@@ -272,7 +272,95 @@ input.search{border:1px solid var(--line2);background:var(--surface);color:var(-
 .bom-foot{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 20px;box-shadow:var(--shadow);display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
 .bom-foot .cmd{max-width:280px}
 /* ---- why ---- */
-/* Why view styles go here, phone rules in their own @media inside this block */
+#v-why .wy-grid{display:grid;grid-template-columns:276px minmax(0,1fr);gap:16px;align-items:start}
+#v-why .wy-empty{padding:22px 24px}
+#v-why .wy-empty-t{font-size:14.5px;font-weight:600;color:var(--ink)}
+#v-why .wy-empty p{margin:6px 0 0;font-size:13px;color:var(--muted);max-width:620px}
+/* file map */
+#v-why .wy-map{padding:12px;position:sticky;top:16px}
+#v-why .wy-map-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin:14px 8px 6px}
+#v-why .wy-map-h h2{margin:0;font-size:11.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
+#v-why .wy-map-h span{font-size:12px;color:var(--faint);font-variant-numeric:tabular-nums}
+#v-why .wy-list{position:relative;max-height:560px;overflow-y:auto;display:flex;flex-direction:column;gap:2px;padding:3px}
+#v-why .why-file-row{display:block;position:relative;padding:9px 10px 10px 12px;border-radius:10px;cursor:pointer;font-size:12.5px;outline:none}
+.why-file-row:focus{outline:2px solid var(--ai);outline-offset:1px}
+#v-why .why-file-row:hover{background:var(--surface2)}
+#v-why .why-file-row.on{background:var(--aibg)}
+#v-why .why-file-row.on::before{content:"";position:absolute;left:0;top:9px;bottom:9px;width:3px;border-radius:99px;background:var(--ai)}
+#v-why .wf-top{display:flex;align-items:baseline;gap:10px;min-width:0}
+#v-why .wf-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12.5px;color:var(--ink);font-weight:600}
+#v-why .wf-dir{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:1px;font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:11px;color:var(--faint)}
+#v-why .wf-cnt{flex:none;font-size:11.5px;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+#v-why .wf-cnt b{color:var(--ink);font-weight:600}
+#v-why .wf-bar{height:4px;margin-top:8px}
+#v-why .wy-dir{color:var(--faint);font-weight:400}
+#v-why .wy-base{color:var(--ink);font-weight:600}
+#v-why .wy-none{padding:10px 8px;font-size:12.5px;color:var(--muted)}
+/* code card */
+#v-why .wy-code-card{padding:0;overflow:hidden}
+#v-why .wy-code-h{display:flex;justify-content:space-between;align-items:center;gap:8px 14px;flex-wrap:wrap;padding:14px 18px;border-bottom:1px solid var(--line)}
+#v-why .wy-path{margin:0;min-width:0;font:400 14px/1.4 "JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;word-break:break-all}
+#v-why .wy-trunc{margin-left:8px;font:500 12px/1 Inter,ui-sans-serif,-apple-system,sans-serif;color:var(--faint)}
+#v-why .wy-count{text-transform:none;letter-spacing:0;font-size:12px;font-weight:600;padding:3px 10px}
+#v-why .wy-code{color-scheme:dark;position:relative;display:grid;grid-template-columns:minmax(max-content,1fr);align-content:start;border-radius:0;max-height:480px;padding:10px 0;font-size:12.5px;line-height:1.75}
+#v-why .wy-code .wl{display:flex;padding:0 18px 0 0;white-space:pre;cursor:pointer;position:relative;box-shadow:none;outline:none}
+#v-why .wy-code .wl::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:transparent}
+#v-why .wy-code .n{flex:none;width:54px;padding:0 18px 0 0;text-align:right;color:var(--termmuted);user-select:none}
+#v-why .wy-code .wl.ai{background-color:rgba(91,140,255,.10)}#v-why .wy-code .wl.ai::before{background:#5b8cff}
+#v-why .wy-code .wl.ed{background-color:rgba(227,169,43,.11)}#v-why .wy-code .wl.ed::before{background:#e3a92b}
+#v-why .wy-code .wl.tmp{background-color:rgba(167,139,250,.13)}#v-why .wy-code .wl.tmp::before{background:#a78bfa}
+#v-why .wy-code .wl.hu{color:#9aa3b1}
+#v-why .wy-code .wl:hover{background-image:linear-gradient(rgba(255,255,255,.05),rgba(255,255,255,.05))}
+#v-why .wy-code .wl.sib .n{color:#c7cedb}
+#v-why .wy-code .wl.sel{background-image:linear-gradient(rgba(255,255,255,.11),rgba(255,255,255,.11))}
+#v-why .wy-code .wl.sel::before{width:5px}
+#v-why .wy-code .wl.sel .n{color:#fff;font-weight:700}
+#v-why .wy-code .wl:focus{outline:none}
+#v-why .wy-code .wl:focus-visible{outline:2px solid #8fb0ff;outline-offset:-2px}
+#v-why .wy-legend{padding:11px 18px;border-top:1px solid var(--line);margin:0}
+/* line detail */
+#v-why .wy-detail{margin-top:16px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px 22px;box-shadow:var(--shadow);min-width:0}
+#v-why .wy-top{display:flex;align-items:center;gap:8px 10px;flex-wrap:wrap}
+#v-why .wy-who{font-size:13.5px;color:var(--muted)}
+#v-why .wy-who b{color:var(--ink);font-weight:600}
+#v-why .wy-sess{margin-left:auto;font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;color:var(--faint);white-space:nowrap}
+#v-why .wy-ask{margin:18px 0 8px;font-size:13.5px;color:var(--muted)}
+#v-why .wy-ask b{color:var(--ink);font-weight:600}
+#v-why .wy-quote{margin:0;border-left:3px solid var(--ai);padding:2px 0 2px 16px;font-size:17px;line-height:1.55;letter-spacing:-.005em;color:var(--ink);word-break:break-word}
+#v-why .wy-quote.ed{border-left-color:var(--edit)}#v-why .wy-quote.tmp{border-left-color:var(--tmp)}
+#v-why .wy-say{margin:16px 0 0;font-size:17px;line-height:1.5;color:var(--ink)}
+#v-why .wy-say span{color:var(--muted)}
+#v-why .wy-meta{display:flex;flex-wrap:wrap;gap:6px 22px;margin-top:16px;font-size:12.5px;color:var(--ink)}
+#v-why .wy-meta em{font-style:normal;color:var(--faint);margin-right:6px}
+#v-why .wy-meta code{font-size:12px}
+#v-why .wy-tmp{margin-top:18px;border:1px solid var(--line);border-left:3px solid var(--tmp);background:var(--tmpbg);border-radius:10px;padding:12px 14px}
+#v-why .wy-tmp.due{border-color:var(--duebg);border-left-color:var(--due);background:var(--duebg)}
+#v-why .wy-tmp-h{display:flex;align-items:center;gap:6px 10px;flex-wrap:wrap;font-size:13px}
+#v-why .wy-tmp-l{font-weight:600}
+#v-why .wy-tmp-w{color:var(--muted)}
+#v-why .wy-tmp-r{margin-top:6px;font-size:12.5px;color:var(--muted);word-break:break-word}
+#v-why .wy-tmp .cmd{margin-top:12px}
+#v-why .wy-lbl{font-size:11.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
+#v-why .wy-same{margin-top:18px}
+#v-why .wy-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+#v-why .wy-chip{border:1px solid var(--line2);background:var(--surface);color:var(--ink);border-radius:99px;padding:3px 11px;font:500 12px/1.5 "JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;cursor:pointer;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#v-why .wy-chip:hover{border-color:var(--ai);color:var(--ai);background:var(--aibg)}
+#v-why .wy-chip.file{color:var(--muted)}
+#v-why .wy-cmd{margin-top:18px;padding-top:16px;border-top:1px solid var(--line)}
+#v-why .wy-detail .cmd code{white-space:normal;word-break:break-all;overflow:visible}
+#v-why #whyFallback{margin-top:16px}
+@media (max-width:760px){
+#v-why .wy-grid{grid-template-columns:minmax(0,1fr)}
+#v-why .wy-map{position:static}
+#v-why .wy-list{max-height:236px}
+#v-why .wy-code{max-height:380px;font-size:12px}
+#v-why .wy-code .n{width:42px;padding-right:12px}
+#v-why .wy-code-h{padding:12px 14px}
+#v-why .wy-legend{padding:10px 14px;gap:6px 12px}
+#v-why .wy-detail{padding:16px}
+#v-why .wy-quote,#v-why .wy-say{font-size:16px}
+#v-why .wy-sess{margin-left:0;flex-basis:100%}
+}
 /* ---- end why ---- */
 
 /* ---- spacer between view blocks ---- */
@@ -387,26 +475,27 @@ input.search{border:1px solid var(--line2);background:var(--surface);color:var(-
   <!-- WHY -->
   <section class="view" id="v-why">
     <div class="vh"><div class="eyebrow">Why this line</div><h1>Every AI-written line keeps the prompt that caused it.</h1><p>Pick a file, then click a line. The answer is the same one <code>whyline why</code> gives in a terminal.</p></div>
-    <div id="whyEmpty" style="display:none" class="card empty">
-      no AI-written lines at HEAD yet (commit something Bob wrote, then run whyline report)
+    <div id="whyEmpty" style="display:none" class="card wy-empty">
+      <div class="wy-empty-t">no AI-written lines at HEAD yet (commit something Bob wrote, then run whyline report)</div>
+      <p>Whyline records the prompt behind every line Bob writes. Once a commit has AI-written lines, pick a file here and click a line to see why it exists.</p>
     </div>
     <div id="whyMain" style="display:none">
-      <div class="row2c" style="display:grid;grid-template-columns:280px minmax(0,1fr);gap:16px;align-items:start">
-        <div class="card" style="padding:12px;min-width:0">
+      <div class="wy-grid" id="whyGrid">
+        <div class="card wy-map">
           <input class="search" id="whySearch" placeholder="Filter files" type="text" aria-label="Filter files">
-          <div class="card-h" style="margin:12px 4px 6px"><h2 style="font-size:13px">Files</h2><span class="aside" id="whyFileCount"></span></div>
-          <div id="whyFileList" style="max-height:520px;overflow-y:auto"></div>
+          <div class="wy-map-h"><h2>Files</h2><span id="whyFileCount"></span></div>
+          <div class="wy-list" id="whyFileList"></div>
         </div>
-        <div style="min-width:0">
-          <div class="card" style="padding:14px;min-width:0">
-            <div class="card-h" style="margin-bottom:10px"><h2 id="whyCodeTitle" class="mono" style="font-size:14px">select a file</h2>
-              <div class="legend"><span><i class="dot"></i>AI</span><span><i class="dot edit"></i>AI, edited by a human</span><span><i class="dot tmp"></i>temporary</span><span><i class="dot human"></i>human</span></div></div>
-            <div class="code" id="whyCode"></div>
+        <div class="wy-right" style="min-width:0">
+          <div class="card wy-code-card">
+            <div class="wy-code-h"><h2 id="whyCodeTitle" class="wy-path">select a file</h2><span id="whyCodeStat"></span></div>
+            <div class="code wy-code" id="whyCode"></div>
+            <div class="legend wy-legend"><span><i class="dot"></i>AI</span><span><i class="dot edit"></i>AI edited by a human</span><span><i class="dot tmp"></i>temporary</span><span><i class="dot human"></i>human</span></div>
           </div>
-          <div class="detail" id="whyDetail" style="margin-top:16px;display:none" aria-live="polite" aria-atomic="true"></div>
+          <div class="wy-detail" id="whyDetail" style="display:none" aria-live="polite" aria-atomic="true"></div>
         </div>
       </div>
-      <div id="whyFallback" style="display:none;margin-top:16px">
+      <div id="whyFallback" style="display:none">
         <div class="card"><div class="card-h"><h2>AI ranges</h2></div>
           <table id="whyTable"><thead><tr><th>File</th><th>Lines</th><th>Agent</th><th>Prompt</th><th>Origin</th></tr></thead><tbody></tbody></table>
         </div>
@@ -753,7 +842,7 @@ if (unrevFiles > 0) document.getElementById('unrevCnt').className = 'cnt rev';
   // undefined = old data without why; null or empty files = nothing at HEAD
   if (why === undefined) {
     document.getElementById('whyMain').style.display = 'block';
-    document.querySelector('#whyMain .row2c').style.display = 'none';
+    document.getElementById('whyGrid').style.display = 'none';
     document.getElementById('whyFallback').style.display = 'block';
     var whyTbody = document.querySelector('#whyTable tbody');
     ranges.slice().sort(function(a, b) { return a.file < b.file ? -1 : 1; }).forEach(function(r) {
@@ -773,105 +862,229 @@ if (unrevFiles > 0) document.getElementById('unrevCnt').className = 'cnt rev';
   }
   document.getElementById('whyMain').style.display = 'block';
 
-  function lineClass(line) {
+  var cv = document.getElementById('whyCode');
+  var list = document.getElementById('whyFileList');
+  var detail = document.getElementById('whyDetail');
+  var search = document.getElementById('whySearch');
+
+  // origin of a line: temporary wins over edited, as in the gutter
+  var ORIGIN = {
+    ai: { pill: 'ai', label: 'AI', long: 'AI-written' },
+    ed: { pill: 'review', label: 'AI edited', long: 'AI-written, edited by a human since' },
+    tmp: { pill: 'tmp', label: 'Temporary', long: 'AI-written temporary code' },
+    hu: { pill: 'dim', label: 'Human', long: 'human' }
+  };
+  function kindOf(line) {
     if (!line.origin) return 'hu';
     if (line.item) return 'tmp';
-    if (line.origin === 'ai-edited') return 'mx';
+    if (line.origin === 'ai-edited') return 'ed';
     return 'ai';
+  }
+  var mixes = {};
+  files.forEach(function(f) {
+    var m = { ai: 0, ed: 0, tmp: 0, hu: 0, n: f.code.length };
+    f.code.forEach(function(l) { m[kindOf(l)]++; });
+    mixes[f.file] = m;
+  });
+
+  function pathHtml(p) {
+    var i = p.lastIndexOf('/');
+    return (i >= 0 ? '<span class="wy-dir">' + esc(p.slice(0, i + 1)) + '</span>' : '') + '<span class="wy-base">' + esc(p.slice(i + 1)) + '</span>';
+  }
+  // contiguous runs of line numbers: [1,2,3,7] -> [[1,3],[7,7]]
+  function runs(nums) {
+    var out = [];
+    nums.forEach(function(n) {
+      var last = out[out.length - 1];
+      if (last && n === last[1] + 1) last[1] = n; else out.push([n, n]);
+    });
+    return out;
+  }
+  function rangeLabel(r) { return r[0] === r[1] ? 'line ' + r[0] : 'lines ' + r[0] + '-' + r[1]; }
+
+  var cur = null;
+
+  // keep a line visible inside the code box without scrolling the page
+  function reveal(el) {
+    var top = el.offsetTop, bottom = top + el.offsetHeight;
+    if (top < cv.scrollTop + 10) cv.scrollTop = Math.max(0, top - 10);
+    else if (bottom > cv.scrollTop + cv.clientHeight - 10) cv.scrollTop = bottom - cv.clientHeight + 10;
+  }
+
+  function selectLine(idx, focus) {
+    var rows = cv.children, line = cur.code[idx];
+    if (!line || !rows[idx]) return;
+    [].forEach.call(rows, function(r, i) {
+      var same = i !== idx && line.session && cur.code[i].origin && cur.code[i].session === line.session;
+      r.classList.toggle('sel', i === idx);
+      r.classList.toggle('sib', !!same);
+      r.setAttribute('aria-pressed', i === idx ? 'true' : 'false');
+    });
+    reveal(rows[idx]);
+    if (focus) rows[idx].focus({ preventScroll: true });
+    showLineDetail(cur, line);
   }
 
   function renderCode(f) {
-    document.getElementById('whyCodeTitle').textContent = f.file + (f.truncated ? ' (first 400 lines)' : '');
-    var cv = document.getElementById('whyCode');
-    cv.innerHTML = '';
-    var detail = document.getElementById('whyDetail');
+    cur = f;
+    document.getElementById('whyCodeTitle').innerHTML = pathHtml(f.file) + (f.truncated ? '<span class="wy-trunc">first ' + f.code.length + ' lines</span>' : '');
+    document.getElementById('whyCodeStat').innerHTML = '<span class="pill ai wy-count">' + f.aiLines + ' of ' + f.lines + ' ' + plural(f.lines, 'line') + ' AI-written</span>';
+    var h = '';
+    f.code.forEach(function(line, i) {
+      var k = kindOf(line);
+      h += '<div class="wl ' + k + '" tabindex="0" role="button" aria-pressed="false" data-i="' + i + '" aria-label="line ' + line.n + ', ' + esc(ORIGIN[k].long) + '">' +
+        '<span class="n">' + line.n + '</span><span class="t">' + esc(line.text) + '</span></div>';
+    });
+    cv.innerHTML = h;
+    cv.scrollTop = 0;
     detail.style.display = 'none';
     detail.innerHTML = '';
-    f.code.forEach(function(line) {
-      var d = document.createElement('div');
-      d.className = lineClass(line);
-      d.setAttribute('tabindex', '0');
-      d.setAttribute('role', 'button');
-      d.setAttribute('aria-label', 'line ' + line.n + ', ' + (line.origin ? line.origin : 'human'));
-      d.innerHTML = '<span class="n">' + line.n + '</span>' + esc(line.text);
-      function activate() {
-        cv.querySelectorAll('div').forEach(function(x) { x.classList.remove('sel'); });
-        d.classList.add('sel');
-        showLineDetail(f, line);
-      }
-      d.onclick = activate;
-      d.onkeydown = function(e) {
-        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activate(); }
-        else if (e.key === 'ArrowDown') { e.preventDefault(); var nx = d.nextElementSibling; if (nx) nx.focus(); }
-        else if (e.key === 'ArrowUp') { e.preventDefault(); var pv = d.previousElementSibling; if (pv) pv.focus(); }
-      };
-      cv.appendChild(d);
-    });
-    var first = f.code.find(function(l) { return l.origin; });
-    if (first) {
-      var el = cv.children[f.code.indexOf(first)];
-      if (el) { el.classList.add('sel'); showLineDetail(f, first); }
-    }
-    document.querySelectorAll('.why-file-row').forEach(function(r) {
-      r.classList.toggle('on', r.getAttribute('data-file') === f.file);
-      r.setAttribute('aria-pressed', r.getAttribute('data-file') === f.file ? 'true' : 'false');
+    var first = -1;
+    f.code.some(function(l, i) { if (l.origin) { first = i; return true; } return false; });
+    if (first >= 0) selectLine(first, false);
+    else if (f.code.length) selectLine(0, false);
+    [].forEach.call(list.children, function(r) {
+      var on = r.getAttribute('data-file') === f.file;
+      r.classList.toggle('on', on);
+      if (r.hasAttribute('aria-pressed')) r.setAttribute('aria-pressed', on ? 'true' : 'false');
+      if (on && (r.offsetTop < list.scrollTop || r.offsetTop + r.offsetHeight > list.scrollTop + list.clientHeight)) list.scrollTop = Math.max(0, r.offsetTop - 8);
     });
   }
 
   function showLineDetail(f, line) {
-    var file = f.file;
-    var detail = document.getElementById('whyDetail');
-    detail.style.display = 'block';
-    var sess = line.session ? (sessMapAll[line.session] || {}) : {};
-    var item = line.item ? (itemMap[line.item] || null) : null;
-    if (!line.origin) {
-      detail.innerHTML = '<h4>Line ' + line.n + ' &middot; human</h4>' +
-        '<p class="muted" style="margin:4px 0 12px">Human-written: no prompt on record.</p>' + cmdChip('whyline why ' + file + ':' + line.n);
+    var k = kindOf(line), o = ORIGIN[k];
+    var cmd = '<div class="wy-cmd">' + cmdChip('whyline why ' + f.file + ':' + line.n) + '</div>';
+    var h;
+    if (k === 'hu') {
+      h = '<div class="wy-top"><span class="pill dim">Human</span><span class="wy-who">line ' + line.n + '</span></div>' +
+        '<p class="wy-say">Line ' + line.n + ' was written by a human. <span>No prompt on record.</span></p>' +
+        (line.commit ? '<div class="wy-meta"><span><em>Commit</em><code>' + esc(String(line.commit).slice(0, 7)) + '</code></span></div>' : '') + cmd;
+      detail.innerHTML = h;
+      detail.style.display = 'block';
       return;
     }
-    var who = line.origin === 'ai-edited' ? 'AI, edited by a human since' : 'AI (' + esc(sess.agent || 'unknown') + ')';
-    var h = '<h4>Line ' + line.n + ' &middot; ' + who + '</h4>';
-    if (sess.prompt) h += '<div class="prompt">&ldquo;' + esc(sess.prompt) + '&rdquo;</div>';
-    h += '<dl>';
-    if (sess.author) h += '<dt>Asked by</dt><dd>' + esc(sess.author) + '</dd>';
-    if (sess.ts) h += '<dt>When</dt><dd>' + esc(day(sess.ts)) + '</dd>';
-    if (sess.id) h += '<dt>Session</dt><dd class="mono">' + esc(sess.id.slice(0, 8)) + '</dd>';
-    h += '<dt>Cost</dt><dd>' + (sess.cost != null ? esc(String(sess.cost)) : 'no data') + '</dd>';
-    if (item) h += '<dt>Temporary</dt><dd><span class="pill ' + esc(item.state || 'active') + '">' + esc(item.state || '') + '</span> <span class="kind">' + esc(item.kind || '') + '</span>' + (waitingFor(item) ? ' &middot; removes when ' + esc(waitingFor(item)) : '') + '</dd>';
-    h += '</dl><div style="margin-top:14px">' + cmdChip('whyline why ' + file + ':' + line.n) + '</div>';
-    detail.innerHTML = h;
+    var sess = (line.session && sessMapAll[line.session]) || {};
+    var agent = sess.agent || 'an agent', author = sess.author || 'Someone';
+    h = '<div class="wy-top"><span class="pill ' + o.pill + '">' + o.label + '</span>' +
+      '<span class="wy-who"><b>' + esc(agent) + '</b> wrote line ' + line.n + '</span>' +
+      (line.session ? '<span class="wy-sess" title="agent session">session ' + esc(String(line.session).slice(0, 8)) + '</span>' : '') + '</div>';
+    if (sess.prompt) {
+      h += '<p class="wy-ask"><b>' + esc(author) + '</b> asked <b>' + esc(agent) + '</b>:</p>' +
+        '<blockquote class="wy-quote ' + k + '">&ldquo;' + esc(sess.prompt) + '&rdquo;</blockquote>';
+    } else {
+      h += '<p class="wy-say">No prompt on record for this session.</p>';
+    }
+    h += '<div class="wy-meta"><span><em>When</em>' + nd(day(sess.ts)) + '</span>' +
+      '<span><em>Origin</em>' + esc(o.long) + '</span>' +
+      '<span><em>Cost</em>' + (sess.cost != null ? esc(String(sess.cost)) + ' Bobcoin' : 'no data') + '</span>' +
+      (line.commit ? '<span><em>Commit</em><code>' + esc(String(line.commit).slice(0, 7)) + '</code></span>' : '') + '</div>';
+
+    // temporary code this line belongs to (file name only, never the item id)
+    if (line.item) {
+      var it = itemMap[line.item];
+      if (it) {
+        var st = it.state || 'active', wf = waitingFor(it);
+        h += '<div class="wy-tmp' + (st === 'due' ? ' due' : '') + '"><div class="wy-tmp-h">' +
+          '<span class="pill ' + esc(st) + '">' + esc(st) + '</span><span class="wy-tmp-l kind">' + esc(it.kind || 'temporary') + '</span>' +
+          (wf ? '<span class="wy-tmp-w">removes when ' + esc(wf) + '</span>' : '') + '</div>' +
+          (it.reason ? '<div class="wy-tmp-r"><span class="faint">Reason</span> ' + esc(it.reason) + '</div>' : '') +
+          (st === 'due' ? cmdChip('remove ' + base(it.file || f.file), 'bob') : '') + '</div>';
+      } else {
+        h += '<div class="wy-tmp"><div class="wy-tmp-h"><span class="wy-tmp-l">Temporary code</span><span class="wy-tmp-w">recorded when this line was written</span></div></div>';
+      }
+    }
+
+    // other lines from the same prompt: in this file, then in other files
+    if (line.session) {
+      var nums = [];
+      f.code.forEach(function(l) { if (l.origin && l.session === line.session && l.n !== line.n) nums.push(l.n); });
+      var others = files.filter(function(g) { return g !== f && g.code.some(function(l) { return l.origin && l.session === line.session; }); });
+      if (nums.length || others.length) {
+        h += '<div class="wy-same"><div class="wy-lbl">Same prompt also wrote</div><div class="wy-chips">' +
+          runs(nums).map(function(r) { return '<button class="wy-chip" type="button" data-line="' + r[0] + '">' + rangeLabel(r) + '</button>'; }).join('') +
+          others.map(function(g) { return '<button class="wy-chip file" type="button" data-wyfile="' + esc(g.file) + '" title="' + esc(g.file) + '">' + esc(base(g.file)) + '</button>'; }).join('') +
+          '</div></div>';
+      }
+    }
+    detail.innerHTML = h + cmd;
+    detail.style.display = 'block';
   }
 
   function buildFileList(filter) {
-    var list = document.getElementById('whyFileList');
-    list.innerHTML = '';
-    var visible = files.filter(function(f) { return !filter || f.file.toLowerCase().indexOf(filter.toLowerCase()) !== -1; });
-    document.getElementById('whyFileCount').textContent = visible.length + ' of ' + files.length;
+    var q = (filter || '').toLowerCase();
+    var visible = files.filter(function(f) { return !q || f.file.toLowerCase().indexOf(q) !== -1; });
+    document.getElementById('whyFileCount').textContent = q ? visible.length + ' of ' + files.length : files.length + ' ' + plural(files.length, 'file');
+    var h = '';
     visible.forEach(function(f) {
-      var p = f.lines ? Math.round(f.aiLines / f.lines * 100) : 0;
-      var row = document.createElement('div');
-      row.className = 'why-file-row';
-      row.setAttribute('data-file', f.file);
-      row.setAttribute('tabindex', '0');
-      row.setAttribute('role', 'button');
-      row.setAttribute('aria-label', f.file + ', ' + f.aiLines + ' AI lines of ' + f.lines);
-      row.setAttribute('aria-pressed', 'false');
-      row.innerHTML = '<span class="fname" title="' + esc(f.file) + '">' + esc(f.file) + '</span>' +
-        '<span class="fbar"><span class="bar"><i style="width:' + p + '%"></i></span></span><span class="fcnt">' + f.aiLines + '/' + f.lines + '</span>';
-      row.onclick = function() { renderCode(f); };
-      row.onkeydown = function(e) {
-        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); renderCode(f); }
-        else if (e.key === 'ArrowDown') { e.preventDefault(); var nx = row.nextElementSibling; if (nx) nx.focus(); }
-        else if (e.key === 'ArrowUp') { e.preventDefault(); var pv = row.previousElementSibling; if (pv) pv.focus(); }
-      };
-      list.appendChild(row);
+      var m = mixes[f.file], n = m.n || 1;
+      var on = cur && cur.file === f.file;
+      h += '<div class="why-file-row' + (on ? ' on' : '') + '" tabindex="0" role="button" aria-pressed="' + (on ? 'true' : 'false') + '" data-file="' + esc(f.file) + '"' +
+        ' aria-label="' + esc(f.file) + ', ' + f.aiLines + ' of ' + f.lines + ' lines AI-written">' +
+        '<div class="wf-top"><span class="wf-name" title="' + esc(f.file) + '">' + esc(base(f.file)) + '</span>' +
+        '<span class="wf-cnt"><b>' + f.aiLines + '</b> of ' + f.lines + ' AI</span></div>' +
+        (f.file.indexOf('/') >= 0 ? '<span class="wf-dir">' + esc(f.file.slice(0, f.file.lastIndexOf('/') + 1)) + '</span>' : '') +
+        '<div class="bar wf-bar" aria-hidden="true"><i style="width:' + (m.ai / n * 100) + '%"></i><i class="edit" style="width:' + (m.ed / n * 100) + '%"></i><i class="tmp" style="width:' + (m.tmp / n * 100) + '%"></i></div></div>';
     });
+    list.innerHTML = h || '<div class="wy-none">no files match</div>';
   }
+
+  function fileByName(name) { return files.find(function(x) { return x.file === name; }) || null; }
+  function rowIndex(el) { return el ? parseInt(el.getAttribute('data-i'), 10) : -1; }
+
+  // file map: click, Enter/Space, ArrowUp/ArrowDown
+  list.addEventListener('click', function(e) {
+    var r = e.target.closest('.why-file-row');
+    if (r) renderCode(fileByName(r.getAttribute('data-file')));
+  });
+  list.addEventListener('keydown', function(e) {
+    var r = e.target.closest('.why-file-row');
+    if (!r) return;
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); renderCode(fileByName(r.getAttribute('data-file'))); }
+    else if (e.key === 'ArrowDown') { e.preventDefault(); if (r.nextElementSibling) r.nextElementSibling.focus(); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); if (r.previousElementSibling) r.previousElementSibling.focus(); }
+  });
+
+  // code lines: click, Enter/Space, ArrowUp/ArrowDown move and select
+  cv.addEventListener('click', function(e) {
+    var d = e.target.closest('.wl');
+    if (d) selectLine(rowIndex(d), false);
+  });
+  cv.addEventListener('keydown', function(e) {
+    var d = e.target.closest('.wl');
+    if (!d) return;
+    var i = rowIndex(d);
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectLine(i, true); }
+    else if (e.key === 'ArrowDown') { e.preventDefault(); if (i + 1 < cur.code.length) selectLine(i + 1, true); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); if (i > 0) selectLine(i - 1, true); }
+  });
+
+  // same-prompt chips
+  detail.addEventListener('click', function(e) {
+    var c = e.target.closest('.wy-chip');
+    if (!c) return;
+    if (c.hasAttribute('data-line')) {
+      var n = parseInt(c.getAttribute('data-line'), 10);
+      var idx = cur.code.findIndex(function(l) { return l.n === n; });
+      if (idx >= 0) selectLine(idx, true);
+      return;
+    }
+    var sid = (cur.code[rowIndex(cv.querySelector('.wl.sel'))] || {}).session;
+    var g = fileByName(c.getAttribute('data-wyfile'));
+    if (!g) return;
+    window.whyOpenFile(g.file);
+    var j = g.code.findIndex(function(l) { return l.origin && l.session === sid; });
+    if (j >= 0) selectLine(j, true);
+  });
 
   buildFileList('');
   renderCode(files[0]);
-  window.whyOpenFile = function(name) { var f = files.find(function(x) { return x.file === name; }); if (f) renderCode(f); };
-  document.getElementById('whySearch').oninput = function() { buildFileList(this.value); };
+  window.whyOpenFile = function(name) {
+    var f = fileByName(name);
+    if (!f) return;
+    if (search.value && f.file.toLowerCase().indexOf(search.value.toLowerCase()) === -1) { search.value = ''; buildFileList(''); }
+    renderCode(f);
+  };
+  search.oninput = function() { buildFileList(this.value); };
 })();
 
 // EXPIRY
