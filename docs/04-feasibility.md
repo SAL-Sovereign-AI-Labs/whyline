@@ -6,7 +6,7 @@ Date: 26 Sep 2026, 12:20 am. Sources: live experiments on the installed Bob Shel
 
 Every feature in the plan is doable in Bob today. Proof below. Two design changes came out of the research:
 
-1. Capture from hooks, never from Bob's database. Bob Shell creates the attribution_logs table but never writes to it (verified in source). The hook payload carries everything we need.
+1. Capture from hooks, never from Bob's database. Bob keeps a local attribution_logs table (file, tool, line range, task id). On our machines it stayed empty (0 rows, checked again on 27 Sep 2026), and another team reports rows appearing when Bob works inside a git repository. Either way it holds no prompt and never leaves the machine, while the hook payload carries everything we need and git notes travel with the code.
 2. Attribution itself is not new (entire.io has 5,119 stars, agentblame 101, agentdiff 45). None of them support IBM Bob, none attach the prompt as "why" in a report, none do expiry or a bill of materials. Our pitch must say "attribution exists; we make it Bob-native and actionable", not "nobody tracks AI code".
 
 ## 2. Live experiment evidence (Bob Shell 2.0.5, this Mac)
@@ -130,7 +130,7 @@ Install for a user: `npx whyline init` inside a repo. It copies `bob/` into `.bo
 
 - Hooks fire in Bob IDE 2.2 with the same payload shape as Bob Shell: UserPromptSubmit, PostToolUse write_file (path, content, line_count) and apply_diff (path, diff; tool_response carries the `<patch>` block). Raw payloads saved as cli/test/fixtures/bob-ide-payloads.json.
 - The IDE and the Shell share `~/.bob/db/bob.db` (IDE log: "Task store opened /Users/.../.bob/db/bob.db"). The IDE keeps rows in the write-ahead log while it runs, so the cost lookup opens with `mode=ro` first (WAL-aware) and falls back to `immutable=1`. The cart task cost 0.768 Bobcoins for 21,254 context tokens.
-- `attribution_logs` stays empty from the IDE as well ("Attribution store opened" is logged, no rows written). Hooks remain the only source.
+- `attribution_logs` stayed empty from the IDE on our machines as well ("Attribution store opened" is logged, no rows written in our runs). It is local, has no prompt, and is not shared; hooks remain the only source Whyline uses.
 - Note attached by the post-commit hook, and `git log` shows it under the commit thanks to `notes.displayRef`.
 
 

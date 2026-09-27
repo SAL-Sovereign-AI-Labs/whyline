@@ -6,9 +6,43 @@ Every line an AI agent writes keeps the prompt that caused it, the session, the 
 
 Built for IBM Bob 2.0. Bob's free lifecycle hooks record every write; six skills turn the records into answers inside Bob; git notes store everything. Last year's winner, Pedigree, proved that a commit was AI-written, for auditors. Whyline keeps why each line exists and acts on it, for developers.
 
-Live demo report (the demo shop after the payments-v2 merge, rebuilt by CI): https://sal-sovereign-ai-labs.github.io/whyline/
+**Hooks record, Bob explains.** A model never writes the record: Bob's lifecycle hooks capture each write deterministically, a git hook seals it into a note on the commit, and Bob only reads those notes to answer and to propose removals you approve.
+
+## For judges: start here
+
+| What you want to see | Where |
+|---|---|
+| The live dashboard (demo shop after the payments-v2 merge, rebuilt by CI, no login) | https://sal-sovereign-ai-labs.github.io/whyline/ |
+| The package | `npm install -g @sal-sovereign-ai-labs/whyline` ([npm](https://www.npmjs.com/package/@sal-sovereign-ai-labs/whyline)) |
+| The Bob pack a repo gets from `whyline init` | [.bob/settings.json](.bob/settings.json) (3 hooks), [.bob/skills/](.bob/skills/) (6 skills) |
+| Bob building and using Whyline | [bob_sessions/](bob_sessions/) (task screenshots) and [bob_sessions/costs.md](bob_sessions/costs.md) (29.28 Bobcoins) |
+| Tests and CI | [cli/test/](cli/test/) (71 tests), [Actions](https://github.com/SAL-Sovereign-AI-Labs/whyline/actions) |
+| Check every claim yourself | [the table below](#dont-take-our-word-for-it) |
 
 ![Whyline architecture: Bob writes, hooks record, a commit seals a git note, commands answer, Bob acts](docs/architecture.svg)
+
+## What is recorded, and what is not
+
+| Tier | Written by | Can it be wrong? |
+|---|---|---|
+| Recorded: prompt, session, exact lines written, cost, commit | Bob's lifecycle hooks and a git hook, into `refs/notes/whyline` | No model involved. It is what Bob's hook payload and git say. |
+| Derived: `ai` or `ai-edited` per line, unreviewed, due items, bill of materials | Deterministic whyline commands over the notes and `git blame` | Reproducible: the same repo gives the same answer every time. |
+| Explained: plain-language answers and removal proposals in Bob | Bob, through the six skills, always citing the command output | Bob can phrase it badly, so removals always end in Bob's approval prompt and a human decision. |
+| Not recorded | Anything written before `whyline init`, and files Bob changes through shell commands | Listed, never guessed. See [Known limitations](#known-limitations). |
+
+## Don't take our word for it
+
+Every value below comes from running the command. Build the demo first: `git clone https://github.com/SAL-Sovereign-AI-Labs/whyline && cd whyline && node demo/build.js /tmp/shop` (whyline on your PATH).
+
+| Claim | Check it | You should see |
+|---|---|---|
+| 71 tests, zero dependencies | `npm test` and `node -e "console.log(Object.keys(require('./package.json').dependencies \|\| {}).length)"` | `pass 71`, `fail 0`, and `0` |
+| Every AI line keeps its prompt | `cd /tmp/shop && whyline why src/payments/mock_gateway.py:3` | `origin ai (bob)` and the prompt that wrote it |
+| The record lives in git itself | `git notes --ref=whyline list \| wc -l` and `git log --notes=whyline -1 <commit>` | 7 notes, each a JSON note under its commit |
+| Temporary code has a lifecycle | `git merge payments-v2 && whyline check` | `mock_gateway.py` listed as due: "no references outside the file and its tests" |
+| It can gate CI | `whyline check --gate; echo $?` | `2` while anything is due |
+| It is published | `npm view @sal-sovereign-ai-labs/whyline version` | `0.1.0` |
+| Recording costs 0 Bobcoins | [.bob/settings.json](.bob/settings.json) | three hooks of `"type": "command"`: shell commands, no model call |
 
 ## Install in a repo
 
@@ -82,17 +116,36 @@ Hackathon build (IBM Bob 2.0 Hackathon, 25 to 27 Sep 2026). See docs/ for the re
 - Recording starts at `whyline init`. Code written before that has no note and shows as human. `whyline seed` recovers temporary-looking code from before that point, but not who wrote it or why beyond the comment.
 - Hook commands print their one status line to stderr so that stdout stays empty for the agent. `git commit` shows it; tooling that hides stderr will not.
 
+What Whyline does not claim:
+
+- A recorded prompt shows what was asked, not that the code is correct. Whyline is not a scanner and does not grade code or tests.
+- Git notes are an audit trail, not a tamper-proof ledger: anyone with write access to the repository can edit or delete them.
+- Files Bob changes through shell commands (for example `sed` or `rm` in the terminal) do not pass through the write hooks and are not recorded as AI writes. Every Bob file-writing tool is covered: write_file, write_to_file, apply_diff, insert_content, search_and_replace.
+- The demo repository and its prompts were built by us to show the lifecycle end to end.
+
 ## Speed
 
-`npm run bench` builds the demo repo and times each command, median of 10. On a MacBook Pro with an Apple M1 Pro, Node 26: capture hook 165 ms (the only thing on Bob's write path), `why` 267 ms, `check` 344 ms, `bom` 560 ms, `unreviewed` 592 ms, session-start line 899 ms, `report` 2.0 s (runs in the background after a commit). Recording costs 0 Bobcoins.
+`npm run bench` builds the demo repo and times each command, median of 10. On a MacBook Pro with an Apple M1 Pro, Node 26, measured 27 Sep 2026: capture hook 181 ms (the only thing on Bob's write path), `why` 274 ms, `check` 350 ms, `unreviewed` 636 ms, session-start line 876 ms, `bom` 1.2 s, `report` 2.5 s (runs in the background after a commit). Recording costs 0 Bobcoins.
 
 ## Built with IBM Bob
 
-Bob is inside the product (three lifecycle hooks, six skills, the session-start line, removal through Bob's own approval prompt) and Bob built part of it: 16 Bob IDE tasks across two developers, 29 Bobcoins, task summaries in [bob_sessions/](bob_sessions/) with costs in [bob_sessions/costs.md](bob_sessions/costs.md). Bob also used Whyline on Whyline's own repository and reported five issues; three became fixes (docs/04, section 11). The rest of the code, tests and docs were written by the team with other tools.
+| Bob 2.0 feature | How Whyline uses it | Where | Uses a model? |
+|---|---|---|---|
+| Lifecycle hooks: SessionStart, UserPromptSubmit, PostToolUse | Record every prompt and every write with its exact lines; tell Bob at session start what is due | [.bob/settings.json](.bob/settings.json), [cli/lib/capture.js](cli/lib/capture.js) | No |
+| Skills (6): why, check, decide, remove, status, setup | Answer plain questions in Agent mode by running the whyline command and citing its output | [.bob/skills/](.bob/skills/) | Bob phrases the answer |
+| Agent mode and Bob's approval prompt | Removal of due temporary code: evidence table, dry run, your "yes", then Bob deletes and commits | [.bob/skills/whyline-remove/SKILL.md](.bob/skills/whyline-remove/SKILL.md) | Yes, and only this step changes code |
+| Bob task database | Each note records the task's Bobcoin cost, read only | [cli/lib/agents/bob/index.js](cli/lib/agents/bob/index.js) | No |
+| Git notes (git, not Bob) | The ledger: one JSON note per commit on `refs/notes/whyline` | [cli/lib/commit.js](cli/lib/commit.js) | No |
+
+Bob also built part of it: 16 Bob IDE tasks across two developers, 29.28 Bobcoins, task summaries in [bob_sessions/](bob_sessions/) with costs in [bob_sessions/costs.md](bob_sessions/costs.md). Bob used Whyline on Whyline's own repository and reported five issues; three became fixes (docs/04, section 11). The rest of the code, tests and docs were written by the team with other tools.
 
 ## Business model
 
-The CLI is free and MIT. Organisations pay for policy: enforced hooks rolled out to every developer (Bob's EnforcedHooks group policy) and the report as a compliance record per release.
+| | What | Who pays |
+|---|---|---|
+| Free | The CLI, the six skills and the dashboard, MIT, on npm | Nobody |
+| Team | Enforced hooks rolled out to every developer through Bob's EnforcedHooks group policy, an organisation dashboard across repositories, and the report kept as a compliance record per release. $20 per repository per month | The engineering lead who signs off releases, in regulated teams (fintech, health, public sector) |
+| Bob | Each developer's own Bob seat. Recording itself costs 0 Bobcoins | The team, as today |
 
 ## Troubleshooting
 

@@ -12,22 +12,22 @@ git blame tells you who. Whyline tells you why. Provenance for AI-written code i
 
 ## Problem and solution statement
 
-**The problem.** Coding agents write a growing share of every codebase, and the reason behind each line disappears when the task ends. git blame names the committer, not the prompt. Temporary code (a mock "until payments-v2 lands", a demo script, a feature flag) is written with an exit condition nobody records, so it stays. Review is not keeping up: Faros' 2026 study of 22,000 developers found pull requests merged with no review up 31.3%, and 66% of developers in the Stack Overflow 2025 survey say AI code is "almost right, but not quite". Teams cannot answer four questions: why does this line exist, which temporary code is due, which AI code did nobody review, and how much of this release did an agent write?
+**The problem.** Coding agents write a growing share of every codebase, and the reason behind each line disappears when the task ends. git blame names the committer, not the prompt. Temporary code (a mock "until payments-v2 lands", a demo script, a flag) is written with an exit condition nobody records, so it stays. Review is not keeping up: Faros' 2026 study of 22,000 developers found pull requests merged with no review up 31.3%. Teams cannot answer: why does this line exist, which temporary code is due, which AI code did nobody review, and how much of this release did an agent write?
 
-**The solution.** Whyline is a code ledger for AI-written code, built into IBM Bob, in four parts.
+**The solution.** Whyline records the answer when Bob writes the line, not after. Hooks record, Bob explains: a model never writes the record.
 
-1. Hooks. Bob's lifecycle hooks record the prompt and the exact line ranges each write touched: 166 ms per write, 0 Bobcoins.
-2. Notes. On commit, a git hook compares what Bob wrote with what was committed (ai, ai-edited or human) and attaches one JSON note to the commit. The ledger travels with the repository.
-3. Check. Writes that look temporary become items with a removal condition recorded at birth: a date, or "no references left". `whyline check` evaluates them with git grep in 129 ms and moves each item through a lifecycle: active, due, then kept or removed.
-4. Remover. A Bob skill removes a due item in Agent mode with evidence (references, tests, review) and asks for approval through Bob's normal prompt. Hooks record, scripts decide, Bob acts, humans approve.
+1. Bob's lifecycle hooks capture the prompt and the exact lines of every write: 181 ms, 0 Bobcoins.
+2. On commit, a git hook seals that into a JSON note under the commit. The ledger travels with the code.
+3. Temporary writes get a removal condition at birth (a date, or no references left). `whyline check` moves them from active to due; Bob removes a due item in Agent mode only after your "yes" in its own approval prompt.
+4. `why`, `unreviewed` and `bom` answer the four questions in the CLI, in Bob through six skills, and on a dashboard.
 
-**Who uses it and how.** After `whyline init` there is nothing new to type. Developers ask `whyline why file:line` and get the prompt, the session, the sibling files and its temporary item. Leads run `whyline unreviewed`. Release managers run `whyline bom` for an AI bill of materials. Everyone gets a read-only HTML report, regenerated on every commit. In Bob, skills answer the same questions, and every session opens with what is due.
+**Proof on the demo shop, from the tools' own output.** 49 of 96 lines are AI-written (51%) across 7 Bob sessions, 47 of them unreviewed. Merging payments-v2 leaves the mock gateway unreferenced, `check --gate` exits 2, and Bob removed it after approval in a recorded run. 71 tests, zero dependencies, published on npm.
 
-**Proof on the demo shop.** 49 of 90 lines are AI-written (54%) across 7 Bob sessions. Six temporary items were recorded at birth and one is due. Merging the payments-v2 branch leaves the mock gateway unreferenced, `check` reports two due, and Bob takes it out after approval. 71 tests pass.
+**Why it is different.** Audit tools reconstruct intent from a pull request after the fact; Whyline was there when Bob wrote the line and kept the prompt. Pedigree, last year's winner, recorded who signed a commit; Whyline records why each line exists.
 
-**Why it is new.** Last hackathon's winner, Pedigree, proved that a commit was AI-written, for auditors. Whyline keeps why each line exists and acts on it, for developers: the prompt per line, the lifecycle of temporary code, what nobody reviewed, and a bill of materials per release. Zero dependencies, no servers, nothing leaves the laptop. Squash merges drop notes, a stated limitation; amend and rebase keep them, and a pre-push hook shares them.
+**Limits.** A prompt shows intent, not correctness. Git notes are an audit trail, not tamper-proof. Shell-command edits bypass the write hooks.
 
-**Business model.** The CLI is free. Organisations pay for policy: enforced hooks rolled out to every developer, and the report for compliance.
+**Business model.** Free CLI. Teams pay $20 per repository per month for enforced hooks and a compliance record per release.
 
 ## IBM Bob usage statement
 
