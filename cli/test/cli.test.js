@@ -55,7 +55,8 @@ test('check exits 0 by default and 2 only with --gate; keep and until accept a f
 
 test('check --gate prints a GitHub annotation per due item only inside GitHub Actions', () => {
   const dir = repoWithItem();
-  assert.doesNotMatch(run(dir, ['check', '--gate']).stdout, /::error/, 'no annotations outside Actions');
+  const outside = spawnSync(process.execPath, [CLI, 'check', '--gate'], { cwd: dir, encoding: 'utf8', env: { ...env, GITHUB_ACTIONS: '' } });
+  assert.doesNotMatch(outside.stdout, /::error/, 'no annotations outside Actions');
   const r = spawnSync(process.execPath, [CLI, 'check', '--gate'], { cwd: dir, encoding: 'utf8', env: { ...env, GITHUB_ACTIONS: 'true' } });
   assert.equal(r.status, 2);
   assert.match(r.stdout, /^::error file=demo_seed\.py,line=1,title=whyline%3A temporary demo is due::/m);
