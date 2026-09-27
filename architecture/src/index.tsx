@@ -41,7 +41,7 @@ const TONES: Record<FigTone, string> = {
   gray: '#8b949e',
 };
 const cardBody = (c: FigContent): ReactNode => {
-  if (c == null) return '—';
+  if (c == null) return '';
   if (!isRows(c)) return c;
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 4, whiteSpace: 'normal' }}>

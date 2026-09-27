@@ -1,7 +1,7 @@
 {
   "name": "whyline-architecture",
   "private": true,
-  "description": "The interactive Whyline architecture page, published to GitHub Pages at /architecture/. Not part of the npm package.",
+  "description": "The interactive Whyline architecture page and the recorder for its README GIFs. Not part of the npm package.",
   "type": "module",
   "scripts": {
     "dev": "vite --open",

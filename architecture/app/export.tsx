@@ -11,7 +11,7 @@ declare global {
     startExport: (step: number) => void;
     /** The step labels, so the recorder can name the files and know how many clips to make. */
     exportSteps: string[];
-    /** The figure's title and, per step, the narration it speaks — the recorder writes it beside the clip. */
+    /** The figure's title and, per step, the narration it speaks. The recorder writes it beside the clip. */
     exportNarration: { title: string; steps: { label: string; says: string[] }[] };
   }
 }
@@ -35,7 +35,16 @@ export function ExportPage({ figure, dark }: { figure: Figure; dark: boolean }) 
   const c = dark ? DARK.bg : '#fff';
   return (
     // ?zoom=1.5 records the figure larger, so its small text stays sharp once a GIF is scaled down.
-    <div style={{ display: 'inline-block', padding: 20, background: c, zoom: Number(new URLSearchParams(location.search).get('zoom') ?? 1) }}>
+    <div
+      style={{
+        display: 'inline-block',
+        padding: 20,
+        background: c,
+        // The player inherits its font: without this the recorder page falls back to Chrome's serif default.
+        fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+        zoom: Number(new URLSearchParams(location.search).get('zoom') ?? 1),
+      }}
+    >
       {/* A clip keeps the step label and the narration, but not the buttons a reader would click. */}
       <style>
         {
