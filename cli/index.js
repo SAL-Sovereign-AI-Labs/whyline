@@ -20,6 +20,8 @@ const USAGE = `whyline <command> [--json]
   removed <item>            record a removal done by hand (a commit message naming the item does this automatically)
   seed [--dry-run] [--by-name] first run on an existing repo: record code with TODO remove, FIXME, HACK, temporary or until markers; --by-name also records mock_, compat_, examples/, fixtures/ names
 
+  selftest                  prove every check can fail: plant a passing and a failing case for each, in a temp repo
+
   <item> is a file path (or its last part), a watched symbol, a kind (mock, demo, flag, shim, fixture) when unique,
   or the id shown by check. People name files; ids are for notes and scripts.
 
@@ -105,6 +107,13 @@ function dispatch(argv) {
       if (json) { console.log(JSON.stringify(r, null, 2)); return 0; }
       printWhy(m[1], +m[2], r);
       return 0;
+    }
+    case 'selftest': {
+      const r = require('./lib/selftest').run();
+      if (json) { console.log(JSON.stringify(r, null, 2)); return r.proven ? 0 : 1; }
+      for (const t of r.results) console.log(`${t.ok ? 'PASS' : 'FAIL'}  ${t.name}${t.detail ? ` (${t.detail})` : ''}`);
+      console.log(`${r.passed}/${r.total} checks proved able to fail. Result: ${r.proven ? 'PROVEN' : 'FAILED'}.`);
+      return r.proven ? 0 : 1;
     }
     case 'check': {
       const gate = args.includes('--gate');

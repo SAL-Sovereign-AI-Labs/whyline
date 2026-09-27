@@ -20,6 +20,9 @@ test('init installs .bob files and git hooks, merges without dropping user hooks
   assert.equal(s.hooks.PostToolUse.length, 1, 'no duplicate after second init');
   assert.match(s.hooks.PostToolUse[0].matcher, /apply_diff/);
   assert.ok(fs.existsSync(path.join(dir, '.bob', 'hooks', 'whyline.sh')));
+  assert.ok(fs.existsSync(path.join(dir, '.bob', 'hooks', 'whyline-guard.sh')), 'guard installed');
+  assert.equal(s.hooks.PreToolUse.length, 1, 'one guard entry after two inits');
+  assert.equal(s.hooks.PreToolUse[0].matcher, '^execute_command$');
   assert.ok(fs.existsSync(path.join(dir, '.bob', 'skills', 'whyline-remove', 'SKILL.md')));
   assert.ok(fs.existsSync(path.join(dir, '.bob', 'skills', 'whyline-check', 'SKILL.md')));
   assert.ok(fs.existsSync(path.join(dir, '.bob', 'skills', 'whyline-why', 'SKILL.md')));

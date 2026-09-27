@@ -33,6 +33,18 @@
         ],
         "matcher": "^(write_file|write_to_file|apply_diff|insert_content|search_and_replace)$"
       }
+    ],
+    "PreToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh .bob/hooks/whyline-guard.sh",
+            "timeout": 5
+          }
+        ],
+        "matcher": "^execute_command$"
+      }
     ]
   }
 }

@@ -14,10 +14,10 @@ Built for IBM Bob 2.0. Bob's free lifecycle hooks record every write; six skills
 |---|---|
 | The live dashboard (demo shop after the payments-v2 merge, rebuilt by CI, no login) | https://sal-sovereign-ai-labs.github.io/whyline/ |
 | The package | `npm install -g @sal-sovereign-ai-labs/whyline` ([npm](https://www.npmjs.com/package/@sal-sovereign-ai-labs/whyline)) |
-| The Bob pack a repo gets from `whyline init` | [.bob/settings.json](.bob/settings.json) (3 hooks), [.bob/skills/](.bob/skills/) (6 skills) |
+| The Bob pack a repo gets from `whyline init` | [.bob/settings.json](.bob/settings.json) (4 hooks), [.bob/skills/](.bob/skills/) (6 skills) |
 | Bob building and using Whyline | [bob_sessions/](bob_sessions/) (task screenshots) and [bob_sessions/costs.md](bob_sessions/costs.md) (29.28 Bobcoins) |
 | The CI gate on a real repo: a green PR and a red PR | [whyline-demo-shop](https://github.com/SAL-Sovereign-AI-Labs/whyline-demo-shop): [PR 1, mock removed](https://github.com/SAL-Sovereign-AI-Labs/whyline-demo-shop/pull/1) and [its check passing](https://github.com/SAL-Sovereign-AI-Labs/whyline-demo-shop/actions/runs/36303214774); [PR 2, mock left behind](https://github.com/SAL-Sovereign-AI-Labs/whyline-demo-shop/pull/2) and [its check failing](https://github.com/SAL-Sovereign-AI-Labs/whyline-demo-shop/actions/runs/36303836900) |
-| Tests and CI | [cli/test/](cli/test/) (72 tests), [Actions](https://github.com/SAL-Sovereign-AI-Labs/whyline/actions) |
+| Tests and CI | [cli/test/](cli/test/) (75 tests), [Actions](https://github.com/SAL-Sovereign-AI-Labs/whyline/actions) |
 | Check every claim yourself | [the table below](#dont-take-our-word-for-it) |
 
 ![Whyline architecture: Bob writes, hooks record, a commit seals a git note, commands answer, Bob acts](docs/architecture.svg)
@@ -37,13 +37,15 @@ Every value below comes from running the command. Build the demo first: `git clo
 
 | Claim | Check it | You should see |
 |---|---|---|
-| 72 tests, zero dependencies | `npm test` and `node -e "console.log(Object.keys(require('./package.json').dependencies \|\| {}).length)"` | `pass 72`, `fail 0`, and `0` |
+| 75 tests, zero dependencies | `npm test` and `node -e "console.log(Object.keys(require('./package.json').dependencies \|\| {}).length)"` | `pass 75`, `fail 0`, and `0` |
 | Every AI line keeps its prompt | `cd /tmp/shop && whyline why src/payments/mock_gateway.py:3` | `origin ai (bob)` and the prompt that wrote it |
 | The record lives in git itself | `git notes --ref=whyline list \| wc -l` and `git log --notes=whyline -1 <commit>` | 7 notes, each a JSON note under its commit |
 | Temporary code has a lifecycle | `git merge payments-v2 && whyline check` | `mock_gateway.py` listed as due: "no references outside the file and its tests" |
 | It can gate CI | `whyline check --gate; echo $?` | `2` while anything is due |
 | It is published | `npm view @sal-sovereign-ai-labs/whyline version` | `0.1.0` |
-| Recording costs 0 Bobcoins | [.bob/settings.json](.bob/settings.json) | three hooks of `"type": "command"`: shell commands, no model call |
+| Every check can fail | `whyline selftest` | `5/5 checks proved able to fail. Result: PROVEN.` (a passing and a failing case planted for each check in a temp repo) |
+| Bob cannot rewrite its own record | `whyline selftest` (check 5), or feed the guard `git notes --ref=whyline remove HEAD` | the guard exits 2 and Bob sees "whyline: blocked" |
+| Recording costs 0 Bobcoins | [.bob/settings.json](.bob/settings.json) | four hooks of `"type": "command"`: shell commands, no model call |
 
 ## Install in a repo
 
@@ -120,7 +122,7 @@ Hackathon build (IBM Bob 2.0 Hackathon, 25 to 27 Sep 2026). See docs/ for the re
 What Whyline does not claim:
 
 - A recorded prompt shows what was asked, not that the code is correct. Whyline is not a scanner and does not grade code or tests.
-- Git notes are an audit trail, not a tamper-proof ledger: anyone with write access to the repository can edit or delete them.
+- Git notes are an audit trail, not a tamper-proof ledger. Bob is blocked from rewriting or deleting them (the PreToolUse guard), but a person with write access to the repository can still edit them.
 - Files Bob changes through shell commands (for example `sed` or `rm` in the terminal) do not pass through the write hooks and are not recorded as AI writes. Every Bob file-writing tool is covered: write_file, write_to_file, apply_diff, insert_content, search_and_replace.
 - The demo repository and its prompts were built by us to show the lifecycle end to end.
 
@@ -133,6 +135,7 @@ What Whyline does not claim:
 | Bob 2.0 feature | How Whyline uses it | Where | Uses a model? |
 |---|---|---|---|
 | Lifecycle hooks: SessionStart, UserPromptSubmit, PostToolUse | Record every prompt and every write with its exact lines; tell Bob at session start what is due | [.bob/settings.json](.bob/settings.json), [cli/lib/capture.js](cli/lib/capture.js) | No |
+| PreToolUse hook (exit 2 blocks) | A guard on Bob's shell tool: Bob cannot rewrite or delete Whyline's record (git notes edits on the whyline ref, deleting the ref, removing `.git/whyline`). Plain sh, about 30 ms per command | [.bob/hooks/whyline-guard.sh](.bob/hooks/whyline-guard.sh) | No |
 | Skills (6): why, check, decide, remove, status, setup | Answer plain questions in Agent mode by running the whyline command and citing its output | [.bob/skills/](.bob/skills/) | Bob phrases the answer |
 | Agent mode and Bob's approval prompt | Removal of due temporary code: evidence table, dry run, your "yes", then Bob deletes and commits | [.bob/skills/whyline-remove/SKILL.md](.bob/skills/whyline-remove/SKILL.md) | Yes, and only this step changes code |
 | Bob task database | Each note records the task's Bobcoin cost, read only | [cli/lib/agents/bob/index.js](cli/lib/agents/bob/index.js) | No |

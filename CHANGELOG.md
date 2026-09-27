@@ -4,6 +4,11 @@ All notable changes to this project are documented here. Format: Keep a Changelo
 
 ## [Unreleased]
 
+### Added
+- `whyline selftest`: plants a passing and a failing case for every check in a temp repo and reports PROVEN only when each check tells them apart.
+- Bob PreToolUse guard (`.bob/hooks/whyline-guard.sh`): Bob cannot rewrite or delete Whyline's record through its shell tool; exit 2 with the reason.
+- `check --gate` inside GitHub Actions prints an error annotation on each due file.
+
 ## [0.1.0] - 2026-09-26
 
 Published on npm as `@sal-sovereign-ai-labs/whyline` (the bare name is blocked by the registry as too similar to `byline`). The command is still `whyline`.
