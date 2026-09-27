@@ -166,3 +166,71 @@ test('overview KPI: zero items shows "0" not "no data" when notes exist (counts.
   assert.doesNotMatch(html, /sessions\.length \|\| null/, 'sessions length must not use || null');
 });
 
+// gather() and the project picker: every project in WHYLINE_PROJECTS or whyline.project, by basename only.
+function fixtureRepo(prefix, file, prompt) {
+  const dir = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), prefix)));
+  sh(dir, ['init', '-q', '-b', 'main']);
+  agentWrite(dir, file, 'def f():\n    return 1\n', 's1', prompt);
+  commitAll(dir, 'first');
+  return dir;
+}
+function embedded(html) { return JSON.parse(html.match(/window\.WHYLINE_DATA = (.*?);<\/script>/s)[1]); }
+function withEnv(value, fn) {
+  const before = process.env.WHYLINE_PROJECTS;
+  if (value === undefined) delete process.env.WHYLINE_PROJECTS; else process.env.WHYLINE_PROJECTS = value;
+  try { return fn(); } finally { if (before === undefined) delete process.env.WHYLINE_PROJECTS; else process.env.WHYLINE_PROJECTS = before; }
+}
+
+test('gather: the same data shape the report router builds', () => {
+  process.env.WHYLINE_BOB_DB = '/nonexistent';
+  const dir = fixtureRepo('whyline-gather-', 'cart.py', 'Add cart.');
+  const d = report.gather(dir);
+  assert.deepEqual(Object.keys(d).sort(), ['bom', 'check', 'generatedAt', 'head', 'notes', 'ranges', 'repo', 'sessions', 'unreviewed', 'why']);
+  assert.equal(d.repo, path.basename(dir));
+  assert.equal(d.head, sh(dir, ['rev-parse', 'HEAD']));
+  assert.equal(d.notes, 1);
+  assert.equal(d.sessions.length, 1);
+  assert.equal(d.ranges.length, 1);
+  assert.deepEqual(d.why.files.map(f => f.file), ['cart.py']);
+  assert.ok(d.check.counts && d.unreviewed.totals, 'check and unreviewed are the lens results');
+});
+
+test('render: WHYLINE_PROJECTS adds every other repo to the picker by name, never by path', () => {
+  process.env.WHYLINE_BOB_DB = '/nonexistent';
+  const second = fixtureRepo('whyline-second-', 'pay.py', 'Add payments.');
+  const notRepo = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'whyline-notrepo-')));
+  const html = withEnv([second, notRepo, second].join(':'), () => report.render(BASE_DATA));
+  const data = embedded(html);
+  const name = path.basename(second);
+  assert.deepEqual(data.projects.map(p => p.name), ['shop-backend', name], 'current first, the second repo once, the non-repo skipped');
+  assert.equal(data.projects[0].current, true);
+  assert.equal(data.projects[1].current, false);
+  assert.equal(data.projects[1].notes, 1);
+  assert.deepEqual(Object.keys(data.others), [name]);
+  assert.equal(data.others[name].notes, 1);
+  assert.deepEqual(data.others[name].why.files.map(f => f.file), ['pay.py']);
+  for (const p of [second, notRepo, os.tmpdir(), fs.realpathSync(os.tmpdir())]) assert.ok(!html.includes(p), 'no absolute path: ' + p);
+  assert.equal(html.split('<script>').length, 3, 'exactly the data block and the template script');
+});
+
+test('projectRoots: env paths first, then git config whyline.project relative to the repo root, no duplicates or self', () => {
+  process.env.WHYLINE_BOB_DB = '/nonexistent';
+  const a = fixtureRepo('whyline-a-', 'a.py', 'A.');
+  const b = fixtureRepo('whyline-b-', 'b.py', 'B.');
+  const c = fixtureRepo('whyline-c-', 'c.py', 'C.');
+  sh(a, ['config', '--add', 'whyline.project', path.join('..', path.basename(c))]);
+  sh(a, ['config', '--add', 'whyline.project', path.join('..', path.basename(b))]);
+  sh(a, ['config', '--add', 'whyline.project', '.']);
+  sh(a, ['config', '--add', 'whyline.project', '../does-not-exist']);
+  assert.deepEqual(withEnv(b, () => report.projectRoots(a)), [b, c]);
+});
+
+test('render: with no other projects, the picker lists the current one and how to add another', () => {
+  const html = withEnv(undefined, () => report.render(BASE_DATA));
+  const data = embedded(html);
+  assert.equal(data.projects[0].name, 'shop-backend');
+  assert.equal(data.projects[0].current, true);
+  assert.ok(html.includes('aria-haspopup="listbox"'));
+  assert.ok(html.includes('git config --add whyline.project ../path'), 'hint names how to add a repo');
+});
+
