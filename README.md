@@ -88,6 +88,26 @@ What Whyline does not claim:
 - A saved request shows what was asked, not that the code is correct. Whyline does not grade code or tests.
 - The history is a record, not a tamper-proof ledger. Bob cannot edit it, but a person with write access to the repository can.
 
+## Under the hood
+
+For the curious: two animated diagrams of the moving parts, with the real file and event names. Each plays its steps in a loop.
+
+**1. In your editor.** You ask Bob, the scripts Bob runs automatically save your request and the lines Bob wrote, a commit saves them in your git history, `why` and `check` answer from there, and Bob deletes temporary code only after your yes.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/figures/whyline-1-editor-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="docs/figures/whyline-1-editor-light.svg">
+  <img alt="Whyline in your editor: you and IBM Bob, the scripts Bob runs automatically, the Whyline commands, and your git repository. Your request is saved, attached to the commit, answered by why and check, and a mock that nothing uses any more is deleted by Bob after you say yes." src="docs/figures/whyline-1-editor-light.svg" width="100%">
+</picture>
+
+**2. Across the team.** The saved history travels with the code through git, a pull request check fails while temporary code that is ready to delete is still there, and the report page answers each role. The last step shows a proposed paid Team plan, not built yet.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/figures/whyline-2-team-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="docs/figures/whyline-2-team-light.svg">
+  <img alt="Whyline across the team: developers, git, GitHub and the answers. Git carries the saved history, GitHub Actions runs whyline check --gate on each pull request (one passes, one fails), GitHub Pages hosts the report page, and a proposed Team plan turns Whyline on for every developer." src="docs/figures/whyline-2-team-light.svg" width="100%">
+</picture>
+
 ## Everything the CLI does
 
 | Command | What it does | Exit code |
@@ -137,7 +157,7 @@ Node 20 or newer and git. IBM Bob IDE 2.2 or Bob Shell 2.x. macOS and Linux are 
 ## Development
 
 ```sh
-npm test            # 77 tests on throwaway git repositories
+npm test            # 82 tests on throwaway git repositories
 npm run smoke
 npm run bench
 ```
@@ -154,8 +174,8 @@ Whyline was built for the IBM Bob 2.0 hackathon (25 to 27 Sep 2026). For judges:
 | A pull request check passing and failing on a real repository | [whyline-demo-shop](https://github.com/SAL-Sovereign-AI-Labs/whyline-demo-shop): [PR 1, the mock is deleted](https://github.com/SAL-Sovereign-AI-Labs/whyline-demo-shop/pull/1) and [its check passing](https://github.com/SAL-Sovereign-AI-Labs/whyline-demo-shop/actions/runs/36303214774); [PR 2, the mock is left behind](https://github.com/SAL-Sovereign-AI-Labs/whyline-demo-shop/pull/2) and [its check failing on the file](https://github.com/SAL-Sovereign-AI-Labs/whyline-demo-shop/actions/runs/36303836900) |
 | The package | `npm install -g @sal-sovereign-ai-labs/whyline` ([npm](https://www.npmjs.com/package/@sal-sovereign-ai-labs/whyline)) |
 | What `whyline init` adds to a repository | [.bob/settings.json](.bob/settings.json) (4 Bob scripts), [.bob/skills/](.bob/skills/) (6 instruction files that let you ask Bob in plain English) |
-| Bob building and using Whyline | [bob_sessions/](bob_sessions/) (task screenshots), [bob_sessions/costs.md](bob_sessions/costs.md) (29.28 Bob usage credits) |
-| Tests and CI | [cli/test/](cli/test/) (77 tests), [Actions](https://github.com/SAL-Sovereign-AI-Labs/whyline/actions) |
+| Bob building and using Whyline | [bob_sessions/](bob_sessions/) (task screenshots), [bob_sessions/costs.md](bob_sessions/costs.md) (41.46 Bob usage credits) |
+| Tests and CI | [cli/test/](cli/test/) (82 tests), [Actions](https://github.com/SAL-Sovereign-AI-Labs/whyline/actions) |
 
 ### Check it yourself
 
@@ -163,7 +183,7 @@ Every value below comes from running the command. Build the sample repository fi
 
 | Claim | Run | You should see |
 |---|---|---|
-| 77 tests, zero dependencies | `npm test` and `node -e "console.log(Object.keys(require('./package.json').dependencies \|\| {}).length)"` | `pass 77`, `fail 0`, and `0` |
+| 82 tests, zero dependencies | `npm test` and `node -e "console.log(Object.keys(require('./package.json').dependencies \|\| {}).length)"` | `pass 82`, `fail 0`, and `0` |
 | Every AI line keeps its request | `cd /tmp/shop && whyline why src/payments/mock_gateway.py:3` | `written by AI (IBM Bob)` and the request that wrote it |
 | The history lives in git | `git notes --ref=whyline list \| wc -l` | 7, one per commit Bob wrote in |
 | Temporary code gets a date to go | `git merge payments-v2 && whyline check` | `READY TO DELETE`, `src/payments/mock_gateway.py`, `nothing uses MockGateway any more` |
@@ -181,7 +201,7 @@ Every value below comes from running the command. Build the sample repository fi
 | Agent mode and Bob's approval prompt | Deleting temporary code: proof, a dry run, your yes, then Bob deletes and commits | [.bob/skills/whyline-remove/SKILL.md](.bob/skills/whyline-remove/SKILL.md) | Yes, and only this step changes code |
 | Bob's task database | Each saved record includes what that Bob task cost, read only | [cli/lib/agents/bob/index.js](cli/lib/agents/bob/index.js) | No |
 
-Bob also helped build Whyline: 16 Bob IDE tasks across two developers, 29.28 Bob usage credits, with task summaries in [bob_sessions/](bob_sessions/). Bob used Whyline on Whyline's own repository and reported five issues; three became fixes. The rest of the code, tests and docs were written by the team with other tools.
+Bob also helped build Whyline: 19 Bob IDE tasks across two developers, 41.46 Bob usage credits, with task summaries in [bob_sessions/](bob_sessions/). Bob used Whyline on Whyline's own repository and reported five issues; three became fixes. The rest of the code, tests and docs were written by the team with other tools.
 
 ### Business model
 

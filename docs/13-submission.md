@@ -25,7 +25,7 @@ Know why your AI wrote every line, and clean up what it left behind. Whyline sav
 
 For Sara: Whyline shows her own request ("a mock gateway so checkout works until payments-v2 lands"), that payments-v2 has landed, and that nothing uses the mock any more. Bob removes it after she says yes.
 
-**Proof, from real runs.** In the demo shop, 49 of 96 lines are AI-written and 47 of those were never changed by a person. After payments-v2 merges, the check fails on the mock, and Bob removed it after approval in a recorded run. A public demo repository shows the check passing on one pull request and failing on another. 77 tests, a built-in self check that proves every check can fail, no dependencies, published on npm.
+**Proof, from real runs.** In the demo shop, 49 of 96 lines are AI-written and 47 of those were never changed by a person. After payments-v2 merges, the check fails on the mock, and Bob removed it after approval in a recorded run. A public demo repository shows the check passing on one pull request and failing on another. 82 tests, a built-in self check that proves every check can fail, no dependencies, published on npm.
 
 **Why it is different.** Review tools look at a pull request after the fact and guess the intent. Whyline was there when Bob wrote the line and kept the request. And no other AI code tool tracks the temporary code an AI leaves behind until it is safe to delete.
 
@@ -60,8 +60,9 @@ For Sara: Whyline shows her own request ("a mock gateway so checkout works until
 | B task05 | report overview panels | 1.74 |
 | B task06 | report keyboard and screen reader support | 2.44 |
 | B task07 | GitHub Pages workflow | 5.26 |
-| B task08 | Bob code review of report and bom, two fixes | 4.22 |
+| B task08 | Bob code review of the report code, two fixes | 4.22 |
 | B task09 | Whyline used from Bob, status questions | 0.132 |
+| B tasks10-12 | report page redesign: temporary code, AI code nobody changed, AI report | 12.18 |
 
 Bob also used Whyline on this repository and reported five issues; three became fixes.
 
