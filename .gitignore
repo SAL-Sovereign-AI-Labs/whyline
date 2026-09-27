@@ -6,3 +6,6 @@ node_modules/
 .DS_Store
 docs/design/
 .internal/
+
+# architecture page build output
+architecture/dist/
