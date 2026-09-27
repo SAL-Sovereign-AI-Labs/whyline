@@ -91,12 +91,13 @@ function run(cwd, range) {
   // Items: from check(), only those whose commit is in range
   const checkResult = lenses.check(cwd);
   const allItems = [...checkResult.due, ...checkResult.active, ...checkResult.other];
-  const itemCounts = { active: 0, due: 0, removed: 0 };
+  const itemCounts = { active: 0, due: 0, kept: 0, removed: 0 };
   for (const it of allItems) {
     if (!commits.has(it.commit)) continue;
     const state = it.state;
     if (state === 'active') itemCounts.active++;
     else if (state === 'due') itemCounts.due++;
+    else if (state === 'kept') itemCounts.kept++;
     else if (state === 'removed') itemCounts.removed++;
   }
 
@@ -120,7 +121,7 @@ function run(cwd, range) {
   // No notes at all: AI lines, review and items are unknown, not zero (the hooks never recorded anything here).
   if (!idx.notes.length) {
     return { range: displayRange, linesChanged: changed, ai: { total: null, byAgent: {} }, reviewed: { lines: null, percent: null },
-      tested: { lines: null, percent: null }, items: { active: null, due: null, removed: null },
+      tested: { lines: null, percent: null }, items: { active: null, due: null, kept: null, removed: null },
       cost: { sum: null, sessionsWithCost: 0, sessions: 0 }, missing: ['notes', 'coverage', 'cost'] };
   }
 
@@ -152,6 +153,7 @@ function format(r) {
     ['covered by tests', testedCell],
     ['temporary code waiting', nd(r.items.active)],
     ['temporary code ready to delete', nd(r.items.due)],
+    ['temporary code kept on purpose', nd(r.items.kept)],
     ['temporary code deleted', nd(r.items.removed)],
     ['cost', costCell],
   ];

@@ -67,7 +67,7 @@ test('bom over the whole fixture: lines, AI by agent, reviewed, tested, items, c
   assert.deepEqual(r.ai, { total: 7, byAgent: { bob: 7 } });
   assert.deepEqual(r.reviewed, { lines: 1, percent: 14, unreviewedLines: 6 }, 'the ai-edited line counts as reviewed');
   assert.deepEqual(r.tested, { lines: null, percent: null }, 'no coverage file: null, never zero');
-  assert.deepEqual(r.items, { active: 1, due: 0, removed: 0 });
+  assert.deepEqual(r.items, { active: 1, due: 0, kept: 0, removed: 0 });
   assert.deepEqual(r.cost, { sum: null, sessionsWithCost: 0, sessions: 2 });
   assert.ok(r.missing.includes('coverage'));
   assert.ok(r.missing.includes('cost'));
@@ -84,7 +84,7 @@ test('a narrower range only counts notes on commits inside it', () => {
   const r = bom.run(fx.dir, `${fx.c1}..${fx.c3}`);
   assert.equal(r.linesChanged, 8);
   assert.deepEqual(r.ai, { total: 3, byAgent: { bob: 3 } });
-  assert.deepEqual(r.items, { active: 1, due: 0, removed: 0 });
+  assert.deepEqual(r.items, { active: 1, due: 0, kept: 0, removed: 0 });
   assert.equal(r.cost.sessions, 1);
 });
 
@@ -93,7 +93,7 @@ test('a range with only human commits: zero AI lines is a real zero, the review 
   assert.equal(r.linesChanged, 3);
   assert.deepEqual(r.ai, { total: 0, byAgent: {} });
   assert.deepEqual(r.reviewed, { lines: 0, percent: null, unreviewedLines: 0 });
-  assert.deepEqual(r.items, { active: 0, due: 0, removed: 0 });
+  assert.deepEqual(r.items, { active: 0, due: 0, kept: 0, removed: 0 });
   assert.deepEqual(r.cost, { sum: null, sessionsWithCost: 0, sessions: 0 });
 });
 
@@ -138,7 +138,7 @@ test('a repo with no notes: unknown is null with the fix named, never a zero', (
   assert.equal(r.linesChanged, 1, 'lines changed is known from git alone');
   assert.deepEqual(r.ai, { total: null, byAgent: {} });
   assert.deepEqual(r.reviewed, { lines: null, percent: null });
-  assert.deepEqual(r.items, { active: null, due: null, removed: null });
+  assert.deepEqual(r.items, { active: null, due: null, kept: null, removed: null });
   assert.ok(r.missing.includes('notes'));
   const out = bom.format(r);
   assert.match(out, /written by AI\s+no data/);
@@ -195,4 +195,13 @@ test('AI lines never exceed lines changed: a file Bob wrote and a human deleted 
   assert.equal(r.linesChanged, 12, 'additions summed per commit: 10 + 2');
   assert.ok(r.ai.total <= r.linesChanged);
   assert.deepEqual(r.reviewed, { lines: 10, percent: 100, unreviewedLines: 0 }, 'deleted by a human counts as reviewed');
+});
+
+test('a kept item counts as kept, not active', () => {
+  const k = fixture();
+  const item = [...require('../lib/lenses').index(k.dir).items.values()][0];
+  require('../lib/lenses').recordItemChange(k.dir, item.id, { status: 'kept', reason: 'stays for the Q1 demo' });
+  const r = bom.run(k.dir, `${k.base}..HEAD`);
+  assert.deepEqual(r.items, { active: 0, due: 0, kept: 1, removed: 0 });
+  assert.match(bom.format(r), /temporary code kept on purpose\s+1/);
 });
