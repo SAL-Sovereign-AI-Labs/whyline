@@ -17,10 +17,28 @@ Built for IBM Bob 2.0. Bob's free lifecycle hooks record every write; six skills
 | The Bob pack a repo gets from `whyline init` | [.bob/settings.json](.bob/settings.json) (4 hooks), [.bob/skills/](.bob/skills/) (6 skills) |
 | Bob building and using Whyline | [bob_sessions/](bob_sessions/) (task screenshots) and [bob_sessions/costs.md](bob_sessions/costs.md) (29.28 Bobcoins) |
 | The CI gate on a real repo: a green PR and a red PR | [whyline-demo-shop](https://github.com/SAL-Sovereign-AI-Labs/whyline-demo-shop): [PR 1, mock removed](https://github.com/SAL-Sovereign-AI-Labs/whyline-demo-shop/pull/1) and [its check passing](https://github.com/SAL-Sovereign-AI-Labs/whyline-demo-shop/actions/runs/36303214774); [PR 2, mock left behind](https://github.com/SAL-Sovereign-AI-Labs/whyline-demo-shop/pull/2) and [its check failing](https://github.com/SAL-Sovereign-AI-Labs/whyline-demo-shop/actions/runs/36303836900) |
-| Tests and CI | [cli/test/](cli/test/) (75 tests), [Actions](https://github.com/SAL-Sovereign-AI-Labs/whyline/actions) |
+| Tests and CI | [cli/test/](cli/test/) (80 tests), [Actions](https://github.com/SAL-Sovereign-AI-Labs/whyline/actions) |
 | Check every claim yourself | [the table below](#dont-take-our-word-for-it) |
 
-![Whyline architecture: Bob writes, hooks record, a commit seals a git note, commands answer, Bob acts](docs/architecture.svg)
+## Architecture
+
+Two animated figures. Each plays its chapters in a loop, with the chapter name and a one-line narration under the diagram.
+
+**1. In your editor:** record → commit → why → lifecycle → remove. Bob writes, Bob's hooks record the prompt and the lines, a commit seals them into a git note, commands answer, and Bob removes temporary code only after your yes.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/figures/whyline-1-editor-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="docs/figures/whyline-1-editor-light.svg">
+  <img alt="Whyline in your editor: you and IBM Bob, Bob's hooks and Whyline skills, the Whyline CLI, and the git repo. A prompt is captured into the session log, sealed into a git note on commit, answered by why and check, and a due mock gateway is removed by Bob after your approval." src="docs/figures/whyline-1-editor-light.svg" width="100%">
+</picture>
+
+**2. Across the team:** share → CI gate → dashboard → team tier. The notes travel with the code through git hooks, `whyline check --gate` fails a pull request that leaves due temporary code behind, and the report answers each role. The last chapter is the proposed Team tier.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/figures/whyline-2-team-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="docs/figures/whyline-2-team-light.svg">
+  <img alt="Whyline across the team: developers, git hooks, GitHub and answers. pre-push and post-merge carry the git notes, GitHub Actions runs whyline check --gate on each pull request (PR 1 passes, PR 2 fails), GitHub Pages hosts the dashboard and AI bill of materials, and a proposed Team tier enforces the hooks through Bob's EnforcedHooks policy." src="docs/figures/whyline-2-team-light.svg" width="100%">
+</picture>
 
 ## What is recorded, and what is not
 
@@ -37,7 +55,7 @@ Every value below comes from running the command. Build the demo first: `git clo
 
 | Claim | Check it | You should see |
 |---|---|---|
-| 75 tests, zero dependencies | `npm test` and `node -e "console.log(Object.keys(require('./package.json').dependencies \|\| {}).length)"` | `pass 75`, `fail 0`, and `0` |
+| 80 tests, zero dependencies | `npm test` and `node -e "console.log(Object.keys(require('./package.json').dependencies \|\| {}).length)"` | `pass 80`, `fail 0`, and `0` |
 | Every AI line keeps its prompt | `cd /tmp/shop && whyline why src/payments/mock_gateway.py:3` | `origin ai (bob)` and the prompt that wrote it |
 | The record lives in git itself | `git notes --ref=whyline list \| wc -l` and `git log --notes=whyline -1 <commit>` | 7 notes, each a JSON note under its commit |
 | Temporary code has a lifecycle | `git merge payments-v2 && whyline check` | `mock_gateway.py` listed as due: "no references outside the file and its tests" |

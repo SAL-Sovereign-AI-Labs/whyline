@@ -21,7 +21,7 @@ git blame tells you who. Whyline tells you why. Provenance for AI-written code i
 3. Temporary writes get a removal condition at birth (a date, or no references left). `whyline check` moves them from active to due; Bob removes a due item in Agent mode only after your "yes" in its own approval prompt.
 4. `why`, `unreviewed` and `bom` answer the four questions in the CLI, in Bob through six skills, and on a dashboard.
 
-**Proof on the demo shop, from the tools' own output.** 49 of 96 lines are AI-written (51%) across 7 Bob sessions, 47 of them unreviewed. Merging payments-v2 leaves the mock gateway unreferenced, `check --gate` exits 2, and Bob removed it after approval in a recorded run. 75 tests and a `whyline selftest` that proves every check can fail, zero dependencies, published on npm; a public demo repo shows the CI gate passing on one pull request and failing on another.
+**Proof on the demo shop, from the tools' own output.** 49 of 96 lines are AI-written (51%) across 7 Bob sessions, 47 of them unreviewed. Merging payments-v2 leaves the mock gateway unreferenced, `check --gate` exits 2, and Bob removed it after approval in a recorded run. 80 tests and a `whyline selftest` that proves every check can fail, zero dependencies, published on npm; a public demo repo shows the CI gate passing on one pull request and failing on another.
 
 **Why it is different.** Audit tools reconstruct intent from a pull request after the fact; Whyline was there when Bob wrote the line and kept the prompt. Pedigree, last year's winner, recorded who signed a commit; Whyline records why each line exists.
 
