@@ -1,6 +1,6 @@
 {
   "name": "@sal-sovereign-ai-labs/whyline",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Provenance for AI-written code. Every line keeps the prompt that caused it. Built for IBM Bob.",
   "type": "commonjs",
   "license": "MIT",
